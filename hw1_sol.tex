@@ -116,9 +116,115 @@ So during this process, at most $nlog_2n$ lambs got sacrificed.
 \question{3.A}
 % =============
 
+\noindent %顶格（不缩进）
+	\textbf{Intuition:}
+	{Assume that $\exists t \in Z$ and $\exists C \in R$,for any n $\in Z$ satisfying $n<=t$ and $n>=4$, we can get $T(n)<=Cnlogn$. Now, we are attempting to prove that for $n=t+1$, $T(n)<=Cnlogn$.}%使用{}括号并且文本换行自带空格
+
+		$\bullet$ since $n>=4$, $[n/4]<n<=t$, $[3n/4]<n<=t$,
+		\begin{align*}
+ 		T(n)&=2n+T([n/4])+T([3n/4]) \\
+		&<=2n + \frac{Cn}{4} \log{\frac{n}{4}} + \frac{3Cn}{4} \log{ \frac{3n}{4}}\\
+		&= 2n + \frac{Cn}{4}(\log{n}-\log{4}) + \frac{3Cn}{4} ({ \log{n}+\log{\frac{3}{4}}})\\
+		&= 2n + Cn\log{n} + \frac{3Cn\log{3}}{4} - Cn\log{4}
+		\end{align*}
+		
+		$\bullet$ In order to let $T(n)<=Cnlogn$,
+		\begin{align*}
+ 		&2n + \frac{3Cn\log{3}}{4} - Cn\log{4} <0 \\
+		&2 + \frac{3C\log{3}}{4} - C\log{4} <0 \\
+		&C > \frac{2}{\log{4}-\frac{3}{4}\log{3}}\approx 8.189
+		\end{align*}
+		
+	\noindent
+	\textbf{Formal answer:}
+	{Let $C=9$ and set a constant b satisfying $b>=1$.  We assume that $T(n)<=9nlogn+b$}.
+
+		% 用\\意味着不换段只是换行，文本空两行可以首行缩进
+		$\bullet$ \textbf{base case:}
+		For $n=1$ and $n=2$, it is obvious that $T(1)=1<=b$ and $T(2)=1<=18log2+b$.
+
+
+		$\bullet$ \textbf{Induction hypothesis:}
+		Let $k>0$ be an arbitary integer, assume that $T(n)<=9nlogn+b$ for any integer n satisfying $n<=k$.
+
+		
+		$\bullet$ \textbf{Induction Step:}
+		Now, if we prove that $T(n)<=9nlogn+b$ holds for n=k+1, then we can conclude that $T(n)<=9nlogn+b$.
+
+
+		
+		\textbf{case 1$(k<=8)$}:
+		$T(n)=1$ for n satisfying $n=k+1<=9$. Let $f(n)=9nlogn+b$. Because $f'(n)=9+9logn>0$ for $n>=1$, f(n) is an increasing function. We can prove that $T(n)<=f(1)<=f(n)=9nlogn+b$.
+
+		
+		\textbf{case 2$(k>=9)$}:
+		$T(n)=2n+T([n/4])+T([3n/4])$ for n satisfying $n=k+1>=10$. since $n=k+1>=10$, we could know that $[n/4]<n<=k$ and $[3n/4]<n<=k$. Thus, 
+		\begin{align*}
+ 		T(n)&=2n+T([n/4])+T([3n/4]) \\
+		&<=2n + \frac{9n}{4} \log{\frac{n}{4}} + \frac{27n}{4} \log{ \frac{3n}{4}}+2b\\
+		&= 2n + \frac{9n}{4}(\log{n}-\log{4}) + \frac{27n}{4} ({ \log{n}+\log{\frac{3}{4}}})+2b\\
+		&= 2n + 9n\log{n} + \frac{27n\log{3}}{4} - 9n\log{4} + 2b\\
+		&= -0.1980n + 9nlogn + 2b
+		\end{align*}
+
+	
+		In order to let $T(n)<=9nlogn + b$, we can get $b<=0.1980n$. Since b is any constant that satisfying $b>=1$ and $n=k+1>=10$, we can simply let $b=1$.
+	$$ T(n)= -0.1980n+9nlogn+2 <= 9nlogn +0.02 <=9nlogn+1 =9nlogn + b$$
+		Now, we can conclude that 	$T(n)<=9nlogn+1$ for all natural number n. According to the definition, we prove that $T(n)=O(nlogn)$ for nutural number n . Finally, we consider the case where n is a negative integer or 0. Obviously, $T(n)=1$, so $T(n)=O(1)$ for negative integer or 0. Overall, $T(n)=O(nlogn)$ for all integer n.\\\\
+
+
 % =============
 \question{3.B}
 % =============
+\textbf{Intuition:}
+	{Assume that $\exists t \in Z$ and $\exists C \in R$,for any n $\in Z$ satisfying $n<=t$ and $n>=1$, we can get $T(n)<=Cn$. Now, we are attempting to prove that for $n=t+1$, $T(n)<=Cn$.}%使用{}括号并且文本换行自带空格
+
+		$\bullet$ since $n>=1$, $[n/4]<=n<=t$, $[n/6]<=n<=t$, $[n/7]<=n<=t$
+		\begin{align*}
+ 		T(n)&=n+T([n/2])+T([n/6])+T([n/7]) \\
+		&<=n + \frac{Cn}{2}  + \frac{Cn}{6} + \frac{Cn}{7} \\
+		\end{align*}
+
+
+		$\bullet$ In order to let $T(n)<=Cn$,
+		\begin{align*}
+ 		&n + \frac{Cn}{2}  + \frac{Cn}{6} + \frac{Cn}{7}<=Cn\\
+		&n <=\frac{4Cn}{21}\\
+		&C >=\frac{21}{4},(n>=1)
+		\end{align*}
+		
+	\noindent
+	\textbf{Formal answer:}
+	{Let $C=10$.  We assume that $T(n)<=f(n)=10n$}.
+
+		% 用\\意味着不换段只是换行，文本空两行可以首行缩进
+		$\bullet$ \textbf{base case:}
+		For $n=1$ and $n=2$, it is obvious that $T(1)=1<=10=f(1)$ and $T(2)=1<=20=f(2)$.
+
+
+		$\bullet$ \textbf{Induction hypothesis:}
+		Let $k>0$ be an arbitary integer, assume that $T(n)<=10n$ for any integer n satisfying $n<=k$.
+
+		
+		$\bullet$ \textbf{Induction Step:}
+		Now, if we prove that $T(n)<=10n$ holds for n=k+1, then we can conclude that $T(n)<=10n$.
+
+
+		
+		\textbf{case 1$(k<=22)$}:
+		$T(n)=1$ for n satisfying $n=k+1<=23$. Let $f(n)=10n$. Because $f'(n)=10>0$ for $n>=1$, f(n) is an increasing function. We can prove that $T(n)<=f(1)<=f(n)=10n$.
+
+		
+		\textbf{case 2$(k>=23)$}:
+		$T(n)=n+T([n/4])+T([n/6])+T([n/7])$ for n satisfying $n=k+1>=24$. since $n=k+1>=24$, we could know that $[n/4]<n<=k$, $[n/6]<=n<=t$ and $[n/7]<=n<=t$. Thus, 
+		\begin{align*}
+ 		T(n)&=n+T([n/4])+T([n/6])+T([n/7]) \\
+		&<=n + \frac{10n}{4}  + \frac{10n}{6} + \frac{10n}{7}\\
+		&= \frac{277}{42}n\\
+		&\approx 6.5952n<=10n
+		\end{align*}
+
+		Now, we can conclude that 	$T(n)<=10n$ for all integer n. According to the definition, we prove that $T(n)=O(n)$. Finally, we consider the case where n is a negative integer or 0. Obviously, $T(n)=1$, so $T(n)=O(1)$ for negative integer or 0. Overall, $T(n)=O(n)$ for all integer n.
 
 
 \end{document}
