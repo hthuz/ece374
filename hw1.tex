@@ -1,0 +1,124 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\pagestyle{plain}
+% choose any of the following packages to support AmsTeX
+%\usepackage{amsmath,amssymb,amsfonts,mathrsfs,mathptm,bm,mathtools}
+% choose the following package to insert eps figures
+% for png, jpg or pdf figures, use pdflatex
+%\usepackage{graphicx}
+
+
+\setlength{\parindent}{1.4em}
+
+\newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
+\newcommand{\HWnum}{1}
+\newcommand{\StudentA}{First Last$^\ast$, 3xxxxxxxxx}
+\newcommand{\StudentB}{First Last, 3xxxxxxxxx}
+\newcommand{\StudentC}{First Last, 3xxxxxxxxx}
+
+% ===============================================================
+\begin{document}
+
+%%% header
+{\noindent \rule{\linewidth}{0.2mm}}\\
+\noindent{ECE 374, ZJUI, Spring 2023\hfill%
+  \textbf{\large H{}W\HWnum\ Solutions} \hfill \today\smallskip}
+
+\noindent{\hfill \StudentA, \StudentB, and \StudentC \hfill}
+\\[-0.2cm]{\noindent \rule{\linewidth}{0.2mm}}
+%%% end header
+
+% =============
+\question{1.A}
+% =============
+
+According to the text, $f(i)$ is the depth of the first $i$ characters of the string $s$. And $f(j)$ is the depth of the first $j$ characters of the string $s$.
+
+As $f(i) = f(j)$, $d(S_{\leq{i}}) = d(S_{\leq{j}})$, which means that  
+$$
+\#a(S_{\leq{i}})-\#b(S_{\leq{i}}) = \#a(S_{\leq{j}})-\#b(S_{\leq{j}})
+$$. 
+
+By simplifying this equation, we get $\#a(S_{\leq{j}})- \#a(S_{\leq{i}}) -  (\#b(S_{\leq{j}}) - \#b(S_{\leq{i}})) = 0$.
+
+It can be seen that $\#a(S_{\leq{j}})- \#a(S_{\leq{i}})$ is the number of $a$ in the string constructed by index $i+1$ to $j$ in string $s$, $\#b(S_{\leq{j}}) - \#b(S_{\leq{i}})$ is the number of $b$ in the string constructed by index $i+1$ to $j$ in string $s$. 
+
+So, $s_{i+1}s_{i+2}\ldots s_j $  is a weakly balanced string.
+
+% =============
+\question{1.B}
+% =============
+
+The string is balanced, so the number of $a$ must be equal to the number of $b$ in this string. The base case is $s = \epsilon $ or $s \in \sum^\ast$. 
+
+So, $(i)$ is proved.
+
+As $x,y \in \sum^\ast$, by definition, we have $d(xy) = d(x)+d(y)$. As $d(x) = d(y) = 0$, $d(xy)=0$. So $s= xy$ is also balanced, $(ii)$ is proved.
+
+Assume $s_1=a$, $s_2=b$. By definition, $d(s_1)=1$, $d(s_2)=-1$. Since we also have $d(xy) = d(x)+d(y)$, we can get $d(axb)=d(s_1)+d(x)+d(s_2)=1+d(x)-1$. As $x$ is a balanced string, $d(x)=0$. So, $d(axb)=0$, $s=axb$ is also balanced, $(iii)$ is proved.
+
+There are no other cases.
+
+% =============
+\question{1.C}
+% =============
+
+There are two scenarios. As $s$ is balanced, its length $n$ must be even.
+
+The first scenario is the string s is in the form of $``aaa\ldots bbb\ldots ``$, where the number of $a$ in the front is equal to the number of $b$ behind. And the number of $``a``s or ``b``$s must larger than 1.
+
+For this case, we can get that $d_{max}=\frac{1}{2} n$. 
+
+Let $y=\frac{1}{2}n - \sqrt{n}$, by taking the derivative of it, we get $y`= \frac{1}{2}-\frac{1}{2\sqrt{n}}$.
+
+When $n=1$, $y`=0$, which means $y$ is decreasing when $n<1$, and increasing when $n\geq 1$.
+
+Because $n \geq 4$, when $n=4$, $y=0$. So, $y \geq 0$, which means in this scenario the maximum depth of $s$ is $\geq \sqrt{n}$.
+
+The other scenario is the remaining cases. The base case is $s=ab$. By the definition, it can be broken into 1 substring, that is $m=1$. And $\sqrt{n}-1=\sqrt{2} -1 < 1=m$.
+
+In terms of this scenario, according to the question, it can be inferred that the first letter must be $a$, and the last letter must be $b$. Also, let $f(i) = d(s_\leq i)$, then $f(0)=0, f(1)=1, \ldots, f(n-1)=1, f(n)=0$.
+
+\question{1.D}
+
+
+\question{2}
+
+
+
+
+We use induction to solve this problem. 
+
+\textbf{Base case:} Let n = 2. There are only two people in the world and if there's only one tribe with 2 people, no lambs are sacrificed. If there are two tribes each with 1 person, then one tribe will lose and one lamb is sacrificed. In both cases. The number of lambs sacrificed is smaller than $nlog_2n = 2$
+
+Let n = 3, Then then number of lambs sacrificed can be 0 or 1, both of which is smaller than $3log_23$.
+
+\textbf{Inductive hypothesis:} For any $n > 1$, at most $nlog_2n$ lambs got sacrificed.
+
+\textbf{Induction step:} Let W be a world of n people, Assume inductive hypothesis holds for all worlds with number of people greater than 2 and less than n.
+
+Then in the world with n-1 people, we have number of lambs sacrificed $\le (n-1)log_2(n-1)$. By adding one more person, this world will have n people. If the tribe this new-added person is in wins all the fight, then the number of lambs sacrificed doesn't change. If the the tribe this new-added person is in loses, there will be one more lamb sacrificed. In this case, we have
+\begin{equation*}
+    \begin{split}
+        Number\ of\ lambs\ sacrificed\ in\ world\ W & \le (n-1)log_2(n-1) + 1 \\
+             & = nlog_2(n-1) + 1 - log_2(n-1) \\
+             & \le nlog_2(n-1) \\
+             & < nlog_2(n) \\
+    \end{split}
+\end{equation*}
+
+In both cases, the number of lambs sacrificed in world W is less than $nlog_2(n)$
+
+So during this process, at most $nlog_2n$ lambs got sacrificed.
+
+% =============
+\question{3.A}
+% =============
+
+% =============
+\question{3.B}
+% =============
+
+
+\end{document}
