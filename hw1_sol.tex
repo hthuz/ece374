@@ -13,8 +13,8 @@
 
 \newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
 \newcommand{\HWnum}{1}
-\newcommand{\StudentA}{First Last$^\ast$, 3xxxxxxxxx}
-\newcommand{\StudentB}{First Last, 3xxxxxxxxx}
+\newcommand{\StudentA}{Hanggang Zhu$^\ast$, 3200110457}
+\newcommand{\StudentB}{Suhao Wang, 3200110777}
 \newcommand{\StudentC}{First Last, 3xxxxxxxxx}
 
 % ===============================================================
@@ -50,43 +50,102 @@ So, $s_{i+1}s_{i+2}\ldots s_j $  is a weakly balanced string.
 \question{1.B}
 % =============
 
-The string is balanced, so the number of $a$ must be equal to the number of $b$ in this string. The base case is $s = \epsilon $ or $s \in \sum^\ast$. 
+Define the set of strings that meet any of the three conditions in the problem as $P\subseteq \sum^\ast$, and define the set of all balanced strings as $F\subseteq \sum^\ast$.
+We are going to prove $P\subseteq F$ first.
 
-So, $(i)$ is proved.
 
-As $x,y \in \sum^\ast$, by definition, we have $d(xy) = d(x)+d(y)$. As $d(x) = d(y) = 0$, $d(xy)=0$. So $s= xy$ is also balanced, $(ii)$ is proved.
+The (i) case is $s = \epsilon $. It is obvious that d(t)=0 and $\#_{a}(s) >= \#_{b}(s)$ since $\#_{a}(s) = \#_{b}(s) =0$.
 
-Assume $s_1=a$, $s_2=b$. By definition, $d(s_1)=1$, $d(s_2)=-1$. Since we also have $d(xy) = d(x)+d(y)$, we can get $d(axb)=d(s_1)+d(x)+d(s_2)=1+d(x)-1$. As $x$ is a balanced string, $d(x)=0$. So, $d(axb)=0$, $s=axb$ is also balanced, $(iii)$ is proved.
+So, $(i)$ is proved. Empty string is balanced.
 
-There are no other cases.
+In case (ii), as $x,y \in F$ and they are non-empty, by definition, we have $d(xy) = d(x)+d(y)$. As $d(x) = d(y) = 0$, $d(xy)=0$. So $s= xy$ is also weakly balanced. Because x is a balanced string, any prefix substring p1 of the first part of $s=xy$  satisfies  $\#_{a}(p1) >= \#_{b}(p1)$. Any prefix substring t of y satisfy $\#_{a}(t) >= \#_{b}(t)$. $s=xy$ means adding the same number of $a$ and $b$ before y, then any prefix substring p2 of the second part of $s=xy$ still satisfy $\#_{a}(p2) >= \#_{b}(p2)$.
+
+So, $(ii)$ is proved. 
+
+In case (iii), assume $s_1=a$, $s_2=b$. By definition, $d(s_1)=1$, $d(s_2)=-1$. Since we also have $d(xy) = d(x)+d(y)$, we can get $d(axb)=d(s_1)+d(x)+d(s_2)=1+d(x)-1$. As $x$ is a balanced string, $d(x)=0$. So, $d(axb)=0$, $s=axb$ is also weakly balanced. As $x$ is a balanced string, any prefix substring p of $x$ satisfies $\#_{a}(p) >= \#_{b}(p)$. Add one $a$ means that $\#_{a}(t) >= \#_{b}(t)$ still right for any prefix substring t of string $ax$. As for the total string $s=axb$, $\#_{a}(s) = \#_{b}(s)$.
+
+So, $(iii)$ is proved. 
+So, $P\subseteq F$ has been proved.\\
+
+
+Now, we are going to prove that $F\subseteq P$.\\
+
+Suppose there is a string $s \in F$ and the length of $s$ is $n$, which means that $s$ is a balanced string. We first classify according to whether the string is empty.
+
+
+case (1): $s$ is an empty string. in that case, $s \in P$.
+
+
+case (2): $s$ is a non-empty string. According to the definition of balanced string, we can know that "$s$ must start with $a$", because any prefix substring p of $s$ satisfies $\#_{a}(p) >= \#_{b}(p)$, we can consider the prefix substring with only one letter. At the same time, "$s$ must end with $b$", because for the (n-1) letter prefix substring, it satisfies $\#_{a}(p) >= \#_{b}(p)$, and $\#_{a}(s) = \#_{b}(s)$. As $s$ is balanced with $\#_{a}(s) = \#_{b}(s)$, "the string between the first '$a$' and the last '$b$' is a weakly balanced string".
+
+
+So balanced string $s$ can be expressed as $aqb$ with weakly balanced string $q$. if $q$ is empty, it is obvious that $s=aqb \in P$. So we then assume that $q$ is a non-empty string. On the premise of case 2, we next classify $s$ according to whether the string $q$ is balanced.
+
+
+case(2.1): $q$ is a balanced string. In this case, $s=aqb \in P$ as it satisfies the requirements of (iii).
+
+
+case(2.2): $q$ is a weakly balanced string and $q$ is not a balanced string.
+
+
+$\bullet$ $q$ is not a balanced string $==>$  $\exists p$, a prefix substring of q, we have that $\#_{a}(p) < \#_{b}(p)$.(1)
+
+
+$\bullet$ $aqb$ is a balanced string $==>$ for any prefix substring p of $aq$, we have that  $\#_{a}(p) >= \#_{b}(p)$.(2)
+
+
+From (1) and (2), we can conclude that:
+
+
+$\bullet$ For any prefix substring $h$ of string $q$, it must satisfying $\#_{a}(h) >= \#_{b}(h) -1$.(3)
+
+
+$\bullet$ $q$ has at least one prefix substring $m$, which satisfies $\#_{a}(m) + 1= \#_{b}(m)$. (4)
+
+
+$\bullet$ For any prefix substring $t$ of string $m$, it must satisfying $\#_{a}(t) + 1>= \#_{b}(t)$. (5)\\
+
+
+Using (4), We just find and cut the prefix substring $m$, and split the $q$ into string $m$ and string $n$. Now, if we can prove that $am$ and $nb$ are both non-empty balanced strings like what (ii) says, then we can prove that in case(2.2), $q \in P$.
+
+
+First of all, it is obvious that because of $\#_{a}(m) + 1= \#_{b}(m)$, $\#_{a}(n) - 1= \#_{b}(n)$, $am$ and $nb$ are both weakly balanced strings. 
+
+
+For $am$, using (5), when you add one "$a$" before $m$, we can conclude that "for any prefix substring $t$ of string $am$, they must satisfying $\#_{a}(t) >= \#_{b}(t)$", so $am$ is balanced string. 
+
+
+For $nb$, suppose $\#_{a}(m)=x$, then $\#_{b}(m)=(x+1)$, using (3), when you delete $m$ before $q=mn$, we can conclude that "for any prefix substring $h$ of string $q$, there is a corresponding prefix substring $c$ of string $n$, which must satisfying $\#_{a}(c)= \#_{a}(h)- x >= \#_{b}(h) -x - 1 = \#_{b}(c)$".
+
+
+Thus, $am$ and $nb$ are both non-empty balanced strings. In case (2.2), $q \in P$. Because in case(1), case(2.1), case(2.2), we can derive that $q \in P$, we prove that $F\subseteq P$. Thus, $F=P$ and we have proved that if a string is balanced, it is either belongs to (i)(ii)(iii) in the question.
+
 
 % =============
 \question{1.C}
+
 % =============
+Let $f(i) = d(s_{\le i})$. If $f(i) = f(j)$ with $ i < j$, then $s_is_{i+1}...s_{j}$ is a weakly balanced string, which is proved in 1.A. It suggests that everytime the value of $f(i)$ repeats, we can cut in the corresponding position to get weakly balanced substring. If there are m - 1 repetitive values of $f(i)$ for a certain value of i, then we can cut m - 1 times, and get m substrings.
 
-There are two scenarios. As $s$ is balanced, its length $n$ must be even.
+Then we use contradiction to prove question C.Suppose there exists a balanced string $s_c \in \{a,b\}^*$ of length n such that it doesn't satisfy condition (i) and (ii). For formally,
 
-The first scenario is the string s is in the form of $``aaa\ldots bbb\ldots ``$, where the number of $a$ in the front is equal to the number of $b$ behind. And the number of $``a``s or ``b``$s must larger than 1.
+$\bullet$ The maximum depth of $s_c$ is $<\sqrt{n}$ and 
 
-For this case, we can get that $d_{max}=\frac{1}{2} n$. 
+$\bullet$ $s_c$ can't be broken into m non-empty substrings $s_c$ = $t_1\vline t_2\vline ... \vline t_m$ such that $t_2,t_3,...t_{m-1}$ are weakly balanced strings and $m \ge \sqrt{n} - 1$
 
-Let $y=\frac{1}{2}n - \sqrt{n}$, by taking the derivative of it, we get $y`= \frac{1}{2}-\frac{1}{2\sqrt{n}}$.
+To let $s_c$ fail to satisfy condition (ii), we try to find minimum possible value of m. This situation happens when there are minimum repetitive values of $f(i)$ for a given $i$. By definition of $f(i)$ we can get the following formula for $f(i)$ with $i \ge 1$:
 
-When $n=1$, $y`=0$, which means $y$ is decreasing when $n<1$, and increasing when $n\geq 1$.
+\begin{equation*}
+	f(i)=
+	\begin{cases}
+		f(i - 1) + 1, & s_i \mbox{ is a},\\
+		f(i - 1) - 1, & s_i \mbox{ is b}
+	\end{cases}
+\end{equation*}
 
-Because $n \geq 4$, when $n=4$, $y=0$. So, $y \geq 0$, which means in this scenario the maximum depth of $s$ is $\geq \sqrt{n}$.
-
-The other scenario is the remaining cases. The base case is $s=ab$. By the definition, it can be broken into 1 substring, that is $m=1$. And $\sqrt{n}-1=\sqrt{2} -1 < 1=m$.
-
-In terms of this scenario, according to the question, it can be inferred that the first letter must be $a$, and the last letter must be $b$. Also, let $f(i) = d(s_\leq i)$, then $f(0)=0, f(1)=1, \ldots, f(n-1)=1, f(n)=0$.
-
-\question{1.D}
-
+As we can see in the formula, alternating $a$s and $b$s increase the number of repetitive values of $f(i)$. So the situation happens in the case of least number of alternating $a$s and $b$s, i.e. all $a$s first and then $b$,like $aaaa...bbbb..aaaa..bbbb$. As maximum depth of $s_c$ is $<\sqrt{n}$, the minimum number of $aaaa..bbbb..$ is $ \frac{n}{2\sqrt{n}} - 1 = \frac{\sqrt{n}}{2} - 1$. The minimum number of repetitive values of $f(i)$ is ${ (\frac{\sqrt{n}}{2} - 1) * 2} = \sqrt{n} - 2$ and minimum possible value of m is $\sqrt{n} - 1$, which means such $s_c$ doesn't exist. So any balanced string much satisfy condition either (i) or (ii).
 
 \question{2}
-
-
-
 
 We use induction to solve this problem. 
 
