@@ -13,7 +13,7 @@
 
 \newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
 \newcommand{\HWnum}{1}
-\newcommand{\StudentA}{First Last$^\ast$, 3xxxxxxxxx}
+\newcommand{\StudentA}{Zhu Hanggang$^\ast$, 3200110457}
 \newcommand{\StudentB}{First Last, 3xxxxxxxxx}
 \newcommand{\StudentC}{First Last, 3xxxxxxxxx}
 
@@ -62,31 +62,29 @@ There are no other cases.
 
 % =============
 \question{1.C}
+
 % =============
+Let $f(i) = d(s_{\le i})$. If $f(i) = f(j)$ with $ i < j$, then $s_is_{i+1}...s_{j}$ is a weakly balanced string, which is proved in 1.A. It suggests that everytime the value of $f(i)$ repeats, we can cut in the corresponding position to get weakly balanced substring. If there are m - 1 repetitive values of $f(i)$ for a certain value of i, then we can cut m - 1 times, and get m substrings.
 
-There are two scenarios. As $s$ is balanced, its length $n$ must be even.
+Then we use contradiction to prove question C.Suppose there exists a balanced string $s_c \in \{a,b\}^*$ of length n such that it doesn't satisfy condition (i) and (ii). For formally,
 
-The first scenario is the string s is in the form of $``aaa\ldots bbb\ldots ``$, where the number of $a$ in the front is equal to the number of $b$ behind. And the number of $``a``s or ``b``$s must larger than 1.
+$\bullet$ The maximum depth of $s_c$ is $<\sqrt{n}$ and 
 
-For this case, we can get that $d_{max}=\frac{1}{2} n$. 
+$\bullet$ $s_c$ can't be broken into m non-empty substrings $s_c$ = $t_1\vline t_2\vline ... \vline t_m$ such that $t_2,t_3,...t_{m-1}$ are weakly balanced strings and $m \ge \sqrt{n} - 1$
 
-Let $y=\frac{1}{2}n - \sqrt{n}$, by taking the derivative of it, we get $y`= \frac{1}{2}-\frac{1}{2\sqrt{n}}$.
+To let $s_c$ fail to satisfy condition (ii), we try to find minimum possible value of m. This situation happens when there are minimum repetitive values of $f(i)$ for a given $i$. By definition of $f(i)$ we can get the following formula for $f(i)$ with $i \ge 1$:
 
-When $n=1$, $y`=0$, which means $y$ is decreasing when $n<1$, and increasing when $n\geq 1$.
+\begin{equation*}
+	f(i)=
+	\begin{cases}
+		f(i - 1) + 1, & s_i \mbox{ is a},\\
+		f(i - 1) - 1, & s_i \mbox{ is b}
+	\end{cases}
+\end{equation*}
 
-Because $n \geq 4$, when $n=4$, $y=0$. So, $y \geq 0$, which means in this scenario the maximum depth of $s$ is $\geq \sqrt{n}$.
-
-The other scenario is the remaining cases. The base case is $s=ab$. By the definition, it can be broken into 1 substring, that is $m=1$. And $\sqrt{n}-1=\sqrt{2} -1 < 1=m$.
-
-In terms of this scenario, according to the question, it can be inferred that the first letter must be $a$, and the last letter must be $b$. Also, let $f(i) = d(s_\leq i)$, then $f(0)=0, f(1)=1, \ldots, f(n-1)=1, f(n)=0$.
-
-\question{1.D}
-
+As we can see in the formula, alternating $a$s and $b$s increase the number of repetitive values of $f(i)$. So the situation happens in the case of least number of alternating $a$s and $b$s, i.e. all $a$s first and then $b$,like $aaaa...bbbb..aaaa..bbbb$. As maximum depth of $s_c$ is $<\sqrt{n}$, the minimum number of $aaaa..bbbb..$ is $ \frac{n}{2\sqrt{n}} - 1 = \frac{\sqrt{n}}{2} - 1$. The minimum number of repetitive values of $f(i)$ is ${ (\frac{\sqrt{n}}{2} - 1) * 2} = \sqrt{n} - 2$ and minimum possible value of m is $\sqrt{n} - 1$, which means such $s_c$ doesn't exist. So any balanced string much satisfy condition either (i) or (ii).
 
 \question{2}
-
-
-
 
 We use induction to solve this problem. 
 
