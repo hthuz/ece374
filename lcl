@@ -1,4 +1,25 @@
 #!/bin/sh
-# lcl: Latex CLean, clean intermediate files when building pdf from tex
+# lcl: Latex CLean, clean intermediate files in current (sub)directory when building pdf from tex
 
-ls -R | grep -E 'hw[1-9]_sol\.(aux|fls|fdb_latexmk|log|synctex\.gz)$'
+
+
+clean(){
+    files=$(find . -type f -regextype egrep -regex ".*\.(aux|log|fls|synctex\.gz|fdb_latexmk)")
+    array=($files)
+
+    if [[ ${#array[@]} -eq 0 ]]
+    then
+        echo "Already clean"
+        return
+    fi
+
+    for file in ${array[@]}
+    do
+        rm ${file}
+    done 
+
+    echo "Latex intermediate files cleaned"
+
+}
+
+clean
