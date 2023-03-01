@@ -1,0 +1,4 @@
+#!/bin/sh
+# lcl: Latex CLean, clean intermediate files when building pdf from tex
+
+ls -R | grep -E 'hw[1-9]_sol\.(aux|fls|fdb_latexmk|log|synctex\.gz)$'
