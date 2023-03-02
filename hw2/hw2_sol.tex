@@ -111,7 +111,53 @@ and even number of 1s, other kinds of numbers are not allowed. So, this expressi
 
 \question{6.A}
 
+\noindent For language $L = L_1 \cap L_2 \cap L_3$, formally describe the DFM as  $M = (Q,\sum,\delta,s,A)$, where
+
+$\bullet$ $Q = Q_1 \times Q_2 \times Q_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in Q_1, q_2 \in Q_2, q_3 \in Q_3\}$
+
+$\bullet$ $\delta:Q \times \sum \rightarrow Q \mbox{ ,where } \delta((q_1,q_2,q_3),a) = (\delta_1(q_1,a),\delta_2(q_2,a),\delta_3(q_3,a)) \mbox{ and } a \in \sum$
+
+$\bullet$ $s = (s_1,s_2,s_3)$
+
+$\bullet$ $A = A_1 \times A_2 \times A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in A_1, q_2 \in A_2, q_3 \in A_3\}$
+
 \question{6.B}
+
+For $\delta^*(q,w)$, we have the formal definition:
+
+\begin{equation*}
+\delta^*(q,w) = 
+  \begin{cases}
+    q & \mbox{, if } w = \epsilon, \\
+    \delta^*(\delta(q,a),x) & \mbox{, if } w = ax
+  \end{cases}
+\end{equation*}
+
+Now we prove by induction. 
+
+$\bullet$ \textbf{Base case:} Let $w$ be an artibrary string of length 0. we get $w = \epsilon$. Then
+\begin{align*}
+\delta^*((q_1,q_2,q_3),w) &= \delta^*((q_1,q_2,q_3),\epsilon) \\
+    &= (q_1,q_2,q_3) \\ 
+    &= (\delta_1^*(q_1,\epsilon), \delta_2^*(q_2,\epsilon), \delta_3^*(q_3,\epsilon)) \\
+    &= (\delta_1^*(q_1,w), \delta_2^*(q_2,w), \delta_3^*(q_3,w))
+\end{align*}
+
+$\bullet$ \textbf{Induction hypothesis:} For any string $w$ of length $n > 0$, we have that
+\begin{equation*}
+  \delta^*((q_1,q_2,q_3),w) = (\delta_1^*(q_1,w), \delta_2^*(q_2,w), \delta_3^*(q_3,w))
+\end{equation*}
+
+$\bullet$ \textbf{Inductive step:} Let $w$ be an artibrary string with length $n > 0$. Assume inductive hypothesis holds for all strings x of length $< n$. Then we have $w = ax$ for some string x with length $< n$ and $a \in \sum$. We have:
+\begin{align*}
+  \delta^*((q_1,q_2,q_3),w) &= \delta^*(\delta((q_1,q_2,q_3), a), x) &\mbox{(definition of $\delta^*(q,w)$) }\\
+      &= \delta^*((\delta_1(q_1,a), \delta_2(q_2,a), \delta_3(q_3,a)), x) &\mbox{(definition of $\delta$ in Q6.A)}\\
+      &= (\delta_1^*(\delta_1(q_1,a), x),\delta_2^*(\delta_2(q_2,a), x),\delta_3^*(\delta_3(q_3,a), x)) &\mbox{(induction hypothesis)}\\
+      &= (\delta_1^*(q_1,w), \delta_2^*(q_2,w), \delta_3^*(q_3,w)) &\mbox{(definition of $\delta^*(q,w)$) }
+\end{align*}
+
+So, the equation is proved.
+
 
 \question{6.C}
 
