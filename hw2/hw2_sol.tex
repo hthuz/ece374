@@ -47,15 +47,29 @@
 
 \question{4.F}
 
+Strings not containing subsequence $000$ is equivalent to having at most two $0$s. The regular expression simply consider three cases.
+Solution: $1^* + 1^*01^* + 1^*01^*01^*$
+
 \question{4.G}
+
+The string can also be interpreted as string whose substring with no $11$s come before substring with no $00$s.String with no $11$:$(\epsilon + 1)(0(\epsilon + 1 ))^*$. String with no $00$: $(\epsilon + 0)(1(\epsilon + 0))^*$.Concatenate them and simply.
+Solution: $(\epsilon + 1)(0(\epsilon + 1))^*(1(\epsilon + 0))^*$
+
 
 \question{4.H}
 
+Strings not containing subsequence $010$ means that $1$ can't be in the middle of two $0$s. So $1$ must be on one side of $0$s.
+Solution: $1^*0^*1^*$
+
 \question{4.I}
+
+Given four continuous $0$s, we can't put $1$s between every cut of these $0$s. If we remove these $1$s, we can get $0^*1^*0^*1^*0^*$(remove one $1$s) or $0^*1^*0^*$(remove two $1$s) and $0^*$(remove three $1$s). They are all included in the case of $0^*1^*0^*1^*0^*$. We generalize it by adding $1$s at two sides.
+Solution:$1^*0^*1^*0^*1^*0^*1^*$
 
 \question{4.J}
 
-\question{4.K}
+Strings not containing subsequence $10$ means $0$s must come before $1$s.
+Solution:$0^*1^*$
 
 
 \question{5.A}
