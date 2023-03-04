@@ -193,9 +193,96 @@ $\bullet$ \textbf{Inductive step:} Let $w$ be an artibrary string with length $n
 So, the equation is proved.
 
 
-\question{6.C}
+\question{6.C}\\
 
-\question{6.D}
+	$\bullet$ \textbf{intuition:} "w is in exactly two of {L1,L2,L3}" means that $w \in L = (L_1 \cap L_2 \cap \overline{L_3}) \cup ( L_1 \cap \overline{L_2} \cap L_3) \cup (\overline{L_1} \cap L_2 \cap L_3)$. ($\overline{L}$ means complement of L). Define $L4=(L_1 \cap L_2 \cap \overline{L_3})$, $L5=( L_1 \cap \overline{L_2} \cap L_3)$, $L6 = (\overline{L_1} \cap L_2 \cap L_3)$.
+
+
+	$\bullet$ \textbf{complement result:}According to the theorem and proof in the lecture 3," Languages accepted by DFAs are closed under complement", we will know that for $M = (Q,\sum,\delta,s,A)$ such that $L=L(M)$, we can find $M' = (Q,\sum,\delta,s,Q \backslash A)$ that $\overline{L}=L(M')$. 
+
+
+	$\bullet$ \textbf{intersection result:}According to the theorem and proof in the lecture 3 as well as what we prove in question 6.B, we will know that for $M = (Q,\sum,\delta,s,A)$ such that $L=L(M)$, we can formally describe the DFM for L4 as  $M4 = (Q_{4},\sum,\delta_{4},s_{4},A_{4})$, where
+
+	$\bullet$ $Q_4 = Q_1 \times Q_2 \times \overline{Q_3} =  Q_1 \times Q_2 \times Q_3 =\{(q_1,q_2,q_3)\ \vline\ q_1 \in Q_1, q_2 \in Q_2, q_3 \in Q_3\}$
+
+	$\bullet$ $\delta_4: \delta((q_1,q_2,\overline{q_3}),a) = \delta((q_1,q_2,q_3),a) = (\delta_1(q_1,a),\delta_2(q_2,a),\delta_3(q_3,a)) \mbox{ and } a \in \sum$
+
+	$\bullet$ $s_4 = (s_1,s_2,\overline{s_3}) = (s_1,s_2,s_3)$
+
+	$\bullet$ $A_4 = A_1 \times A_2 \times \overline{A_3} = A_1 \times A_2 \times Q \backslash A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in A_1$ and $q_2 \in A_2$ and $q_3 \in Q \backslash A_3\}$\\
+	{Do the similar work for L5 and L6, we will get:}\\
+
+
+	$\bullet$ $Q_5 = Q_4 = Q_6 $
+
+	$\bullet$ $\delta_5 = \delta_4 = \delta_6$
+
+	$\bullet$ $s_5 = s_4 = s_6$
+
+	$\bullet$ $A_5 = A_1 \times \overline{A_2} \times A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in A_1, q_2 \in Q \backslash A_2, q_3 \in A_3\}$
+
+	$\bullet$ $A_6 = \overline{A_1} \times A_2 \times A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in Q \backslash A_1, q_2 \in A_2, q_3 \in A_3\}$\\
+	{Then we calculate the union of $L_4,L_5,L_6$ and finally get the answer: $M = (Q,\sum,\delta,s,A)$}\\
+	
+	$\bullet$ $Q = \{(q_1,q_2,q_3,q_1',q_2',q_3',q_1'',q_2'',q_3'')\ \vline\ q_1,q_1',q_1'' \in Q_1, q_2,q_2',q_2'' \in Q_2, q_3,q_3',q_3'' \in Q_3\}$
+
+	$\bullet$ $\delta = (\delta_1(q_1,a),\delta_2(q_2,a),\delta_3(q_3,a),\delta_1(q_1',a),\delta_2(q_2',a),\delta_3(q_3',a),\delta_1(q_1'',a),\delta_2(q_2'',a),\delta_3(q_3'',a)) \mbox{ and } a \in \sum$
+
+	$\bullet$ $s = (s_1,s_2,s_3,s_1',s_2',s_3',s_1'',s_2'',s_3'')$
+
+	$\bullet$ $A = A_1 \times A_2 \times Q \backslash A_3 \times A_1 \times Q \backslash A_2 \times A_3 \times Q \backslash A_1 \times A_2 \times A_3= \{(q_1,q_2,q_3,q_1',q_2',q_3',q_1'',q_2'',q_3'')\ \vline\ (q_1 \in A_1, q_2 \in A_2, q_3 \in Q \backslash A_3)\quad  or \quad (q_1 \in A_1, q_2 \in Q \backslash A_2, q_3 \in A_3) \quad or \quad  (q_1 \in Q \backslash A_1, q_2 \in A_2, q_3 \in A_3)\}$
+	
+
+		
+
+\question{6.D}\\
+	$\bullet$ \textbf{intuition:}Separate these three conditions, and then use our conclusion in B to intersect.
+
+
+	$\bullet$ \textbf{Answer:}
+Set $L_1=\left\{ w \ \vline\ w \notin L(M) \right\}$ and $L_2=\left\{w \ \vline\ \overline{w} \in L(M)\right\}$ and $L_3=\left\{w \ \vline\ 1^|w| \in L(M)\right\}$.
+
+
+	Then $L1(M)=\overline{L(M)}$, so we can get:
+	
+	$\bullet$ $Q_1 = Q$
+
+	$\bullet$ $\delta_1(q,a) = \delta(q,a) $
+
+	$\bullet$ $s_1 = s$
+
+	$\bullet$ $A_1 = Q \backslash A$\\
+
+	And for $L2(M)$, we have:
+	
+	$\bullet$ $Q_2 = Q$
+
+	$\bullet$ $\delta_2(q,1) = \delta(q,0), \quad \delta_2(q,0) = \delta(q,1) $
+
+	$\bullet$ $s_2 = s$
+
+	$\bullet$ $A_2 = A$\\
+
+	And for $L3(M)$, we have:
+	
+	$\bullet$ $Q_3 = Q$
+
+	$\bullet$ $\delta_3(q,1) = \left\{ \delta(q,0),\delta(q,1) \right\}, \quad \delta_3(q,0) = \emptyset $
+
+	$\bullet$ $s_3 = s$
+
+	$\bullet$ $A_3 = A$\\
+	
+	Finally, we can get $L' = L_1 \cap L_2 \cap L_3$ and use Q6.A to describe L' and so that we can describe the DFA and $n= \vline\ Q_1 \times Q_2 \times Q_3 \ \vline\ = \vline\ Q \times Q \times Q \ \vline\ $
+	
+	$\bullet$ $Q = Q_1 \times Q_2 \times Q_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in Q_1, q_2 \in Q_2, q_3 \in Q_3\}$
+
+	$\bullet$ $\delta:Q \times \sum \rightarrow Q \mbox{ ,where } \delta((q_1,q_2,q_3),a) = (\delta_1(q_1,a),\delta_2(q_2,a),\delta_3(q_3,a)) \mbox{ and } a \in \sum$
+
+	$\bullet$ $s = (s_1,s_2,s_3)$
+
+	$\bullet$ $A = A_1 \times A_2 \times A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in A_1, q_2 \in A_2, q_3 \in A_3\}$
+
 
 
 \end{document}
