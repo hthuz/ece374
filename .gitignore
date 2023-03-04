@@ -6,3 +6,4 @@
 *.synctex.gz
 *.swp
 *_sol.pdf
+*.DS_Store
