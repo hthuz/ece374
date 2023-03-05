@@ -105,6 +105,9 @@ As we design in the DFA, these states represent all possible patterns of strings
 
 \question{5.B}
 
+To find regular expression with even number of $0$s and even number of $1$s, first consider the simple case where the strings do not contain any consecutive $1$s and $0$s. In this case, the regular expression is $(1010)^* + (0101)^*$. The examples are $01010101...$ and $10101010...$. We can extentily easily by allowing patterns like $01101001$. So we extend the regular expression to $((01+10)(01+10))^*$. For now we allow at most 2 consecutive $0$s and $1$s. We can allow any number of consecutive $0$ and $1$s by cut regular expressions using (00+11)*. Then regular expression becomes $((00+11)^*(01+10)(00+11)^*(01+10)(00+11)^*)^*$, which is the answer.
+
+The correctness of this regular expression lies in the assurance that number of $1$s and $0$s are even. It generalizes by considering cases where there's no consecutive characters, allowing 2 consecutive characters and no limit no consecutive characters.
 
 \question{6.A}
 
