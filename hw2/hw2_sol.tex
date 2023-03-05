@@ -231,17 +231,17 @@ Set $L_1=\left\{ w \ \vline\ w \notin L(M) \right\}$ and $L_2=\left\{w \ \vline\
 
 	$\bullet$ $A_2 = A$\\
 
-	And for $L3(M)$, We can consider the original DFA of L (M), and now we only need to add a new reject state $q_1$ and connect all the "0 arrowhead" to the state q1. As for q1 state, "0 or 1 arrowhead" will point to itself. To express it formally, we can get:
+	And for $L3(M)$, for example, if $111 \in L$, $then (0+1)^3 \in L_3$,we have:
 	
-	$\bullet$ $Q_3 = Q \cup Q_1$, where $Q_1=\{q_1\}$
+	$\bullet$ $Q_3 = Q$
 
-	$\bullet$ $\delta_3(q,1) = \delta(q,1)$, $\delta_3(q,0) = q_1$
+	$\bullet$ $\delta_3(q,1) = \delta(q,1)$, $\delta_3(q,0) = \delta(q,1)$
 
 	$\bullet$ $s_3 = s$
 
 	$\bullet$ $A_3 = A$\\
 	
-	Finally, we can get $L' = L_1 \cap L_2 \cap L_3$ and use Q6.A to describe L' and so that we can describe the DFA and $n= \vline\ Q_1 \times Q_2 \times Q_3 \vline\ =  \lvert Q \rvert^2 (\lvert Q \rvert+1)= \lvert Q \rvert^3 + \lvert Q \ \rvert^2 $
+	Finally, we can get $L' = L_1 \cap L_2 \cap L_3$ and use Q6.A to describe L' and so that we can describe the DFA and $n= \vline\ Q_1 \times Q_2 \times Q_3 \vline\ = \lvert Q \rvert^3 $
 	
 	$\bullet$ $Q = Q_1 \times Q_2 \times Q_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in Q_1, q_2 \in Q_2, q_3 \in Q_3\}$
 
