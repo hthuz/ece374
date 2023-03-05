@@ -86,62 +86,25 @@ Given four continuous $0$s, we can't put $1$s between every cut of these $0$s. I
 \question{4.J}
 
 Strings not containing subsequence $10$ means $0$s must come before $1$s.\\
-\textbf{Answer}$0^*1^*$
+\textbf{Answer:}$0^*1^*$
 
 
 \question{5.A}
 
-The DFA is drawn below.
-\\The DFA accepts all strings that contain an even number of 0s and an even number of 1s.
-Each state records the number of 0s or 1s so far.
-\\  \hspace*{1em} \textbf{Formal Description:}
-\\ \begin{center}
-$Q=\{q0EE,q1EO,q2OO,q3OE\}$, 
-\\where the front letter represents whether the number of 0 is even or not, and the later number
-represents whether the number of 1 is even or not.
-\\ $s=q0$
-\\ $A=\{q0\}$
-\\ $\delta\{q0,0\}=q3$
-\\ $\delta\{q0,1\}=q1$
-\\ $\delta\{q1,0\}=q2$
-\\ $\delta\{q1,1\}=q0$
-\\ $\delta\{q2,0\}=q1$
-\\ $\delta\{q2,1\}=q3$
-\\ $\delta\{q3,0\}=q0$
-\\ $\delta\{q3,1\}=q2$
-\end{center}
-Each state is unique, and $q0$ is the start state and the accepting 
-state, no matter how many number of 0s or 1s are read, the machine
-can only be accepted when returning to $q0$.
+The DFA is drawn in figure \ref{fig:DFA}. The DFA accepts all strings that contain an even number of 0s and an even number of 1s. Each state represents whether the numbers of 0s and 1s are even or odd. The front letter represents whether the number of 0 is even or not, and the latter number represents whether the number of 1 is even or not.
 
-\newpage
+As we design in the DFA, these states represent all possible patterns of strings in terms of odd or even number of $1$s and $0$s. But only state $q_0(E,E)$ is accpeted,which means it only accept every string with even number of $0$s and $1$s and nothing else.
 
-\begin{figure}
+\begin{figure}[hbt!]
   \centering
   \includegraphics[width = 0.7\textwidth]{img/374hw2.png}
+  \caption{Q5.A DFA}
+  \label{fig:DFA}
 \end{figure}
 
+
 \question{5.B}
-\\According to the state removal method, 
-\\if $q1=\delta(q0,x)$ and $q2=\delta(q1,y)$, then $q2=\delta(q1,y)=
-\delta(\delta(q0,x),y)=\delta(q0,xy)$
-\\After removing the states $q1$ and $q2$, we get the following image:
-\begin{figure}
-  \centering
-  \includegraphics[width = 0.6\textwidth]{img/hw2_2.png}
-\end{figure}
-\\So,we get the regular expression for the simplified machine : $11+(0+101)(00)^\ast (0+101)$.
-\\Then, after further simplifying, we get the graph below:
-\begin{figure}
-  \centering
-  \includegraphics[width = 0.6\textwidth]{img/hw2_3.png}
-\end{figure}
-\\So, we get the regular expression of L is $(11+(0+101)(00)^\ast (0+101))^\ast$.
-\\Then, for the argument that this expression is correct, first, we consider the strings
-do not contain any consecutive 0s or 1s, that is, the input is the empty string. According 
-to this expression, it is just the accepting state, which satisfies the condition.
-\\What's more, from the regular expression, we can see that it only accepts even number of 0s
-and even number of 1s, other kinds of numbers are not allowed. So, this expression is correct.
+
 
 \question{6.A}
 
