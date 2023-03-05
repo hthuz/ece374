@@ -36,62 +36,62 @@
 
 
 \question{4.A}
-\\\textbf{Solution:} $(0+1)^\ast 1011$
 \\As $(0+1)^\ast$ represents any strings, it means any string can be 
 in front of $1011$. And $1011$ appears in the end ensures that all strings end in $1011$.
-\\\question{4.B}\\
-\textbf{Solution:} $\epsilon+0+1+00+01+10+(0+1)^3(0+1)^\ast$
+\\\textbf{Answer:} $(0+1)^\ast 1011$
+
+\question{4.B}
 \\We should represent all strings except 11, so we just list out all 
-other strings of length less or equal to 2, and all strings of length greater than 2.
-\\\question{4.C}
-\\\textbf{Solution:} $(0+1)^\ast (101+010)(0+1)^\ast$
+other strings of length less or equal to 2, and all strings of length greater than 2.\\
+\textbf{Answer:} $\epsilon+0+1+00+01+10+(0+1)^3(0+1)^\ast$
+
+\question{4.C}
 \\As the strings contain 101 or 010 as a substring, we should add 
 any strings before and after (010+010) to make sure we represent all 
 the strings.
-\\\question{4.D}
-\\\textbf{Solution:} $\sum f(h)$, where $h \in H$. And $H = \{000111,010101,
-111000,101010,001011,\\010110,110100,101001,001101,011001,110010,100110,001110,011010,110001,
-100101,\\010011,011100,101100,100011\}$ .
-\\As the strings should contain 111 and 000 as a subsequence, it should 
-both contain 111 and 000 as a subsequence at the same time. So, we can
-list all the possible combinations containing 111 and 000 as a subsequence.
-Then we create $f(h)$ as the function that insert $(0+1)^\ast$ between each 
-characters. So, we can represent all strings that contain 111 and 000 as a 
-subsequence.
-\\\question{4.E}
-\\\textbf{Solution:} $((\epsilon+1+11)0)^\ast(\epsilon+1+11)0^\ast$
+\\\textbf{Answer:} $(0+1)^\ast (101+010)(0+1)^\ast$
+
+\question{4.D}
+\\As the strings should contain 111 and 000 as a subsequence, it should contain both 111 and 000 as a subsequence at the same time. So, we can list all the possible combinations containing 111 and 000 as a subsequence. The number of combinations is ${6 \choose 3} = 20$.The regular expression can be represented by inserting $(0+1)^*$ in between any two characters.
+\\\textbf{Answer:} Let A be the set containing all combinations with 3 $1$s and 3 $0$s.
+$A=\{000111, 001011,010011 ...\}$ with 20 elements in total. The regular expression is formed by inserting $(0+1)^*$ between any two characters as well as end and start of the string.
+
+\question{4.E}
 \\As we should represent all strings that don't contain 111 as a 
 substring, we should avoid the appearance of 111. So, we can add 0
 after $(\epsilon+1+11)$, and it can appear any times before $(\epsilon+1+11)0^\ast$.
-\\\question{4.F}
+\\\textbf{Answer:} $((\epsilon+1+11)0)^\ast(\epsilon+1+11)0^\ast$
 
-Strings not containing subsequence $000$ is equivalent to having at most two $0$s. The regular expression simply consider three cases.
-Solution: $1^* + 1^*01^* + 1^*01^*01^*$
+\question{4.F}
+
+Strings not containing subsequence $000$ is equivalent to having at most two $0$s. The regular expression simply consider three cases.\\
+\textbf{Answer:} $1^* + 1^*01^* + 1^*01^*01^*$
 
 \question{4.G}
 
-The string can also be interpreted as string whose substring with no $11$s come before substring with no $00$s.String with no $11$:$(\epsilon + 1)(0(\epsilon + 1 ))^*$. String with no $00$: $(\epsilon + 0)(1(\epsilon + 0))^*$.Concatenate them and simply.
-Solution: $(\epsilon + 1)(0(\epsilon + 1))^*(1(\epsilon + 0))^*$
+The string can also be interpreted as string whose substring with no $11$s come before substring with no $00$s.String with no $11$:$(\epsilon + 1)(0(\epsilon + 1 ))^*$. String with no $00$: $(\epsilon + 0)(1(\epsilon + 0))^*$.Concatenate them and simply.\\
+\textbf{Answer:} $(\epsilon + 1)(0(\epsilon + 1))^*(1(\epsilon + 0))^*$
 
 
 \question{4.H}
 
-Strings not containing subsequence $010$ means that $1$ can't be in the middle of two $0$s. So $1$ must be on one side of $0$s.
-Solution: $1^*0^*1^*$
+Strings not containing subsequence $010$ means that $1$ can't be in the middle of two $0$s. So $1$ must be on one side of $0$s.\\
+\textbf{Answer:} $1^*0^*1^*$
 
 \question{4.I}
 
-Given four continuous $0$s, we can't put $1$s between every cut of these $0$s. If we remove these $1$s, we can get $0^*1^*0^*1^*0^*$(remove one $1$s) or $0^*1^*0^*$(remove two $1$s) and $0^*$(remove three $1$s). They are all included in the case of $0^*1^*0^*1^*0^*$. We generalize it by adding $1$s at two sides.
-Solution:$1^*0^*1^*0^*1^*0^*1^*$
+Given four continuous $0$s, we can't put $1$s between every cut of these $0$s. If we remove these $1$s, we can get $0^*1^*0^*1^*0^*$(remove one $1$s) or $0^*1^*0^*$(remove two $1$s) and $0^*$(remove three $1$s). They are all included in the case of $0^*1^*0^*1^*0^*$. We generalize it by adding $1$s at two sides.\\
+\textbf{Answer:}$1^*0^*1^*0^*1^*0^*1^*$
 
 \question{4.J}
 
-Strings not containing subsequence $10$ means $0$s must come before $1$s.
-Solution:$0^*1^*$
+Strings not containing subsequence $10$ means $0$s must come before $1$s.\\
+\textbf{Answer}$0^*1^*$
 
 
 \question{5.A}
-\\The DFA is drawn below.
+
+The DFA is drawn below.
 \\The DFA accepts all strings that contain an even number of 0s and an even number of 1s.
 Each state records the number of 0s or 1s so far.
 \\  \hspace*{1em} \textbf{Formal Description:}
