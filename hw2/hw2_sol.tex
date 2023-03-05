@@ -209,7 +209,7 @@ So, the equation is proved.
 
 	$\bullet$ $s_4 = (s_1,s_2,\overline{s_3}) = (s_1,s_2,s_3)$
 
-	$\bullet$ $A_4 = A_1 \times A_2 \times \overline{A_3} = A_1 \times A_2 \times Q \backslash A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in A_1$ and $q_2 \in A_2$ and $q_3 \in Q \backslash A_3\}$\\
+	$\bullet$ $A_4 = A_1 \times A_2 \times \overline{A_3} = A_1 \times A_2 \times Q3 \backslash A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in A_1$ and $q_2 \in A_2$ and $q_3 \in Q_3 \backslash A_3\}$\\
 	{Do the similar work for L5 and L6, we will get:}\\
 
 
@@ -219,10 +219,12 @@ So, the equation is proved.
 
 	$\bullet$ $s_5 = s_4 = s_6$
 
-	$\bullet$ $A_5 = A_1 \times \overline{A_2} \times A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in A_1, q_2 \in Q \backslash A_2, q_3 \in A_3\}$
+	$\bullet$ $A_5 = A_1 \times \overline{A_2} \times A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in A_1, q_2 \in Q_2 \backslash A_2, q_3 \in A_3\}$
 
-	$\bullet$ $A_6 = \overline{A_1} \times A_2 \times A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in Q \backslash A_1, q_2 \in A_2, q_3 \in A_3\}$\\
-	{Then we calculate the union of $L_4,L_5,L_6$ and finally get the answer: $M = (Q,\sum,\delta,s,A)$}\\
+	$\bullet$ $A_6 = \overline{A_1} \times A_2 \times A_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in Q_1 \backslash A_1, q_2 \in A_2, q_3 \in A_3\}$
+
+
+	$\bullet$ \textbf{complement result:}{Then we calculate the union of $L_4,L_5,L_6$ and finally get the answer: $M = (Q,\sum,\delta,s,A)$}\\
 	
 	$\bullet$ $Q = \{(q_1,q_2,q_3,q_1',q_2',q_3',q_1'',q_2'',q_3'')\ \vline\ q_1,q_1',q_1'' \in Q_1, q_2,q_2',q_2'' \in Q_2, q_3,q_3',q_3'' \in Q_3\}$
 
@@ -230,7 +232,7 @@ So, the equation is proved.
 
 	$\bullet$ $s = (s_1,s_2,s_3,s_1',s_2',s_3',s_1'',s_2'',s_3'')$
 
-	$\bullet$ $A = A_1 \times A_2 \times Q \backslash A_3 \times A_1 \times Q \backslash A_2 \times A_3 \times Q \backslash A_1 \times A_2 \times A_3= \{(q_1,q_2,q_3,q_1',q_2',q_3',q_1'',q_2'',q_3'')\ \vline\ (q_1 \in A_1, q_2 \in A_2, q_3 \in Q \backslash A_3)\quad  or \quad (q_1 \in A_1, q_2 \in Q \backslash A_2, q_3 \in A_3) \quad or \quad  (q_1 \in Q \backslash A_1, q_2 \in A_2, q_3 \in A_3)\}$
+	$\bullet$ $A = A_1 \times A_2 \times Q_3 \backslash A_3 \times A_1 \times Q_2 \backslash A_2 \times A_3 \times Q_1 \backslash A_1 \times A_2 \times A_3= \{(q_1,q_2,q_3,q_1',q_2',q_3',q_1'',q_2'',q_3'')\ \vline\ (q_1 \in A_1, q_2 \in A_2, q_3 \in Q_3 \backslash A_3)\quad  or \quad (q_1' \in A_1, q_2' \in Q_2 \backslash A_2, q_3' \in A_3) \quad or \quad  (q_1'' \in Q_1 \backslash A_1, q_2'' \in A_2, q_3'' \in A_3)\}$
 	
 
 		
@@ -240,7 +242,7 @@ So, the equation is proved.
 
 
 	$\bullet$ \textbf{Answer:}
-Set $L_1=\left\{ w \ \vline\ w \notin L(M) \right\}$ and $L_2=\left\{w \ \vline\ \overline{w} \in L(M)\right\}$ and $L_3=\left\{w \ \vline\ 1^|w| \in L(M)\right\}$.
+Set $L_1=\left\{ w \ \vline\ w \notin L(M) \right\}$ and $L_2=\left\{w \ \vline\ \overline{w} \in L(M)\right\}$ and $L_3=\left\{w \ \vline\ 1^{|w|} \in L(M)\right\}$.
 
 
 	Then $L1(M)=\overline{L(M)}$, so we can get:
@@ -273,7 +275,7 @@ Set $L_1=\left\{ w \ \vline\ w \notin L(M) \right\}$ and $L_2=\left\{w \ \vline\
 
 	$\bullet$ $A_3 = A$\\
 	
-	Finally, we can get $L' = L_1 \cap L_2 \cap L_3$ and use Q6.A to describe L' and so that we can describe the DFA and $n= \vline\ Q_1 \times Q_2 \times Q_3 \ \vline\ = \vline\ Q \times Q \times Q \ \vline\ $
+	Finally, we can get $L' = L_1 \cap L_2 \cap L_3$ and use Q6.A to describe L' and so that we can describe the DFA and $n= \vline\ Q_1 \times Q_2 \times Q_3 \   \vline\ = \vline\ Q \times Q \times Q \ \vline\ $
 	
 	$\bullet$ $Q = Q_1 \times Q_2 \times Q_3 = \{(q_1,q_2,q_3)\ \vline\ q_1 \in Q_1, q_2 \in Q_2, q_3 \in Q_3\}$
 
