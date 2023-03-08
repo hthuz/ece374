@@ -52,13 +52,54 @@
 
 
 \question{9.A}
-
+\\Let $F$ be the language $0^\ast$.
+\\Let $x$ and $y$ be arbitrary strings in $F$.
+\\Then $x=0^i$ and $y=0^j$ for some non-negative integers $i\neq j$.
+\\Let $z=0^{R-j}$.
+\\Then $xz=0^R \in L$.
+\\And $yz=0^{R+j-i}\notin L$, because $i \neq j$.
+\\Thus, $F$ is a fooling set for $L$.
+\\Because $F$ is infinite, $L$ cannot be regular.
+\\
 \question{9.B}
-
+\\Let $F$ be the language $1^\ast$.
+\\Let $x$ and $y$ be arbitrary strings in $F$.
+\\Then $x=1^i$ and $y=1^j$ for some non-negative integers $i\neq j$.
+\\Let $z=0^i 11^i $.
+\\Then $zx=0^i 11^{2i} \in L$.
+\\And $zy=0^i 11^{i+j}\notin L$, because $i+j \neq 2i$, which can't divide $i$.
+\\Thus, $F$ is a fooling set for $L$.
+\\Because $F$ is infinite, $L$ cannot be regular.
+\\
 \question{9.C}
-
+\\Let $F$ be the language $a^{2^\ast}$.
+\\Let $x$ and $y$ be arbitrary strings in $F$.
+\\As $j=\log_{2}{i}$, $i=2^j$.
+\\Then $x=a^{2^i}$ and $y=a^{2^j}$ for some non-negative integers $i\neq j$.
+\\Let $z=a^{2^i}b^i$.
+\\Then $xz=a^{2^{i+1}}b^i \in L$.
+\\And $yz=a^{2^j +2^i}b^i\notin L$, because $i \neq j$.
+\\Thus, $F$ is a fooling set for $L$.
+\\Because $F$ is infinite, $L$ cannot be regular.
+\\
 \question{9.D}
-
+\\Let $F$ be the language $0^\ast0^\ast$.
+\\Let $x$ and $y$ be arbitrary strings in $F$.
+\\Then $x=0^{3i^2}$ and $y=0^{3j^2}$ for some non-negative integers $i\neq j$.
+\\Let $z=0^{i^2}0^{2i}$.
+\\Then $xz=0^{4i^2}0^{2i} \in L$.
+\\And $yz=0^{3j^2+i^2}0^{2i} \notin L$, because $i \neq j$.
+\\Thus, $F$ is a fooling set for $L$.
+\\Because $F$ is infinite, $L$ cannot be regular.
+\\
 \question{9.E}
-
+\\Let $F$ be the language $cd^\ast$.
+\\Let $x$ and $y$ be arbitrary strings in $F$.
+\\Then $x=cd^i$ and $y=cd^j$ for some non-negative integers $i\neq j$.
+\\Let $z=a^i$.
+\\Then $xz=a^i cd^i \in L$.
+\\And $yz=a^i cd^j \notin L$, because $i \neq j$.
+\\Thus, $F$ is a fooling set for $L$.
+\\Because $F$ is infinite, $L$ cannot be regular.
+\\
 \end{document}
