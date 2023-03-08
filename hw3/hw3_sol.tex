@@ -52,12 +52,12 @@
 
 
 \question{9.A}
-\\Let $F$ be the language $0^\ast$.
+\\Let $F$ be the language $(01)^\ast$.
 \\Let $x$ and $y$ be arbitrary strings in $F$.
-\\Then $x=0^i$ and $y=0^j$ for some non-negative integers $i\neq j$.
-\\Let $z=0^{R-j}$.
-\\Then $xz=0^R \in L$.
-\\And $yz=0^{R+j-i}\notin L$, because $i \neq j$.
+\\Then $x=(01)^i$ and $y=(01)^j$ for some non-negative integers $i\neq j$.
+\\Let $z=(10)^i (01)^i$.
+\\Then $xz=(01)^i(10)^i(01)^i \in L$.
+\\And $yz=(01)^j(10)^i(01)^i \notin L$, because $i \neq j$.
 \\Thus, $F$ is a fooling set for $L$.
 \\Because $F$ is infinite, $L$ cannot be regular.
 \\
