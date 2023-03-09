@@ -66,12 +66,12 @@ Because $F$ is infinite, $L$ cannot be regular. \\
 \question{9.B}
 
 \noindent
-Let $F$ be the language $1^\ast$. \\
+Let $F$ be the language $\{0^{2n}10^n\ \vline\ n \ge 0\}$. \\
 Let $x$ and $y$ be arbitrary strings in $F$. \\
-Then $x=1^i$ and $y=1^j$ for some non-negative integers $i\neq j$. \\
-Let $z=0^i 11^i $. \\
-Then $zx=0^i 11^{2i} \in L$. \\ 
-And $zy=0^i 11^{i+j}\notin L$, because $i+j \neq 2i$, which can't divide $i$. \\
+Then $x=0^{2i}10^i$ and $y=0^{2j}10^j$ for some non-negative integers $i\neq j$. Assume $j > i$. \\
+Let $z=0^i$. \\
+Then $xz=0^{2i}10^{2i} \in L$. \\ 
+And $yz = 0^{2j}10^{i+j}\notin L$, because $k(i + j) \neq 2j$ for any integar $k$.  \\
 Thus, $F$ is a fooling set for $L$. \\
 Because $F$ is infinite, $L$ cannot be regular. \\
 
