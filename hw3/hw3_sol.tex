@@ -91,12 +91,12 @@ Because $F$ is infinite, $L$ cannot be regular. \\
 \question{9.D}
 
 \noindent
-Let $F$ be the language $0^\ast0^\ast$. \\
+Let $F$ be the language $\{0^{3n^2}\ \vline\ n \ge 0\}$. \\
 Let $x$ and $y$ be arbitrary strings in $F$. \\
 Then $x=0^{3i^2}$ and $y=0^{3j^2}$ for some non-negative integers $i\neq j$. \\
 Let $z=0^{i^2}0^{2i}$. \\ 
 Then $xz=0^{4i^2}0^{2i} \in L$. \\
-And $yz=0^{3j^2+i^2}0^{2i} \notin L$, because $i \neq j$. \\
+And $yz=0^{3j^2+i^2}0^{2i} \notin L$, because $i \neq j \Rightarrow \sqrt{3j^2 + i^2} \neq 2i$. \\
 Thus, $F$ is a fooling set for $L$. \\
 Because $F$ is infinite, $L$ cannot be regular. \\
 
