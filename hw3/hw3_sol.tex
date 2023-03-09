@@ -103,12 +103,12 @@ Because $F$ is infinite, $L$ cannot be regular. \\
 \question{9.E}
 
 \noindent
-Let $F$ be the language $cd^\ast$. \\
+Let $F$ be the language $a^*c$. \\
 Let $x$ and $y$ be arbitrary strings in $F$. \\
-Then $x=cd^i$ and $y=cd^j$ for some non-negative integers $i\neq j$. \\
-Let $z=a^i$. \\
-Then $xz=a^i cd^i \in L$. \\
-And $yz=a^i cd^j \notin L$, because $i \neq j$. \\
+Then $x=a^ic$ and $y=a^jc$ for some non-negative integers $i\neq j$. \\
+Let $z=d^i$. \\
+Then $xz=a^icd^i \in L$. \\
+And $yz=a^i cd^j \notin L$, because $i = \#_a(w) \neq j$, where $w$ is $a^i$. \\
 Thus, $F$ is a fooling set for $L$. \\
 Because $F$ is infinite, $L$ cannot be regular. \\
 
