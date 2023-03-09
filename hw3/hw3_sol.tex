@@ -78,13 +78,13 @@ Because $F$ is infinite, $L$ cannot be regular. \\
 \question{9.C}
 
 \noindent
-Let $F$ be the language $a^{2^\ast}$. \\
+Let $F$ be the language $\{a^{2^n}\ \vline\ n \ge 0\}$. \\
 Let $x$ and $y$ be arbitrary strings in $F$. \\
 As $j=\log_{2}{i}$, $i=2^j$. \\
 Then $x=a^{2^i}$ and $y=a^{2^j}$ for some non-negative integers $i\neq j$. \\
-Let $z=a^{2^i}b^i$. \\
-Then $xz=a^{2^{i+1}}b^i \in L$. \\
-And $yz=a^{2^j +2^i}b^i\notin L$, because $i \neq j$. \\
+Let $z=b^i$. \\
+Then $xz=a^{2^{i}}b^i \in L$. \\
+And $yz=a^{2^j}b^i\notin L$, because $\log_{2}{2^j} \neq i$. \\
 Thus, $F$ is a fooling set for $L$. \\
 Because $F$ is infinite, $L$ cannot be regular. \\
 
