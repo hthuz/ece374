@@ -5,6 +5,7 @@
 %\usepackage{amsmath,amssymb,amsfonts,mathrsfs,mathptm,bm,mathtools}
 % choose the following package to insert eps figures
 % for png, jpg or pdf figures, use pdflatex
+\usepackage{float}
 \usepackage{graphicx}
 \graphicspath{{./img}}
 
@@ -81,7 +82,7 @@ The folling NFA accepts the language. $q_0$ means maximal substring of consecuti
 \question{8.A}\\
 $\bullet$ \textbf{Intuition:} We can just exchange all the "1" in the L with "$\epsilon$".\\
 $\bullet$ \textbf{Answer:}Set NFA $N_1=(\sum_1,Q_1,\delta_1,s_1,A_1)$
-
+	
 	Then NFA accepts DelOnes(L), so we can get:
 	
 	$\bullet$ $Q_1 = Q$
@@ -94,44 +95,47 @@ $\bullet$ \textbf{Answer:}Set NFA $N_1=(\sum_1,Q_1,\delta_1,s_1,A_1)$
 	
 
 \question{8.B}\\
-$\bullet$ \textbf{Intuition:} We can just connect the state machine of "$x$" and the state machine of "$y$". We can add an "$\epsilon$" arrow between the "$x$ state machine's accepting state" and the "$y$ state machine's start state". 
-That also means that we can use two DFA M. For one of them, we can swap all the transition function, and swap the start state and the accept state to get an DFA $M_2$. Then, we connect the accept state of $M$ with the new start state of $M_2$ by using $\epsilon$.\\
-$\bullet$ \textbf{Answer:}Set $L_2=\{y \ \vline\ y \in L\}$ which is accepted by $M_2$. $M_2=(\sum,Q_2,\delta_2,s_2,A_2)$ Set $L_3=\{x \ \vline\ x \in L\}$ which is accepted by $M_3$. $M_3=(\sum,Q_3,\delta_3,s_3,A_3)$. 
-
-	$\bullet$ $Q_2 = Q_3 = Q$
-
-	$\bullet$  $\delta_2(q,a) = \delta_3(q,a) =\delta(q,a) $
-
-	$\bullet$ $s_2 = s_3 = s$
-
-	$\bullet$ $A_2 = A_3 = A$\\
-
-	Set NFA $N_4=(\sum,Q_4,\delta_4,s_4,A_4)$,then NFA accepts ThereAndBack(L), so we can get:
+$\bullet$ \textbf{Intuition:} we can use two DFA $M$, one is $M_1$ and one is $M_2$. For one of them, we can swap all the transition function, and swap the start state and the accept state to get an DFA $M_1$. Then, we connect the accept state of $M$ with the new start state of $M_2$ by using $\epsilon$.\\
+$\bullet$ \textbf{Answer:} Construct our NFA with some "$\epsilon$" arrows and two DFA M.
+And we change the original q to $(q,positive)$ or $(q,negative)$. positive means it's M in postive direction, negative means it's another M in negative direction. 
 	
-	$\bullet$ $Q_4 = Q \times Q \times \{xs,ys\}$
+	\begin{figure}[H]
+	\centering %表示居中
+	\includegraphics[height=5.5cm,width=6.5cm]{img//Q8B-1.png}
+	\caption{M concept figure (not real)}
+   	\end{figure}
+	\begin{figure}[H]
+	\centering %表示居中
+	\includegraphics[height=5.5cm,width=12.5cm]{img//Q8B-2.png}
+	\caption{N concept figure (not real)}
+   	\end{figure}
 
-	$\bullet$  $\delta_4((q,xs),a) = (\delta((q,xs),a),xs)$
+	These two pictures just show the idea. The number of accept state can be any. Set NFA $N_1=(\sum,Q_1,\delta_1,s_1,A_1)$,then NFA accepts ThereAndBack(L), so we can get:
+	
+	$\bullet$ $Q_1 = 2Q \times \{positive,negative\}$
+
+	$\bullet$  $\delta_1((q,positive),a) = (\delta((q,positive),a),positive)$
  
-	$\bullet$	$\delta_4(\delta((q,ys),a),a) = (q,ys)$
+	$\bullet$	$\delta_1(\delta((q,negative),a),a) = (q,negative)$
 
-	$\bullet$	$\delta_4((a_3,xs)$,$\epsilon) = \{a_2 \ \vline\ a_2 \in A_2\}$, $a_3 \in A_3$
+	$\bullet$	$\delta_1((a_{pos},positive)$,$\epsilon) = \{(a_{neg},negative) \ \vline\ a_{neg} \in A\}$, $a_{pos} \in A$
 
-	$\bullet$ $s_4 = s_3$
+	$\bullet$ $s_1 = (s,postive)$
 
-	$\bullet$ $A_4 =\{s_2\}$\\
+	$\bullet$ $A_1 = (s,negative)$\\
 
 \question{8.C}\\
 $\bullet$ \textbf{Intuition:} set the state to double state (q,r) so that we can consider x and y.\\
-$\bullet$ \textbf{Answer:}Set $L_5=$XOR$(L)$, which is accepted by $M_5$.
-Set $M_5=(\sum,Q_5,\delta_5,s_5,A_5)$\\
+$\bullet$ \textbf{Answer:}Set $L_1=$XOR$(L)$, which is accepted by $M_1$.
+Set $N_1=(\sum,Q_1,\delta_1,s_1,A_1)$\\
 
-	$\bullet$ $Q_5 = Q \times Q$
+	$\bullet$ $Q_1 = Q \times Q$
 
-	$\bullet$  $\delta_5((q,r),1) = \{(\delta(q,0),\delta(r,1)),(\delta(q,1),\delta(r,0))\}$, $\delta_5((q,r),0) = \{(\delta(q,1),\delta(r,1)),(\delta(q,0),\delta(r,0))\}$
+	$\bullet$  $\delta_1((q,r),1) = \{(\delta(q,0),\delta(r,1)),(\delta(q,1),\delta(r,0))\}$, $\delta_5((q,r),0) = \{(\delta(q,1),\delta(r,1)),(\delta(q,0),\delta(r,0))\}$
 
-	$\bullet$ $s_5 = (s, s)$
+	$\bullet$ $s_1 = (s,s)$
 
-	$\bullet$ $A_5 = \{(q_1,q_2 \vline\ q_1 \in A$ and $q_2 \in A)\}$\\
+	$\bullet$ $A_1 = \{(q_1,q_2 \ \vline\ q_1 \in A$ and $q_2 \in A)\}$\\
 
 
 
