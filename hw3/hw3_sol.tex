@@ -42,11 +42,60 @@
 
 
 
-\question{8.A}
+\question{8.A}\\
+$\bullet$ \textbf{Intuition:} We can just exchange all the "1" in the L with "$\epsilon$".\\
+$\bullet$ \textbf{Answer:}Set NFA $N_1=(\sum_1,Q_1,\delta_1,s_1,A_1)$
 
-\question{8.B}
+	Then NFA accepts DelOnes(L), so we can get:
+	
+	$\bullet$ $Q_1 = Q$
 
-\question{8.C}
+	$\bullet$ $\delta_1(q,0) = \delta(q,0)$, $\delta_1(q,\epsilon) = \delta(q,1)$, $\delta_1(q,1) = \emptyset $
+
+	$\bullet$ $s_1 = s$
+
+	$\bullet$ $A_1 = A$\\
+	
+
+\question{8.B}\\
+$\bullet$ \textbf{Intuition:} We can just connect the state machine of "$x$" and the state machine of "$y$". We can add an "$\epsilon$" arrow between the "$x$ state machine's accepting state" and the "$y$ state machine's start state". 
+That also means that we can use two DFA M. For one of them, we can swap all the transition function, and swap the start state and the accept state to get an DFA $M_2$. Then, we connect the accept state of $M$ with the new start state of $M_2$ by using $\epsilon$.\\
+$\bullet$ \textbf{Answer:}Set $L_2=\{y \ \vline\ y \in L\}$ which is accepted by $M_2$. $M_2=(\sum,Q_2,\delta_2,s_2,A_2)$ Set $L_3=\{x \ \vline\ x \in L\}$ which is accepted by $M_3$. $M_3=(\sum,Q_3,\delta_3,s_3,A_3)$. 
+
+	$\bullet$ $Q_2 = Q_3 = Q$
+
+	$\bullet$  $\delta_2(q,a) = \delta_3(q,a) =\delta(q,a) $
+
+	$\bullet$ $s_2 = s_3 = s$
+
+	$\bullet$ $A_2 = A_3 = A$\\
+
+	Set NFA $N_4=(\sum,Q_4,\delta_4,s_4,A_4)$,then NFA accepts ThereAndBack(L), so we can get:
+	
+	$\bullet$ $Q_4 = Q \times Q \times \{xs,ys\}$
+
+	$\bullet$  $\delta_4((q,xs),a) = (\delta((q,xs),a),xs)$
+ 
+	$\bullet$	$\delta_4(\delta((q,ys),a),a) = (q,ys)$
+
+	$\bullet$	$\delta_4((a_3,xs)$,$\epsilon) = \{a_2 \ \vline\ a_2 \in A_2\}$, $a_3 \in A_3$
+
+	$\bullet$ $s_4 = s_3$
+
+	$\bullet$ $A_4 =\{s_2\}$\\
+
+\question{8.C}\\
+$\bullet$ \textbf{Intuition:} set the state to double state (q,r) so that we can consider x and y.\\
+$\bullet$ \textbf{Answer:}Set $L_5=$XOR$(L)$, which is accepted by $M_5$.
+Set $M_5=(\sum,Q_5,\delta_5,s_5,A_5)$\\
+
+	$\bullet$ $Q_5 = Q \times Q$
+
+	$\bullet$  $\delta_5((q,r),1) = \{(\delta(q,0),\delta(r,1)),(\delta(q,1),\delta(r,0))\}$, $\delta_5((q,r),0) = \{(\delta(q,1),\delta(r,1)),(\delta(q,0),\delta(r,0))\}$
+
+	$\bullet$ $s_5 = (s, s)$
+
+	$\bullet$ $A_5 = \{(q_1,q_2 \vline\ q_1 \in A$ and $q_2 \in A)\}$\\
 
 \question{8.D}
 
