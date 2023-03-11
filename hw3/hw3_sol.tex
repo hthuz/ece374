@@ -5,7 +5,8 @@
 %\usepackage{amsmath,amssymb,amsfonts,mathrsfs,mathptm,bm,mathtools}
 % choose the following package to insert eps figures
 % for png, jpg or pdf figures, use pdflatex
-%\usepackage{graphicx}
+\usepackage{graphicx}
+\graphicspath{{./img}}
 
 \newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
 
@@ -32,15 +33,50 @@
 
 \question{7.A}
 
+The follwing NFA accpets the language. On reading 3,7,4 at states $q_0,q_1,q_2$ respectively, The NFA can go to next state. In all states the NFA can stay at current state reading any character. But accepting state is reached only if $3,7,4$ are read as a subsequence.
+
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width = 0.65\textwidth]{Q-7A}
+\end{figure}
+
 \question{7.B}
+
+The follwing NFA accepts the language. The state is represented as $w_1,w_2$, which means string \textbf{ends with} $w_1,w_2$ if $\vline\ w\ \vline \neq 3$  and \textbf{contains} $w$ if $\vline\ w\ \vline = 3$. $w_1$ stands for substring $374$ and $w_2$ stands for substring $473$. If no matched string is found at the end of string, it's represented by $\epsilon$. The basic logic is to track the end string and once a substring is observed, mark it as observed and keep tracking the other substring. Accpeting state is reached if and only if both $374$ and $473$ are contained.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width = 0.8\textwidth]{Q-7B}
+\end{figure}
 
 \question{7.C}
 
+The follwing NFA accepts the language. The state is represents what the string ends with. All strings are accepted but if $4$ is read at state $37$, then there will be a $374$ substring and this won't be accpeted by the NFA.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width = 1\textwidth]{Q-7C}
+\end{figure}
+
 \question{7.D}
+
+The folling NFA accepts the language. The state is represented with what the string ends with and the even or odd number of $7$s. On reading $7$, the state will transform from odd state to even state or even state to odd state while tracking the end string. On reading $3,4$, the end string state will be changed. Accpeting state is reached if and only if there's substring $374$ and number of $7$ is odd.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width = 1\textwidth]{Q-7D}
+\end{figure}
 
 \question{7.E}
 
+The folling NFA accepts the language. $q_0$ means maximal substring of consecutive $7$s is even and $q_1$ means maximal substring of consecutive $7$ is odd. When the substring of consecutive $7$s is odd and it reads $3$ or $4$. It will go to the rejecting state $\emptyset$. This makes sure that every maximal substring of consecutive $7$ is even in size.
 
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width = 0.7\textwidth]{Q-7E}
+\end{figure}
 
 \question{8.A}\\
 $\bullet$ \textbf{Intuition:} We can just exchange all the "1" in the L with "$\epsilon$".\\
@@ -97,7 +133,6 @@ Set $M_5=(\sum,Q_5,\delta_5,s_5,A_5)$\\
 
 	$\bullet$ $A_5 = \{(q_1,q_2 \vline\ q_1 \in A$ and $q_2 \in A)\}$\\
 
-\question{8.D}
 
 
 \question{9.A}
