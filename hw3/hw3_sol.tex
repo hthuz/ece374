@@ -80,10 +80,8 @@ The folling NFA accepts the language. $q_0$ means maximal substring of consecuti
 \end{figure}
 
 \question{8.A}\\
-$\bullet$ \textbf{Intuition:} We can just exchange all the "1" in the L with "$\epsilon$".\\
-$\bullet$ \textbf{Answer:}Set NFA $N_1=(\sum_1,Q_1,\delta_1,s_1,A_1)$
-	
-	Then NFA accepts DelOnes(L), so we can get:
+$\bullet$ \textbf{Intuition:} Just exchange all the "1" in the L with "$\epsilon$".\\
+$\bullet$ \textbf{Answer:}Set NFA $N_1=(\sum_1,Q_1,\delta_1,s_1,A_1)$, then $N_1$ accepts DelOnes(L).
 	
 	$\bullet$ $Q_1 = Q$
 
@@ -95,8 +93,8 @@ $\bullet$ \textbf{Answer:}Set NFA $N_1=(\sum_1,Q_1,\delta_1,s_1,A_1)$
 	
 
 \question{8.B}\\
-$\bullet$ \textbf{Intuition:} Construct two intermediate DFAs where $M_1$ represents $\{x\ \vline\ x \in L \}$ and $M_2$ represents $\{y\ \vline\ y^R \in L\}.$ $ThereAndBack(L)$ can be Constructed by concatenating these two languages.  For $M_2$, we can swap all the transition functions, the start state and the accepting states. Then connect the accepting states of $M_1$ with the new start state of $M_2$ by using $\epsilon$.\\
-$\bullet$ \textbf{Answer:} Construct our with "$\epsilon$" transitions between two DFAs. We change the original q state to $(q,positive)$ or $(q,negative)$. positive means it's M in postive direction, negative means it's another M in reverse direction. 
+$\bullet$ \textbf{Intuition:} Construct two intermediate DFAs where $M_1$ represents $\{x\ \vline\ x \in L \}$ and $M_2$ represents $\{y\ \vline\ y^R \in L\}.$ $ThereAndBack(L)$ can be Constructed by concatenating these two languages.  For $M_2$, swap all the transition functions, the start state and the accepting states. Then connect the accepting states of $M_1$ with the new start state of $M_2$ by using $\epsilon$.\\
+$\bullet$ \textbf{Answer:} Construct our NFA with "$\epsilon$" transitions between two DFAs. Then change the original q state to $(q,positive)$ or $(q,negative)$. positive means it's M in postive direction, negative means it's another M in reverse direction. 
 	
 	\begin{figure}[H]
 	\centering 
@@ -109,7 +107,7 @@ $\bullet$ \textbf{Answer:} Construct our with "$\epsilon$" transitions between t
 	\caption{N concept example figure}
    	\end{figure}
 
-	These two figures just show the general ideas. The number of accepting states can be any. Set NFA $N_1=(\sum,Q_1,\delta_1,s_1,A_1)$,which accepts the language $ThereAndBack(L)$, so we can get:
+	These two figures just show the general ideas. The number of accepting states can be any. Set NFA $N_1=(\sum,Q_1,\delta_1,s_1,A_1)$,which accepts the language $ThereAndBack(L)$.
 	
 	$\bullet$ $Q_1 = 2Q \times \{positive,negative\}$
 
@@ -124,8 +122,8 @@ $\bullet$ \textbf{Answer:} Construct our with "$\epsilon$" transitions between t
 	$\bullet$ $A_1 = (s,negative)$\\
 
 \question{8.C}\\
-$\bullet$ \textbf{Intuition:} set the state to double state (q,r) so that we can consider x and y.\\
-$\bullet$ \textbf{Answer:}Set $L_1=$XOR$(L)$, which is accepted by $M_1$.
+$\bullet$ \textbf{Intuition:} set the state to double state (q,r) so that it considers both x and y.\\
+$\bullet$ \textbf{Answer:}Set $L_1=$XOR$(L)$, which is accepted by $N_1$.
 Set $N_1=(\sum,Q_1,\delta_1,s_1,A_1)$\\
 
 	$\bullet$ $Q_1 = Q \times Q$
@@ -134,7 +132,7 @@ Set $N_1=(\sum,Q_1,\delta_1,s_1,A_1)$\\
 
 	$\bullet$ $s_1 = (s,s)$
 
-	$\bullet$ $A_1 = \{(q_1,q_2 \ \vline\ q_1 \in A$ and $q_2 \in A)\}$\\
+	$\bullet$ $A_1 = \{(q_1,q_2) \ \vline\ q_1 \in A$ and $q_2 \in A\}$\\
 
 
 
