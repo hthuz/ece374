@@ -95,30 +95,29 @@ $\bullet$ \textbf{Answer:}Set NFA $N_1=(\sum_1,Q_1,\delta_1,s_1,A_1)$
 	
 
 \question{8.B}\\
-$\bullet$ \textbf{Intuition:} we can use two DFA $M$, one is $M_1$ and one is $M_2$. For one of them, we can swap all the transition function, and swap the start state and the accept state to get an DFA $M_1$. Then, we connect the accept state of $M$ with the new start state of $M_2$ by using $\epsilon$.\\
-$\bullet$ \textbf{Answer:} Construct our NFA with some "$\epsilon$" arrows and two DFA M.
-And we change the original q to $(q,positive)$ or $(q,negative)$. positive means it's M in postive direction, negative means it's another M in negative direction. 
+$\bullet$ \textbf{Intuition:} Construct two intermediate DFAs where $M_1$ represents $\{x\ \vline\ x \in L \}$ and $M_2$ represents $\{y\ \vline\ y^R \in L\}.$ $ThereAndBack(L)$ can be Constructed by concatenating these two languages.  For $M_2$, we can swap all the transition functions, the start state and the accepting states. Then connect the accepting states of $M_1$ with the new start state of $M_2$ by using $\epsilon$.\\
+$\bullet$ \textbf{Answer:} Construct our with "$\epsilon$" transitions between two DFAs. We change the original q state to $(q,positive)$ or $(q,negative)$. positive means it's M in postive direction, negative means it's another M in reverse direction. 
 	
 	\begin{figure}[H]
-	\centering %表示居中
+	\centering 
 	\includegraphics[height=5.5cm,width=6.5cm]{img//Q8B-1.png}
-	\caption{M concept figure (not real)}
+	\caption{M concept example figure}
    	\end{figure}
 	\begin{figure}[H]
-	\centering %表示居中
+	\centering 
 	\includegraphics[height=5.5cm,width=12.5cm]{img//Q8B-2.png}
-	\caption{N concept figure (not real)}
+	\caption{N concept example figure}
    	\end{figure}
 
-	These two pictures just show the idea. The number of accept state can be any. Set NFA $N_1=(\sum,Q_1,\delta_1,s_1,A_1)$,then NFA accepts ThereAndBack(L), so we can get:
+	These two figures just show the general ideas. The number of accepting states can be any. Set NFA $N_1=(\sum,Q_1,\delta_1,s_1,A_1)$,which accepts the language $ThereAndBack(L)$, so we can get:
 	
 	$\bullet$ $Q_1 = 2Q \times \{positive,negative\}$
 
-	$\bullet$  $\delta_1((q,positive),a) = (\delta((q,positive),a),positive)$
+	$\bullet$  $\delta_1((q,positive),a) = (\delta(q,a),positive)$
  
-	$\bullet$	$\delta_1(\delta((q,negative),a),a) = (q,negative)$
+	$\bullet$	$\delta_1( (\delta(q,a),negative),a) = (q,negative)$
 
-	$\bullet$	$\delta_1((a_{pos},positive)$,$\epsilon) = \{(a_{neg},negative) \ \vline\ a_{neg} \in A\}$, $a_{pos} \in A$
+	$\bullet$	$\delta_1((a_{pos},positive)$,$\epsilon) = \{(a_{neg},negative) \ \vline\ a_{neg} \in A\}$, \mbox{where }$a_{pos} \in A$
 
 	$\bullet$ $s_1 = (s,postive)$
 
