@@ -38,11 +38,61 @@
 \question{10.C}
 
 \question{11.A}
-
+\\First, consider the special case where $i=0$.
+\\Then, this language can be written as $L=\{b^j c^k d^l | j,k,l \geq 0$ and $j+l=k\}$.
+\\And we get the CFL:
+\begin{center}
+  $S \rightarrow AB$
+  \\$A \rightarrow bAc | \epsilon$
+  \\$B \rightarrow cBd | \epsilon$
+\end{center}
+Then, we consider another special case where $j=i$.
+\\Then, we get $k=l$. And this language can be written as $L=\{a^j b^j c^k d^k | j,k \geq 0\}$.
+\\And we get the CFL:
+\begin{center}
+  $S \rightarrow AB $
+\\$A \rightarrow aAb | \epsilon$
+\\$B \rightarrow cBd | \epsilon$
+\end{center}
+We found that in both cases, it has the equation $B \rightarrow cBd | \epsilon$, so we guess that in general case, 
+we also have this equation.
+\\
+\\By induction, we get the general case:
+\begin{center}
+  $S \rightarrow ABC $
+\\$A \rightarrow aAb | \epsilon$
+\\$B \rightarrow bBc | \epsilon$
+\\$C \rightarrow cCd | \epsilon$
+\end{center}
+To confirm its validity, we found that the number of $a$ plus the number of $c$ is 
+equal to the number of $b$ plus the number of $d$, which satisfie the requirement. 
+\\So, we conclude this answer. 
+\\
 \question{11.B}
-
+\\First, we consider the case when only $\omega_i = a$.
+\\In this case, the string only has $a$, so it must satisfy the condition 
+for $L_B$.
+\\Then, we consider the case $\omega_i$ is a balanced string or $\omega_i = a$. 
+\\By definition, 
+$\omega$ satisfies the condition $\#_a(\omega) \geq \#_b(\omega)$. When $\#_a(\omega)=\#_b(\omega)$,
+we can know that $\omega$ can be at least divided to one balanced string $\omega_i$. 
+When $\#_a(\omega) > \#_b(\omega)$, we can split the string to at least one balanced string and 
+several $a$s. So, it satisfies this condition.
+\\
 \question{11.C}
-
+\\For the above condition, we conclude that the CFG can be expressed as:
+\begin{center}
+  $S \rightarrow abS | aSb | Sab | SS | \epsilon $
+\end{center}
+For $S \rightarrow abS $, $a$ always appears before $b$, so,it satisfies $L_B$.
+\\For $S \rightarrow aSb $, it also satisfies that $a$ always appears before $b$.
+\\For $S \rightarrow Sab $, $a$ always appears before $b$.
+\\For $S \rightarrow SS $, no matter what the value of $S$ is, it always satisfies
+$a$ always appears before $b$, which satisfies $L_B$.
+\\For $S \rightarrow \epsilon $, the empty string does not change the number of $a$ and
+$b$.
+\\So, the correctness of the CFG is proved.
+\\
 \question{12.A}
 
 \question{12.B}
