@@ -37,12 +37,61 @@
 \\[-0.2cm]{\noindent \rule{\linewidth}{0.2mm}}
 %%% end header
 
-\question{10.A}
+\question{10.A}\\
+Let $F$ be the language $\{ba^n\ \vline\ n \ge 0\}$. \\
+Let $x$ and $y$ be arbitrary strings in $F$. \\
+Then $x=ba^{2i}$ and $y=ba^{2j}$ for some non-negative integers $i\neq j$. Assume $j > i$. \\
+Let $z=ba^{i}$. \\
+when w has $n = 2i+1$, length of $w_0$ is $(i+1)$.\\
+Then $xz=ba^{2i}ba^{i} \in L$. \\ 
+And $yz = ba^{2j}ba^{i}\notin L$. \\
+Because w has $n=2j+1$ need a $w_0$ whose length is $(j+1)\neq (i+1)$. \\
+Thus, $F$ is a fooling set for $L$. \\
+Because $F$ is infinite, $L$ cannot be regular. \\
 
-\question{10.B}
+
+\question{10.B}\\
+$\bullet$ \textbf{set:}\\
+Let $L_0=\{0^k1^k \ \vline\ k \ge 0\}$, let $L=L_0 \cup$ \{bitstrings with number of 0s is twice that of 1s\}, L is not regular.\\
+$\bullet$ \textbf{proof:}\\
+Let $F$ be the language $\{0^n\ \vline\ n \ge 0\}$. \\
+Let $x$ and $y$ be arbitrary strings in $F$. \\
+Then $x=0^{i}$ and $y=0^{j}$ for some non-negative integers $i\neq j$ and $2i\neq j$. Assume $j > i$. \\
+Let $z=1^{i}$. \\
+Then $xz=0^{i}1^{i} \in L$. \\ 
+And $yz = 0^{j}1^{i}\notin L$. \\
+Thus, $F$ is a fooling set for $L$. \\
+Because $F$ is infinite, $L$ cannot be regular. \\
+
+\noindent
+$\bullet$ \textbf{set:}\\
+Let $L_1=\overline{L_0}$, the complement of $L_0$, let $L'=L_1 \cup$ \{bitstrings with number of 0s is twice that of 1s\}, L' is not regular.\\
+$\bullet$ \textbf{proof:}\\
+Let $F$ be the language $\{0^n\ \vline\ n \ge 0\}$. \\
+Let $x$ and $y$ be arbitrary strings in $F$. \\
+Then $x=0^{i}$ and $y=0^{j}$ for some non-negative integers $i\neq j$ and $2i\neq j$. Assume $j > i >1$. \\
+Let $z=1^{i}$. \\
+Then $xz=0^{i}1^{i} \notin L'$. \\ 
+And $yz = 0^{j}1^{i}\in L'$. \\
+Thus, $F$ is a fooling set for $L'$. \\
+Because $F$ is infinite, $L'$ cannot be regular. \\
+
+\noindent
+$\bullet$ \textbf{counter-example:}\\
+L and L' are not regular, $L \cup L' = (0+1)^* $ is regular.
+However, $L \cap L' =$ \{bitstrings with number of 0s is twice that of 1s\} is non-regular.
 
 
-\question{10.C}
+\question{10.C}\\
+According to the closure properties, if $L1$, $L2$ are regular then $L1 \cup L2$ is regular. If $L1$, $L2$ are regular then $L1 \cap L2$ is regular.\\
+Because for all $i \ne j$, $L_i \backslash L_j$ is regular:\\\\
+$\bullet$ Set $L_4 = (L_1 \backslash L_2) \cup (L_1 \backslash L_3)$ is regular.\\
+$\bullet$ Set $L_5 = (L_2 \backslash L_1) \cup (L_2 \backslash L_3)$ is regular.\\
+$\bullet$ Set $L_6 = (L_3 \backslash L_1) \cup (L_3 \backslash L_2)$ is regular.\\\\
+Assume $(L_1 \cap L_2 \cap L_3)$ is regular.\\
+Then $(L_1 \cap L_2 \cap L_3) \cup L_4 \cup L_5 \cup L_6= (L_1 \cup L_2 \cup L_3)  $ should be regular. \\
+However, $(L_1 \cup L_2 \cup L_3)$ is not regular.\\
+Thus, $(L_1 \cap L_2 \cap L_3)$ is not regular.
 
 \question{11.A}
 
