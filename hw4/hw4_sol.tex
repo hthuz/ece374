@@ -1,5 +1,12 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fullpage}
+\usepackage{amsmath}
+% \usepackage[
+%   backend=biber,
+%   style=alphabetic,
+%   sorting=ynt
+% ]{biblatex}
+
 \pagestyle{plain}
 % choose any of the following packages to support AmsTeX
 %\usepackage{amsmath,amssymb,amsfonts,mathrsfs,mathptm,bm,mathtools}
@@ -96,5 +103,12 @@ $b$.
 \question{12.A}
 
 \question{12.B}
+
+According to the theorem {\em Every context free language is equivalent to a grammer in Chomsky normal form}\cite{model}. Transform context free language $L$ into its Chomsky normal form. In Chomsky normal form each production rule is of the form $A\rightarrow BC \mbox{ or } A\rightarrow a$ besides those containing starting non-terminal $S$. In all cases, each single terminal symbol on the right of production rule represents a character of the langauge. If we add production rule $A\rightarrow \epsilon$ to every production rule of the form $A\rightarrow a$, the new context-free language represents subsequence($L$). So subsequence($L$) is also a context-free language.
+
+
+\bibliographystyle{plain}
+\bibliography{ref}
+
 
 \end{document}

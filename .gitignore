@@ -7,3 +7,8 @@
 *.swp
 *_sol.pdf
 *.DS_Store
+*.bbl
+*.bcf
+*.blg
+*.run.xml
+
