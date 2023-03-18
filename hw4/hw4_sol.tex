@@ -151,6 +151,54 @@ $b$.
 \\
 \question{12.A}
 
+The context free language for palindrome is easily derived as follows:
+\begin{align}
+  S_0 \rightarrow aS_0a\ \vline\ bS_0b\ \vline\ a\ \vline\ b\ \vline\ \epsilon
+\end{align}
+
+If we insert a character on former half of the palindrome, we can recover it back to palindrome by inserting the same character on the symmetric position on latter half of the palindrome or simply remove the newly inserted palindrome. This illustrates that insertion and deletion are equivalent. So only one operation needs to be considered.
+
+Consider the case of $1$-close palindrome, which includes palindromes and strings that can be converted into palindromes with one operation. These langauges can be formed by introducing one unmatched pattern:
+\begin{align}
+  S_1 & \rightarrow aS_1a\ \vline\ bS_1b\ \vline\ bA_1\ \vline\ A_1b\  \vline\ aB_1\ \vline\ B_1a \\
+  A_1 &\rightarrow aS_0a\ \vline\ bA_1b\ \vline\ a \\
+  B_1 &\rightarrow bS_0b\ \vline\ aB_1a\ \vline\ b
+\end{align}
+
+Note that one $a\/b$ is inserted into a palindrome in former half or latter half. The product rule $A_1 \rightarrow a$ and $B_1 \rightarrow b$ takes even length strings into account. But if a $b$ is inserted, we should avoid the case of inserting another $b$ immediately, which is the reason why two non-terminals $A$,$B$ are used. Product rule $A_1 \rightarrow bA_1b$ is used instead of $A_1 \rightarrow bS_0b$ to avoid immediate follows of $b$, which may lead to symmetric pattern $bbbb$. The same reason holds for $B_1 \rightarrow aB_1a$.
+
+Then, strings that is $1$-close to palindromes can be represented as  
+$$
+  S \rightarrow S_0 | S_1
+$$
+
+Languages that can be changed to palindromes with 2 operations can be formed by adding one layer to the former language. As strings with even length are already taken into accout, we don't add $A_2\rightarrow a$ and $B_2\rightarrow b$ here:
+
+\begin{align}
+  S_2 & \rightarrow aS_2a\ \vline\ bS_2b\ \vline\ bA_2\ \vline\ A_2b\  \vline\ aB_2\ \vline\ B_2a \\
+  A_2 &\rightarrow aS_1a\ \vline\ bA_2b \\
+  B_2 &\rightarrow bS_1b\ \vline\ aB_2a
+\end{align}
+
+Do similarly for languages that can be changed to palindrome with 3 operations:
+\begin{align}
+  S_3 & \rightarrow aS_3a\ \vline\ bS_3b\ \vline\ bA_3\ \vline\ A_3b\  \vline\ aB_2\ \vline\ B_2a \\
+  A_3 &\rightarrow aS_2a\ \vline\ bA_3b \\
+  B_3 &\rightarrow bS_2b\ \vline\ aB_3a
+\end{align}
+
+The language that is 3-close to palindromes can thus be represented as
+$$
+  S \rightarrow S_0 | S_1 | S_2 | S_3
+$$
+where, all non-terminals and production rules are expressed in equations (1) - (10)
+
+
+
+
+
+
+
 \question{12.B}
 
 According to the theorem {\em Every context free language is equivalent to a grammer in Chomsky normal form}\cite{model}. Transform context free language $L$ into its Chomsky normal form. In Chomsky normal form each production rule is of the form $A\rightarrow BC \mbox{ or } A\rightarrow a$ besides those containing starting non-terminal $S$. In all cases, each single terminal symbol on the right of production rule represents a character of the langauge. If we add production rule $A\rightarrow \epsilon$ to every production rule of the form $A\rightarrow a$, the new context-free language represents subsequence($L$). So subsequence($L$) is also a context-free language.
