@@ -130,7 +130,7 @@ Note that production rule $S\rightarrow ABC$ represents the case $j \ge i$ and $
 For $w \in L_B$, there's $\#_a(w) \ge \#_b(w)$. If $\#_a(w) = \#_b(w)$, it's obvious that it's already writen as one balanced string. \\
 If $\#_a(w) > \#_b(w)$, then we can consider that the first character, which must be "a" since it is the prefix of w. \\
 Set the $d(n) = \#_a(w) - \#_b(w)$ as the depth for the first n characters in w. Because $\#_a(w) \ge \#_b(w)$ for all prefix, $d(n) \ge 0$, d(1)=1.
-Find all the n that d(n)=0, cut there. Then we can get $w=a \ \vline\ w_1 \ \vline\ w_2 \ \vline\ w_3 ...\ \vline\ w_n \ \vline\ a^*$ with the weekly balanced substring $w_s$. Seperate all the $a^*$ to be single so that it will meet the requirement.\\
+Find all the n that d(n)=1, cut there. Then we can get $w=a \ \vline\ w_1 \ \vline\ w_2 \ \vline\ w_3 ...\ \vline\ w_n \ \vline\ a^*$ with the weekly balanced substring $w_s$. Seperate all the $a^*$ to be single so that it will meet the requirement.\\
 In this case, $w$ can be represented by concatenation of substring $w_s$ with some characters $a$. So the property is proved.
 
 \question{11.C}
