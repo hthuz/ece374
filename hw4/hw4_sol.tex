@@ -77,7 +77,16 @@ Because $F$ is infinite, $L'$ cannot be regular. \\
 \noindent
 $\bullet$ \textbf{counter-example:}\\
 L and L' are not regular, $L \cup L' = (0+1)^* $ is regular.
-However, $L \cap L' =$ \{bitstrings with number of 0s is twice that of 1s\} is non-regular.
+However, $L \cap L' =$ \{bitstrings with number of 0s is twice that of 1s\} is non-regular.\\
+$\bullet$ \textbf{proof:}\\
+Let $F$ be the language $\{0^{2n}\ \vline\ n \ge 0\}$. \\
+Let $x$ and $y$ be arbitrary strings in $F$. \\
+Then $x=0^{2i}$ and $y=0^{2j}$ for some non-negative integers $i\neq j$. Assume $j > i$. \\
+Let $z=1^{i}$. \\
+Then $xz=0^{2i}1^{i} \in L \cap L'$. \\ 
+And $yz = 0^{2j}1^{i}\notin L \cap L'$. \\
+Thus, $F$ is a fooling set for $L \cap L'$. \\
+Because $F$ is infinite, $L \cap L'$ cannot be regular. \\
 
 
 \question{10.C}\\
@@ -117,9 +126,12 @@ Assume the general case where $j \ge i$. The equation $j - i = k - l$ holds, whi
 
 Note that production rule $S\rightarrow ABC$ represents the case $j \ge i$ and $B\rightarrow bBc | \epsilon$ makes sure $j-i = k-l$ holds. Production rule $S\rightarrow AC|aSd$ represents the case $j \le i$ and $S\rightarrow aSd$ makes sure $i - j = l - k$ holds.
 
-\question{11.B}
-
-For $w \in L_B$, there's $\#_a(w) \ge \#_b(w)$. If $\#_a(w) = \#_b(w)$, it's obvious that it's already writen as one balanced string. If $\#_a(w) > \#_b(w)$, then there must be a substring $w_s$such that $\#_a(w_s) = \#_b(w_s)$. In this case, $w$ can be represented by concatenation of substring $w_s$ with some characters $a$. So the property is proved.
+\question{11.B}\\
+For $w \in L_B$, there's $\#_a(w) \ge \#_b(w)$. If $\#_a(w) = \#_b(w)$, it's obvious that it's already writen as one balanced string. \\
+If $\#_a(w) > \#_b(w)$, then we can consider that the first character, which must be "a" since it is the prefix of w. \\
+Set the $d(n) = \#_a(w) - \#_b(w)$ as the depth for the first n characters in w. Because $\#_a(w) \ge \#_b(w)$ for all prefix, $d(n) \ge 0$, d(1)=1.
+Find all the n that d(n)=0, cut there. Then we can get $w=a \ \vline\ w_1 \ \vline\ w_2 \ \vline\ w_3 ...\ \vline\ w_n \ \vline\ a^*$ with the weekly balanced substring $w_s$. Seperate all the $a^*$ to be single so that it will meet the requirement.\\
+In this case, $w$ can be represented by concatenation of substring $w_s$ with some characters $a$. So the property is proved.
 
 \question{11.C}
 \\According to the property concluded in Q11.B, consider two cases of substrings: consecutive $a$s and balnaced strings.
