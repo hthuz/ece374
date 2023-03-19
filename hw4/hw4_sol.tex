@@ -38,14 +38,12 @@
 %%% end header
 
 \question{10.A}\\
-Let $F$ be the language $\{ba^n\ \vline\ n \ge 0\}$. \\
+Let $F$ be the language $\{ba^{2n}\ \vline\ n \ge 0\}$. \\
 Let $x$ and $y$ be arbitrary strings in $F$. \\
 Then $x=ba^{2i}$ and $y=ba^{2j}$ for some non-negative integers $i\neq j$. Assume $j > i$. \\
 Let $z=ba^{i}$. \\
-when w has $n = 2i+1$, length of $w_0$ is $(i+1)$.\\
-Then $xz=ba^{2i}ba^{i} \in L$. \\ 
-And $yz = ba^{2j}ba^{i}\notin L$. \\
-Because w has $n=2j+1$ need a $w_0$ whose length is $(j+1)\neq (i+1)$. \\
+Then $xz=ba^{2i}ba^{i} \in L$ as $ba^i$ is the string formed by odd characters of $ba^{2i}$ \\ 
+And $yz = ba^{2j}ba^{i}\notin L$ as $i \neq j$ \\
 Thus, $F$ is a fooling set for $L$. \\
 Because $F$ is infinite, $L$ cannot be regular. \\
 
@@ -172,14 +170,12 @@ $$
   S \rightarrow S_0 | S_1
 $$
 
-Languages that can be changed to palindromes with 2 operations can be formed by adding one layer to the former language. As strings with even length are already taken into accout, we don't add $A_2\rightarrow a$ and $B_2\rightarrow b$ here:
-
+Languages that can be changed to palindromes with 2 operations can be formed by adding one layer to the former language. We don't add $A_2\rightarrow a$ and $B_2\rightarrow b$ here as it is already included in the $1$-close palindrome language:
 \begin{align}
   S_2 & \rightarrow aS_2a\ \vline\ bS_2b\ \vline\ bA_2\ \vline\ A_2b\  \vline\ aB_2\ \vline\ B_2a \\
   A_2 &\rightarrow aS_1a\ \vline\ bA_2b \\
   B_2 &\rightarrow bS_1b\ \vline\ aB_2a
 \end{align}
-
 Do similarly for languages that can be changed to palindrome with 3 operations:
 \begin{align}
   S_3 & \rightarrow aS_3a\ \vline\ bS_3b\ \vline\ bA_3\ \vline\ A_3b\  \vline\ aB_2\ \vline\ B_2a \\
@@ -192,10 +188,6 @@ $$
   S \rightarrow S_0 | S_1 | S_2 | S_3
 $$
 where, all non-terminals and production rules are expressed in equations (1) - (10)
-
-
-
-
 
 
 
