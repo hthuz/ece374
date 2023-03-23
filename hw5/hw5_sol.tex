@@ -32,6 +32,11 @@
 
 % =============
 \question{13.A}
+
+In the naive Hanoi, disk n need to be moved from src to dest, with n - 1 disks in the tmp peg. But now it is forbidden to directly move disks move src to dest,the disk should be moved to tmp first and then moved to dest. So we need to move disks $n - 1$ to dest first (with intermediate begin on tmp peg), then move disk $n$ to tmp, move disks $n - 1$ from dest back to src(with intermediate being on tmp peg), move disk $n$ to dest and finally move disk $n -1 $ from src to dest again (with intermediate being on tmp peg). The correctness lies in that disk $n$ and disks $n - 1$ will be moved from src to dest, without violating rules.
+
+The pseudo code is as follows:
+
 % =============
 
 % =============
