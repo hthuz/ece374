@@ -73,7 +73,7 @@ The pseudo code is as follows:
       Hnaoi0(n - 1, src, dest, tmp)
 \end{lstlisting}
 
-The number of moves $T(n)$ can be represented as $T(n) = 3T(n - 1) + 2$ with $T(1) = 2$. Solving the recurrence equation, we have $T(n) = 3^n - 1$
+The number of moves $T(n)$ can be represented as $T(n) = 3T(n - 1) + 2, n > 1$ with $T(1) = 2$. Solving the recurrence equation, we have $T(n) = 3^n - 1$
 
 % =============
 
@@ -83,7 +83,24 @@ The number of moves $T(n)$ can be represented as $T(n) = 3T(n - 1) + 2$ with $T(
 
 % =============
 \question{13.C}
-% =============
+
+The largest remaining disk can be removed when nothing is on top of it. This is the same case in naive Hanoi when there's nothing on top largest remaining disk, we can move it to destination. So we can do modification to naive Hanoi with the difference that we remove the largest disk instead of moving it. The removed largest disk won't have any affect as in naive Hanoi the largest disk won't have any affect on rest of disks.
+
+The pseudo code is as follows:
+\begin{lstlisting}
+  Hanoibyebye(n, src, dest, tmp, max_n):
+    if (n > 0) then
+      Hanoibyebye(n - 1, src, tmp, dest)
+      if (n == max_n) then
+        Remove disk n
+      else
+        Move disk n from src to tmp
+      Hanoibyebye(n - 1, tmp, dest, src)
+  
+\end{lstlisting}
+
+The number of moves $T(n)$ is the same as the case of naive Hanoi, where $T(n) = 2T(n - 1) + 1, n > 1$ with $T(1) = 1$. Solve the recurrence equation and there's $T(n) = 2^n - 1$. Upper bound is $O(2^n)$
+
 
 % =============
 \question{14.A}
