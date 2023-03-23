@@ -1,6 +1,6 @@
 
 
-n = 3
+n = 8
 initpeg = [i for i in range(n , 0, -1)]
 
 # Leftmost item in list means bottom of the peg
@@ -51,12 +51,31 @@ def hanoi0(n,src,dest,tmp):
 
         
 
+def hanoibyebye(n,src,dest, tmp,max_n):
 
+    if n == 0:
+        return
+
+    if n > 0:
+
+        hanoibyebye(n - 1, src, tmp, dest,max_n)
+
+        disk = pegs[src][-1]
+        pegs[src].pop()
+
+        if (disk != max_n):
+            pegs[dest].append(disk)
+        else:
+            max_n -= 1
+
+        print(pegs)
+
+        hanoibyebye(n - 1, tmp, dest, src,max_n)
 
 if __name__ == "__main__":
 
     print(pegs)
-    hanoi0(n,1,2,0)
+    hanoibyebye(n,1,2,0,n)
     print(pegs)
 
 
