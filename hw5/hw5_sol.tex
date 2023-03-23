@@ -8,6 +8,32 @@
 %\usepackage{graphicx}
 \usepackage{amsmath}
 
+%% Presenet code
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+
+
 \newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
 
 % set HW number
@@ -36,6 +62,18 @@
 In the naive Hanoi, disk n need to be moved from src to dest, with n - 1 disks in the tmp peg. But now it is forbidden to directly move disks move src to dest,the disk should be moved to tmp first and then moved to dest. So we need to move disks $n - 1$ to dest first (with intermediate begin on tmp peg), then move disk $n$ to tmp, move disks $n - 1$ from dest back to src(with intermediate being on tmp peg), move disk $n$ to dest and finally move disk $n -1 $ from src to dest again (with intermediate being on tmp peg). The correctness lies in that disk $n$ and disks $n - 1$ will be moved from src to dest, without violating rules.
 
 The pseudo code is as follows:
+
+\begin{lstlisting}
+  Hanoi0(n, src, dest, tmp):
+    if (n > 0) then
+      Hanoi0(n - 1, src, dest, tmp)
+      Move disk n from src to tmp
+      Hanoi0(n - 1, dest, src, tmp)
+      Move disk n from tmp to dest
+      Hnaoi0(n - 1, src, dest, tmp)
+\end{lstlisting}
+
+The number of moves $T(n)$ can be represented as $T(n) = 3T(n - 1) + 2$ with $T(1) = 2$. Solving the recurrence equation, we have $T(n) = 3^n - 1$
 
 % =============
 
