@@ -11,6 +11,8 @@
 %% Presenet code
 \usepackage{listings}
 \usepackage{color}
+\usepackage{float}
+\usepackage{graphicx}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -103,14 +105,150 @@ The number of moves $T(n)$ is the same as the case of naive Hanoi, where $T(n) =
 
 
 % =============
-\question{14.A}
+\question{14.A}\\
 % =============
+$\bullet$ \textbf{The algorithm:}\\
+We can use the array index of $A_1$,$A_2$,$\cdot \cdot \cdot$,$A_k$ as the basis for grouping. The problem of get the final big happy array now becomes  getting two ordered arrays, Aleft and Aright, and then merge them.\\
+Set $mid = left+\frac{right-left}{2}$. For the first division, $mid = 1+\frac{k-1}{2}$. Aleft contains all the element in the array $[A_1,A_{mid}]$ and Aright will contains all the element in the array $[A_{mid}+1,A_k]$.\\
+Divide the problem recursively until there are only two arrays, then, skip the divide function and just merge them.\\
+$\bullet$ \textbf{The time:}\\
+There are k arrays at first, so the depth of the tree is at most $\log{k}$. In every layer, there are at most n times comparison. So $T(n) = O(nlogk)$.\\
+$\bullet$ \textbf{the concept picture:} this is just an example.
+	\begin{figure}[H]
+	\centering %表示居中
+	\includegraphics[height=5.5cm,width=12.5cm]{picture//Q14A.png}
+	\caption{concept tree}
+	\end{figure}
+$\bullet$ \textbf{Pseudocode:}
+	\begin{lstlisting}
+	MergeSortA( left, right, result):
+		if(right - left<1) then result = original array
+		mid=left+(right-left)/2
+		MergeSortA( left, mid, temp1)
+		MergeSortA( mid+1, right, temp2)
+		MergeTwo( temp1, temp2, result)
+
+
+	MergeTwo ( t1, t2, result ):
+		# use the pointer t1 and t2 to access the data
+		i = 0, j= 0, k=0
+		# len1 = the length of t1 array
+		# len2 = the lenght of t2 array
+		while ( i<=len1 and j<=len2 ):
+			if ( t1 [ i ] <= t2[ j ] ):
+				result [ k ] = t1[ i ]
+				i=i+1
+				k=k+1
+			else:
+				result [ k ] = t2[ i ]
+				j=j+1
+				k=k+1
+	\end{lstlisting}
+
 
 % =============
-\question{14.B}
+\question{14.B}\\
 % =============
+\textbf{If we are taking about merge sort with k-branch tree:}\\
+$\bullet$ \textbf{The algorithm:}\\
+Split the array of size N into k arrays with size $\frac{N}{k}$,\\
+recursively sort them, get the sorted arrays,\\
+then merge the k sorted arrays to get the final big sorted array.\\
+$\bullet$ \textbf{The time:}\\
+The depth of the k-branches tree is $\log{k}$.\\
+The comparision time of every layer is $cN$.\\
+The running time is: $T(N) = kT(\frac{N}{k})+cN = O(NlogN)$\\
+$\bullet$ \textbf{the concept picture:}\\
+	\begin{figure}[H]
+	\centering %表示居中
+	\includegraphics[height=5.5cm,width=12.5cm]{picture//Q14B1.png}
+	\caption{concept tree}
+	\end{figure}
 
-\question{14.C}
+\noindent
+\textbf{If we are taking about Q14 with t-branch tree:}\\
+$\bullet$ \textbf{The algorithm:}\\
+Similar to the first question, suppose we use a t-branch tree for recursion.\\
+Set (t-1) mid values and use these indexes to group and merge arrays.\\
+$\bullet$ \textbf{The time:}\\
+The depth of the t-branches tree is $\log{k}$.\\
+The comparision time of every layer is $cn$.\\
+The running time is: $T(n) =  O(nlogk)$\\
+$\bullet$ \textbf{the concept picture:} this is just an example.
+	\begin{figure}[H]
+	\centering %表示居中
+	\includegraphics[height=5.5cm,width=12.5cm]{picture//Q14B2.png}
+	\caption{concept tree}
+	\end{figure}
+$\bullet$ \textbf{Pseudocode:}
+	\begin{lstlisting}
+	MergeSortB( left, right, result, k):
+		if(right - left<1) then return
+		count = 0
+		while (count<k):
+			mid [ i ] =left+(right-left)/k
+			count= count+1
+		
+		count = 0
+		while (count<k):
+			MergeSortB( left, mid , temp, k, startmid)
+			count= count+1
+	
+		Merge( temp, result)
+	
+	MergeB ( temp, k, result ):
+		# merge data and stored into result
+	\end{lstlisting}
+
+% =============
+\question{14.C}\\
+% =============
+$\bullet$ \textbf{The algorithm:}\\\\
+Set an array $"temp"$ and $"result"$ to store the sorted array for each merge.\\
+1. Traverse $k$ arrays in [$n_1$, $n_2$,.. ,$n_k$], find the one with the smallest $n_i$, record it in the array $temp$, and delete it from [$n_1$, $n_2$,.. ,$n_k$].\\
+2. Traverse the $k-1$ array, find the one with the smallest $n_i$, merge it with $temp$, and store the result in the $result$. Overwrite the $temp$ array with $result$.\\
+3. Traverse the $k-2$ array, find the one with the smallest $n_i$, merge it with $temp$, and store the result in the $result$. Overwrite the $temp$ array with $result$.\\\\
+Cycle the above operations until [$n_1$, $n_2$,.. ,$n_k$] no longer has elements.\\
+$\bullet$ \textbf{The time:}\\
+the total Traverse time $T1 = k+k-1+k-2+...+1 = \frac{k+1}{2} = O(n)$\\
+The depth of $n_i$ in the tree is $\log{\frac{n}{n_i}}$.\\
+when merging $n_i$ to a higher layer, the merging time is $cn_i$.\\
+The running time is: $T(n) = \frac{k+1}{2}+ \sum^k_{i=1}{n_i\log{\frac{n}{n_i}}} = O(n+\sum^k_{i=1}{n_i\log{\frac{n}{n_i}}})$\\
+$\bullet$ \textbf{the concept picture:} assume that $n_1>n_2>n_3>$....$n_k$\\
+	\begin{figure}[H]
+	\centering %表示居中
+	\includegraphics[height=5.5cm,width=12.5cm]{picture//Q14C2.png}
+	\caption{concept tree}
+	\end{figure}
+$\bullet$ \textbf{Pseudocode:}
+	\begin{lstlisting}
+	arr = [A1,A2,...,Ak]
+	MergeSortC( arr, result, temp):
+		# temp = the array pointer with the smallest ni found by Traverse
+		# delete Ai in arr
+		while (len(arr) <> 0 ):
+			#  temp1 = the array pointer with the smallest ni found by Traverse
+			# delete Ai in arr
+			MergeTwo( temp1, temp , res)
+			temp = res
+			
+
+	MergeTwo ( t1, t2, res ):
+		# use the pointer t1 and t2 to access the data
+		i = 0, j= 0, k=0
+		# len1 = the length of t1 array
+		# len2 = the lenght of t2 array
+		while ( i<=len1 and j<=len2 ):
+			if ( t1 [ i ] <= t2[ j ] ):
+				result [ k ] = t1[ i ]
+				i=i+1
+				k=k+1
+			else:
+				result [ k ] = t1[ i ]
+				j=j+1
+				k=k+1
+	\end{lstlisting}
+
 
 
 \question{15.A}
