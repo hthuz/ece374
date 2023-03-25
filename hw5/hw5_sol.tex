@@ -114,7 +114,26 @@ The number of moves $T(n)$ is the same as the case of naive Hanoi, where $T(n) =
 
 
 \question{15.A}
+\\We can use the Boyer-Moore Majority Vote Algorithm here. This algorithm works by maintaining a count of a candidate element that could be the majority element.
+The count is incremented when an element is encountered that is equal to the candidate and decremented when it is not. If the count reaches zero, then a new candidate is chosen.
+\\So, we can slove the problem according to the algorithm mentioned above:
+\\Since strictly more than half of the birds belong to the same speicies, we can pick any two birds and put them in a cage together. If they are friendly to each other, then they 
+are of the same species. We call this speices $S$. Otherwise, we can separate them and repeat the same step with two different birds. 
+\\Now, we know that at least one bird belongs to $S$. We can use this bird as a reference and compare it with other birds by using the same process. We keep doing this until we
+have compared the reference bird with every other bird. If more than half of the birds are friendly with the reference bird, then we say this bird belongs to the dominant species. 
+We can output all the birds that are friendly with the reference bird. Then, we finish identifying every bird among the $n$ birds that belong to this dominant species.
+\\As for the time complexity of this algorithm, in the worst case, we need to perform the experiment with all possible pairs of birds. There are $n$ choose 2 = $n(n-1)/2$ possible 
+paris of birds, so the worst-case time complexity of this algorithm is $O(n^2)$.
 
 \question{15.B}
+\\For this question, we can use a variation of the Boyer-Moore Majority Vote Algorithm. Instead of looking for a majority element, we look for an element that occurs more that $n/p$ times,
+where $p$ is the number of species present in the kettle of $n$ birds.
+\\Suppose the plurality species has $k$ birds, where $k>n/2$. Then, we can pick any two birds and put them in a cage together. If they are friendly to each other, then they are of the same species.
+We call this speices $S$. Otherwise, we can separate them and repeat the same step with two different birds. 
+\\Now, we know that at least one bird belongs to $S$. We can use this bird as a reference and compare it with other birds by using the same process. We keep doing this until we have 
+compared the reference bird with $k-1$ other birds. If more than half of the birds are friendly with the reference bird, then it belongs to the plurality species. We can output all the birds that 
+are friendly with the reference bird. Then, we finish picking out the birds from the plurality species.
+\\As for the time complexity of this algorithm, we only need to compare the reference bird with $k-1$ other birds, which is $O(k)$. Since $k>n/2$, the worst-case time complexity of this algorithm is
+$O(n)$. This is more efficient than the above algorithm.
 
 \end{document}
