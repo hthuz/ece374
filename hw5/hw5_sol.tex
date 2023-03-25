@@ -108,9 +108,9 @@ The number of moves $T(n)$ is the same as the case of naive Hanoi, where $T(n) =
 \question{14.A}\\
 % =============
 $\bullet$ \textbf{The algorithm:}\\
-We can use the array index of $A_1$,$A_2$,$\cdot \cdot \cdot$,$A_k$ as the basis for grouping. The problem of get the final big happy array now becomes  getting two ordered arrays, Aleft and Aright, and then merge them.\\
-Set $mid = left+\frac{right-left}{2}$. For the first division, $mid = 1+\frac{k-1}{2}$. Aleft contains all the element in the array $[A_1,A_{mid}]$ and Aright will contains all the element in the array $[A_{mid}+1,A_k]$.\\
-Divide the problem recursively until there are only two arrays, then, skip the divide function and just merge them.\\
+We can use the array index of $A_1$,$A_2$,$\cdot \cdot \cdot$,$A_k$ as the basis for grouping. The problem of get the final big happy array now becomes getting two ordered arrays, Aleft and Aright, and then merge them.\\
+Set $mid = left+\frac{right-left}{2}$. For the first division, $mid = 1+\frac{k-1}{2}$. Aleft contains all the element in the array $[A_1 \ \ to \ \ A_{mid}]$ and Aright will contains all the element in the array $[A_{mid}+1 \ \ to \ \ A_k]$.\\
+Divide the big array recursively until there are only two arrays, then, skip the divide function and just merge them.\\
 $\bullet$ \textbf{The time:}\\
 There are k arrays at first, so the depth of the tree is at most $\log{k}$. In every layer, there are at most n times comparison. So $T(n) = O(nlogk)$.\\
 $\bullet$ \textbf{the concept picture:} this is just an example.
@@ -119,7 +119,9 @@ $\bullet$ \textbf{the concept picture:} this is just an example.
 	\includegraphics[height=5.5cm,width=12.5cm]{picture//Q14A.png}
 	\caption{concept tree}
 	\end{figure}
-$\bullet$ \textbf{Pseudocode:}
+\noindent
+$\bullet$ \textbf{Pseudocode:}\\
+	left and right is the index of arrays from $A_1$ to $A_k$, result will store the final array, temp1,temp2 is used to store the children's sorted arrays.
 	\begin{lstlisting}
 	MergeSortA( left, right, result):
 		if(right - left<1) then result = original array
@@ -149,15 +151,16 @@ $\bullet$ \textbf{Pseudocode:}
 % =============
 \question{14.B}\\
 % =============
-\textbf{If we are taking about merge sort with k-branch tree:}\\
+\textbf{If we are talking about merge sort with k-branch tree:}\\
 $\bullet$ \textbf{The algorithm:}\\
 Split the array of size N into k arrays with size $\frac{N}{k}$,\\
-recursively sort them, get the sorted arrays,\\
-then merge the k sorted arrays to get the final big sorted array.\\
+Now the question becomes sort the k arrays and merge them.\\
+for every sub-arrays with size<>1, split them into k arrays with size $\frac{N}{k^2}$.\\. sort the new k arrays and merge them.\\
+Do the recursive work and the final result is a big happy sorted array.\\
 $\bullet$ \textbf{The time:}\\
 The depth of the k-branches tree is $\log{k}$.\\
 The comparision time of every layer is $cN$.\\
-The running time is: $T(N) = kT(\frac{N}{k})+cN = O(NlogN)$\\
+The running time is: $T(N) = kT(\frac{N}{k})+cN = O(NlogN)$\\	
 $\bullet$ \textbf{the concept picture:}\\
 	\begin{figure}[H]
 	\centering %表示居中
@@ -166,10 +169,36 @@ $\bullet$ \textbf{the concept picture:}\\
 	\end{figure}
 
 \noindent
-\textbf{If we are taking about Q14 with t-branch tree:}\\
+$\bullet$ \textbf{Pseudocode:}\\
+	left and right is the index of arrays from $A_1$ to $A_n$, every array contains exactly one element at first. result will store the final array, t is the branch of the tree, temp is used to store the children's sorted arrays.
+	\begin{lstlisting}
+	MergeSortB( left, right, result, t):
+		if(right - left<1) then result = original array
+		count = 0
+		while (count<t):
+			mid [ i ] =left+(right-left)/t
+			count= count+1
+		
+		count = 0
+		while (count<t):
+			temp [count] = MergeSortB( left, mid[count] , result, t )
+			count= count+1
+	
+		Merge( temp, k, result )
+	
+	MergeB ( temp, t, result ):
+		# merge data from temp[0] to temp [t-1] and stored into result
+	\end{lstlisting}
+
+
+\noindent
+\textbf{If we are talking about Q14 with t-branch tree:}\\
 $\bullet$ \textbf{The algorithm:}\\
 Similar to the first question, suppose we use a t-branch tree for recursion.\\
-Set (t-1) mid values and use these indexes to group and merge arrays.\\
+Set (t-1) mid values.\\
+We can use the array index of $A_1$,$A_2$,$\cdot \cdot \cdot$,$A_k$ as the basis for grouping. The problem of get the final big happy array now becomes getting k ordered arrays, $B_1$,$B_2$,$B_3$... and $B_k$, and then merge them.\\
+Set $mid[i] = left+i \cdot \frac{right-left}{2}$. For the first division, $mid[i] = 1+i \cdot \frac{k-1}{2}$. $B_1$ contains all the element in the array $[A_1 \ \ to \ \ A_{mid[1]}]$ , for $i<k$, $B_i$ will contains all the element in the array $[A_{mid[i]}+1 \ \ to \ \ A_{mid[i+1]}]$.\\
+Divide the big array recursively until there are only two arrays, then, skip the divide function and just merge them.\\
 $\bullet$ \textbf{The time:}\\
 The depth of the t-branches tree is $\log{k}$.\\
 The comparision time of every layer is $cn$.\\
@@ -180,24 +209,26 @@ $\bullet$ \textbf{the concept picture:} this is just an example.
 	\includegraphics[height=5.5cm,width=12.5cm]{picture//Q14B2.png}
 	\caption{concept tree}
 	\end{figure}
+\noindent
 $\bullet$ \textbf{Pseudocode:}
+	left and right is the index of arrays from $A_1$ to $A_k$, result will store the final array, t is the number of branch, temp is used to store the children's sorted arrays.
 	\begin{lstlisting}
-	MergeSortB( left, right, result, k):
-		if(right - left<1) then return
+	MergeSortB( left, right, result, t):
+		if(right - left<1) then result = original array
 		count = 0
-		while (count<k):
-			mid [ i ] =left+(right-left)/k
+		while (count<t):
+			mid [ i ] =left+(right-left)/t
 			count= count+1
 		
 		count = 0
-		while (count<k):
-			MergeSortB( left, mid , temp, k, startmid)
+		while (count<t):
+			temp [count] = MergeSortB( left, mid[count] , result, t )
 			count= count+1
 	
-		Merge( temp, result)
+		Merge( temp, k, result )
 	
-	MergeB ( temp, k, result ):
-		# merge data and stored into result
+	MergeB ( temp, t, result ):
+		# merge data from temp[0] to temp [t-1] and stored into result
 	\end{lstlisting}
 
 % =============
@@ -220,6 +251,7 @@ $\bullet$ \textbf{the concept picture:} assume that $n_1>n_2>n_3>$....$n_k$\\
 	\includegraphics[height=5.5cm,width=12.5cm]{picture//Q14C2.png}
 	\caption{concept tree}
 	\end{figure}
+\noindent
 $\bullet$ \textbf{Pseudocode:}
 	\begin{lstlisting}
 	arr = [A1,A2,...,Ak]
