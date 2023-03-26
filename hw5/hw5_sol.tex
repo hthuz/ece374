@@ -80,8 +80,23 @@ The number of moves $T(n)$ can be represented as $T(n) = 3T(n - 1) + 2, n > 1$ w
 % =============
 
 % =============
-\question{13.B}
+\question{13.B}\\
 % =============
+In this Hanoi 2, disk n need to be moved from src(peg1) to dest(peg2), with n - 1 disks in the tmp peg(peg0). But now it is forbidden to directly move disks move src to dest,the disk should be moved once at a time and it is not allowed to put a bigger disk on top of a smaller disk . So we need to move disks $n - 1$ to peg0 first with two steps, then move disk $n$ to dest(peg2), move disks $n - 1$ from dest back to src(peg1), and finally recursively move disk $n -1 $ from src(peg1) to dest(peg2) again . The correctness lies in that disk $n$ and disks $n - 1$ will be moved from src to dest, without violating rules.
+
+The pseudo code is as follows:
+
+\begin{lstlisting}
+  Hanoi2(n, peg1, peg2, peg0):  //src,dest,tmp
+    if (n > 0) then
+      Hanoi2(n - 1, peg1, peg2, peg0)  	// n-1 in peg2
+	   Hanoi2(n - 1, peg2, peg0, peg1)	  // n-1 in peg0
+      Move disk n from peg1 to peg2
+      Hanoi2(n - 1, peg0, peg1, peg2)		// n-1 in peg1
+\end{lstlisting}
+
+The number of moves $T(n)$ can be represented as $T(n) = 3T(n - 1) + 1, n > 1$ with $T(1) = 1$. Solving the recurrence equation, we have Upper bound $O(3^n)$
+
 
 % =============
 \question{13.C}
