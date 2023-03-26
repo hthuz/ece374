@@ -252,15 +252,14 @@ $\bullet$ \textbf{Pseudocode:}
 $\bullet$ \textbf{The algorithm:}\\\\
 Set an array $"temp"$ and $"result"$ to store the sorted array for each merge.\\
 1. Traverse $k$ arrays in [$n_1$, $n_2$,.. ,$n_k$], find the one with the smallest $n_i$, record it in the array $temp$, and delete it from [$n_1$, $n_2$,.. ,$n_k$].\\
-2. Traverse the $k-1$ array, find the one with the smallest $n_i$, merge it with $temp$, and store the result in the $result$. Overwrite the $temp$ array with $result$.\\
-3. Traverse the $k-2$ array, find the one with the smallest $n_i$, merge it with $temp$, and store the result in the $result$. Overwrite the $temp$ array with $result$.\\\\
-Cycle the above operations until [$n_1$, $n_2$,.. ,$n_k$] no longer has elements.\\
+2. Traverse the $k-1$ array, find the one with the smallest $n_i$, merge it with $temp$, and store the result in the $result$. put the $result$'s $n_{new}$ back into [$n_k$] array.\\
+Cycle the above operations until [$n_1$, $n_2$,.. ,$n_k$] has only one elements.\\
 $\bullet$ \textbf{The time:}\\
-the total Traverse time $T1 = k+k-1+k-2+...+1 = \frac{k+1}{2} = O(n)$\\
+the total Traverse time $T1 = k+k-1+k-1+k-2+...+1 = k^2-1 = constant$ \\
 The depth of $n_i$ in the tree is $\log{\frac{n}{n_i}}$.\\
 when merging $n_i$ to a higher layer, the merging time is $cn_i$.\\
-The running time is: $T(n) = \frac{k+1}{2}+ \sum^k_{i=1}{n_i\log{\frac{n}{n_i}}} = O(n+\sum^k_{i=1}{n_i\log{\frac{n}{n_i}}})$\\
-$\bullet$ \textbf{the concept picture:} assume that $n_1>n_2>n_3>$....$n_k$\\
+The running time is: $T(n) = constant+ \sum^k_{i=1}{n_i\log{\frac{n}{n_i}}} = O(n+\sum^k_{i=1}{n_i\log{\frac{n}{n_i}}})$\\
+$\bullet$ \textbf{the concept picture:} assume that $n_1>n_2>n_3>$....$n_k$, and $n_i+n_{i-1}<=n_{i-2}$\\
 	\begin{figure}[H]
 	\centering %表示居中
 	\includegraphics[height=5.5cm,width=12.5cm]{picture//Q14C2.png}
@@ -271,13 +270,13 @@ $\bullet$ \textbf{Pseudocode:}
 	\begin{lstlisting}
 	arr = [A1,A2,...,Ak]
 	MergeSortC( arr, result, temp):
-		# temp = the array pointer with the smallest ni found by Traverse
-		# delete Ai in arr
 		while (len(arr) <> 0 ):
-			#  temp1 = the array pointer with the smallest ni found by Traverse
+			# temp = the array pointer with the smallest ni found by Traverse
+			# delete Ai in arr
+			# temp1 = the array pointer with the smallest ni found by Traverse
 			# delete Ai in arr
 			MergeTwo( temp1, temp , res)
-			temp = res
+			# Add result into arr
 			
 
 	MergeTwo ( t1, t2, res ):
