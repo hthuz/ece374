@@ -62,15 +62,13 @@ def receive_message(i):
         if (len(data) == 0):
             continue
         # con.send("ack".encode('utf-8'))   # to avoid packet splicing 
-        print(data)
+        print("receive "+data)
     
     
 
 def multicast_message(fix_row):
     for key in send_conn:
-        print("send to:"+key)
         (send_conn[key]).send("{0}".format(fix_row).encode("utf-8"))
-        (send_conn[key]).recv(1024).decode("utf-8")
     
 
 # Description: main function
@@ -87,8 +85,8 @@ def main():
 
     # readtxt
     node_num = readtxt(sys.argv[3])
-
     print(node_num,len(send_conn),other_node_ip)
+
     # establish send connection
     send_conn_thread = threading.Thread(target=establish_send, args=(node_num,))
     send_conn_thread.start()
@@ -117,21 +115,19 @@ def main():
         sum = 0
         for i in range(0,node_num):
             sum = sum + receive_prepared[i]
-        print(sum)
+        print("the prepared receive thread is:"+str(sum))
         if (sum == node_num):
             break
     
     # send message thread
     for key in send_conn:
-        print("I have sent")
         (send_conn[key]).send("{0} - {1} connected \n".format(time.time(),sys.argv[1]).encode("utf-8"))
-        # (send_conn[key]).recv(1024).decode("utf-8")
+
     for row in sys.stdin:
-        print ("come here1")
-    #     fix_row = row.strip('\n')
-    #     print (fix_row)
-    #     multicast_thread = threading.Thread(target=multicast_message, args=(fix_row,))
-    #     multicast_thread.start()
+        fix_row = row.strip('\n')
+        print("send "+fix_row)
+        multicast_thread = threading.Thread(target=multicast_message, args=(fix_row,))
+        multicast_thread.start()
 
     while True:
         pass

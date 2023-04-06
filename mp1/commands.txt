@@ -1,0 +1,3 @@
+python -u gentx.py 0.5 | ./mp1_node node3 1236 config3.txt
+python -u gentx.py 0.5 | ./mp1_node node2 1235 config2.txt
+python -u gentx.py 0.5 | ./mp1_node node1 1234 config1.txt
