@@ -18,6 +18,7 @@ send_conn = dict()
 
 # receive_conn don't care about the map relations
 receive_conn = []
+receive_prepared = []
 
 
 def readtxt(filename):
@@ -53,16 +54,15 @@ def establish_send(node_num):
 
 
 
-def receive_message(con):
+def receive_message(i):
+    con = receive_conn[i]
     while True:
-        try:
-            data = con.recv(1024).decode('utf-8')
-            if (len(data) == 0):
-                continue
-            # con.send("ack".encode('utf-8'))   # to avoid packet splicing 
-            print(data)
-        except:
+        receive_prepared [i] = 1
+        data = con.recv(1024).decode('utf-8')
+        if (len(data) == 0):
             continue
+        # con.send("ack".encode('utf-8'))   # to avoid packet splicing 
+        print(data)
     
     
 
@@ -100,22 +100,31 @@ def main():
     while (len(receive_conn)!=node_num):
         s,addr = mynode.accept()
         receive_conn.append(s)
+        receive_prepared.append(0)
 
     # wait until send connection established already
-    while (len(send_conn)!=node_num):
+    while (len(send_conn)!=node_num or len(receive_conn)!=node_num):
         continue
 
 
     # receive message thread
     for i in range(0,node_num):
-        print (i)
-        conn = receive_conn[i]
-        receive_thread = threading.Thread(target=receive_message, args=(conn,))
+        receive_thread = threading.Thread(target=receive_message, args=(i,))
         receive_thread.start()
 
+    # wait until receive thread prepared already
+    while True:
+        sum = 0
+        for i in range(0,node_num):
+            sum = sum + receive_prepared[i]
+        print(sum)
+        if (sum == node_num):
+            break
+    
     # send message thread
     for key in send_conn:
-        (send_conn[key]).send("{0} - {1} connected \n".format(time.time(),sys.argv[1] ).encode("utf-8"))
+        print("I have sent")
+        (send_conn[key]).send("{0} - {1} connected \n".format(time.time(),sys.argv[1]).encode("utf-8"))
         # (send_conn[key]).recv(1024).decode("utf-8")
     for row in sys.stdin:
         print ("come here1")
