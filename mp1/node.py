@@ -11,13 +11,16 @@ import csv
 ########
 # class
 ########
-# queue element is [content,mid,final_priority,deliverable,suggestor, [[turn,suggestor],[turn,suggestor]]]
+# queue element is [content,mid,final_priority,deliverable,sender, [[turn,suggestor],[turn,suggestor]]]
 class hold_queue:
     def __init__(self):
         self.queue = []
    
     def displayqueue(self):
-        print (self.queue)
+        print("#######   queue start  ########")
+        for i in range(0,len(self.queue)):
+            print (self.queue[i])
+        print("#######    queue end   ########")
     
     def queue_append(self,datalist):
         self.queue.append(datalist)
@@ -35,10 +38,10 @@ class hold_queue:
         self.queue[index][4] = suggestor
 
     def sort_queue(self):
-        self.queue.sort(key=lambda x:(-x[2], -x[3], -x[4]))
-        # smaller final_priority will be at the end
-        # smaller deliverable will be at the end
-        # smaller suggestor will be at the end
+        self.queue.sort(key=lambda x:(x[2], x[3], x[4]))
+        # smaller final_priority will be at the head
+        # smaller deliverable will be at the head， undiliverable will be at the head
+        # smaller suggestor will be at the head
         
     def feedbacklist_append(self, index, proposed_info):
         (self.queue[index][5]).append(proposed_info)
@@ -49,7 +52,19 @@ class hold_queue:
     def feedbacklist_sort(self, index):
         (self.queue[index][5]).sort(key=lambda x:(x[0],x[1]))
 
-
+    def feedbacklist_agreed_priority(self,index):
+        return self.queue[index][5][0][0]
+    
+    def feedbacklist_suggested_id(self,index):
+        return self.queue[index][5][0][1]
+    
+    def check_and_remove(self):
+        while (len(self.queue)>0 and self.queue[0][3] == 1):
+            popdata = self.queue[0]
+            self.queue.remove(self.queue[0])
+            print ("deliver:")
+            print (popdata)
+            
 
 
 
@@ -57,7 +72,7 @@ class hold_queue:
 # variable
 ###########
 
-# key is node_name
+# key is node_id, whose type is tring. my_node_id's type is also string
 other_node_ip = dict()    
 other_node_port = dict()
 send_conn = dict()
@@ -69,6 +84,7 @@ receive_prepared = []
 # myqueue and my turn
 myqueue = hold_queue()
 my_turn = 0
+myterminate = 0
 
 # lock
 queue_lock = threading.Lock()
@@ -88,8 +104,8 @@ def feedbackMessage(proposed_priority, mid, suggestor):
     string = "feedback"+"|"+ proposed_priority + "|" + mid+ "|" + suggestor +"|"
     return string
 
-def decidedMessage(agreed_priority, mid):
-    string = "decided"+"|"+ agreed_priority + "|" + mid
+def decidedMessage(agreed_priority, suggested_id, mid):
+    string = "decided"+"|"+agreed_priority+"|"+suggested_id + "|" + mid
     return string
 
 
@@ -105,12 +121,12 @@ def readtxt(filename):
         if len(data_line) == 1:
             node_number = int(data_line[0])
         else:
-            node_name = data_line[0]
+            node_id = (data_line[0])[4]
             ip = data_line[1]
             port = int(data_line[2])
 
-            other_node_ip[node_name] = ip
-            other_node_port[node_name] = port
+            other_node_ip[node_id] = ip
+            other_node_port[node_id] = port
             
     return node_number
 
@@ -130,27 +146,28 @@ def establish_send(node_num):
                 addr = other_node_ip[key]
                 con = socket.socket()
                 con.connect((addr, port))
-                send_conn[port] = con
-                print(key+" is established")
+                send_conn[key] = con
+                # print(key+" is established")
             except:
                 continue
-    print("send_conn established with node_number:"+str(node_num))
+    # print("send_conn established with node_number:"+str(node_num))
 
 
-#################
-# receive_message
-#################
+###########################
+# receive_message_thread
+###########################
 def receive_message(i):
     global myqueue
-    global myname
+    global my_nodeid
     global my_turn
+    global node_num
 
     global receive_conn
     global send_conn
 
 
     con = receive_conn[i]
-    while True:
+    while not myterminate:
         receive_prepared [i] = 1
         data = con.recv(1024).decode('utf-8')
         if (len(data) == 0):
@@ -163,43 +180,96 @@ def receive_message(i):
             mid = datalist[2]
             original_priority = int(datalist[3])
 
-            # store the information into local queue, 
-            # [content,mid,final_priority,deliverable,suggestor,[]]
-            myqueue.queue_append([msg_content,mid,original_priority,0,1,[]])
+            # update queue
+            # [content,mid,final_priority,deliverable,sender,[]]
+            queue_lock.acquire()
+            myqueue.queue_append([msg_content,mid,original_priority,0,int(mid[0]),[]])
             myqueue.sort_queue()
+            # myqueue.displayqueue()
+            queue_lock.release()
 
             # add the my_turn
             myturn_lock.acquire()
             my_turn += 1
+            cur_turn = my_turn
             myturn_lock.release()
 
             # send feedback message
             # feedbackMessage(proposed_priority, mid, suggestor)
-            feedbackmessage = feedbackMessage(str(my_turn), mid, myname)
-            single_send(mid.split(" ")[0],feedbackmessage)
+            feedbackmessage = feedbackMessage(str(cur_turn), mid, my_nodeid)
+            target_node = mid.split(" ")[0]
+            feedback_thread = threading.Thread(target=single_send, args=(target_node, feedbackmessage))
+            feedback_thread.start()
 
 
         if (msg_type == "feedback"):
-            continue
+            #feedbackMessage(proposed_priority, mid, suggestor)
+            proposed_priority = datalist[1]
+            mid = datalist[2]
+            suggestor = int(datalist[3])
+
+            # update queue
+            # [content,mid,final_priority,deliverable,sender,[]]
+            queue_lock.acquire()
+            index = myqueue.queue_find_index(mid)
+            if index == -1: 
+                print(" cannot find the messages")
+                return -1
+            myqueue.feedbacklist_append(index, [int(proposed_priority),int(suggestor)])
+            if (myqueue.feedbacklist_check(index) == node_num+1):
+                # multicast
+                myqueue.feedbacklist_sort(index)
+                agreed_priority = myqueue.feedbacklist_agreed_priority(index)
+                suggested_id = myqueue.feedbacklist_suggested_id(index)
+                mid = mid
+                decidedmessage = decidedMessage(str(agreed_priority), str(suggested_id), mid)
+                decide_thread = threading.Thread(target=multicast_message, args=(decidedmessage,))
+                decide_thread.start()
+
+                # update queue value
+                myqueue.queue_update_element(index,agreed_priority,1,suggested_id)
+                myqueue.sort_queue()
+                myqueue.check_and_remove()
+
+            myqueue.displayqueue()
+            queue_lock.release()
+
+        if (msg_type == "decided"):
+
+            priority = int(datalist[1])
+            mid = datalist[3]
+            suggestor_id = int(datalist[2])
+            # update priority and suggested_id
+            queue_lock.acquire()
+            index = myqueue.queue_find_index(mid)
+            if (index == -1):
+                print ("fail")
+                return -1
+            myqueue.queue_update_element(index,priority,1,suggestor_id)
+            myqueue.sort_queue()  # must sort immediatly
+            myqueue.displayqueue()
+            # check if deliverable, remove from queue
+            myqueue.check_and_remove()
+            queue_lock.release()
 
             
         
-        print("receive "+data)
+        # print("receive "+data)
     
     
-#################
-# send_message
-#################
+###########################
+# send_message thread
+############################
 def multicast_message(fix_row):
     global send_conn
     for key in send_conn:
         (send_conn[key]).send("{0}".format(fix_row).encode("utf-8"))
 
-def single_send(key,fix_row):
+
+def single_send(key,fix_row):  # key is a string
     global send_conn
-    for key1 in send_conn:
-        if (str(key1)==key):
-            (send_conn[key1]).send("{0}".format(fix_row).encode("utf-8"))
+    (send_conn[key]).send("{0}".format(fix_row).encode("utf-8"))
+
 
 
 
@@ -209,7 +279,8 @@ def single_send(key,fix_row):
 def main():
     global my_turn
     global myqueue
-    global myname
+    global my_nodeid
+    global myterminate
 
     global other_node_ip
     global node_num 
@@ -224,7 +295,8 @@ def main():
     print('logger is waiting to connect.')
 
     # my node name
-    myname = sys.argv[1]
+    name = sys.argv[1]
+    my_nodeid = name[4]
 
     # readtxt
     node_num = readtxt(sys.argv[3])
@@ -258,29 +330,35 @@ def main():
         sum = 0
         for i in range(0,node_num):
             sum = sum + receive_prepared[i]
-        print("the prepared receive thread is:"+str(sum))
+        # print("the prepared receive thread is:"+str(sum))
         if (sum == node_num):
             break
     
+
     # send message thread
-    # for key in send_conn:
-    #     (send_conn[key]).send("{0} - {1} connected \n".format(time.time(),sys.argv[1]).encode("utf-8"))
     for row in sys.stdin:
         fix_row = row.strip('\n')
-        mid = myname +" "+ str(time.time())
+        mid = my_nodeid +" "+ str(time.time())
 
+        # update turn, store cur_turn
         myturn_lock.acquire()
         my_turn +=1
+        cur_turn = my_turn
         myturn_lock.release()
 
-        askmessage = askMessage( fix_row, mid, str(my_turn))
+        # update queue
+        queue_lock.acquire()
+        myqueue.queue_append([fix_row,mid,cur_turn,0,int(my_nodeid),[]])
+        myqueue.feedbacklist_append(myqueue.queue_find_index(mid), [cur_turn,int(my_nodeid)])
+        myqueue.sort_queue()
+        myqueue.displayqueue()
+        queue_lock.release()
 
-        print("send "+fix_row)
+        # prepare the message and start the send thread
+        askmessage = askMessage( fix_row, mid, str(cur_turn))
         multicast_thread = threading.Thread(target=multicast_message, args=(askmessage,))
         multicast_thread.start()
 
-    while True:
-        pass
 
 
 if __name__ == '__main__':
