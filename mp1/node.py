@@ -3,7 +3,7 @@ import sys
 import time
 import threading
 import csv
-
+import struct
 
 
 
@@ -62,7 +62,7 @@ class hold_queue:
         while (len(self.queue)>0 and self.queue[0][3] == 1):
             popdata = self.queue[0]
             self.queue.remove(self.queue[0])
-            print ("deliver:")
+            # print ("deliver:")
             print (popdata)
             
 
@@ -97,16 +97,16 @@ myturn_lock = threading.Lock()
 # message function
 ###################
 def askMessage(message_content, mid, send_priority):
-    string = "ask"+"|" + message_content + "|" + mid + "|" + send_priority +"|"
-    return string
+    string = "ask"+"|" + message_content + "|" + mid + "|" + send_priority +"|" 
+    return string.ljust(128,' ')
 
 def feedbackMessage(proposed_priority, mid, suggestor):
     string = "feedback"+"|"+ proposed_priority + "|" + mid+ "|" + suggestor +"|"
-    return string
+    return string.ljust(128,' ')
 
 def decidedMessage(agreed_priority, suggested_id, mid):
-    string = "decided"+"|"+agreed_priority+"|"+suggested_id + "|" + mid
-    return string
+    string = "decided"+"|"+agreed_priority+"|"+suggested_id + "|" + mid+"|"
+    return string.ljust(128,' ')
 
 
 ##########
@@ -169,11 +169,13 @@ def receive_message(i):
     con = receive_conn[i]
     while not myterminate:
         receive_prepared [i] = 1
-        data = con.recv(1024).decode('utf-8')
-        if (len(data) == 0):
-            continue
+        data = con.recv(128).decode('utf-8')
+        if (len(data)!=128):
+            data += con.recv(128-len(data)).decode('utf-8')
+            
         datalist = data.split("|")
         msg_type = datalist[0]
+        # print(data.strip(" "))
 
         if (msg_type == "ask"):
             msg_content = datalist[1]
@@ -198,8 +200,7 @@ def receive_message(i):
             # feedbackMessage(proposed_priority, mid, suggestor)
             feedbackmessage = feedbackMessage(str(cur_turn), mid, my_nodeid)
             target_node = mid.split(" ")[0]
-            feedback_thread = threading.Thread(target=single_send, args=(target_node, feedbackmessage))
-            feedback_thread.start()
+            single_send(target_node, feedbackmessage)
 
 
         if (msg_type == "feedback"):
@@ -223,15 +224,14 @@ def receive_message(i):
                 suggested_id = myqueue.feedbacklist_suggested_id(index)
                 mid = mid
                 decidedmessage = decidedMessage(str(agreed_priority), str(suggested_id), mid)
-                decide_thread = threading.Thread(target=multicast_message, args=(decidedmessage,))
-                decide_thread.start()
+                multicast_message(decidedmessage)
 
                 # update queue value
                 myqueue.queue_update_element(index,agreed_priority,1,suggested_id)
                 myqueue.sort_queue()
                 myqueue.check_and_remove()
 
-            myqueue.displayqueue()
+            # myqueue.displayqueue()
             queue_lock.release()
 
         if (msg_type == "decided"):
@@ -247,7 +247,7 @@ def receive_message(i):
                 return -1
             myqueue.queue_update_element(index,priority,1,suggestor_id)
             myqueue.sort_queue()  # must sort immediatly
-            myqueue.displayqueue()
+            # myqueue.displayqueue()
             # check if deliverable, remove from queue
             myqueue.check_and_remove()
             queue_lock.release()
@@ -338,6 +338,7 @@ def main():
     # send message thread
     for row in sys.stdin:
         fix_row = row.strip('\n')
+        time.sleep(0.0001)
         mid = my_nodeid +" "+ str(time.time())
 
         # update turn, store cur_turn
@@ -351,13 +352,12 @@ def main():
         myqueue.queue_append([fix_row,mid,cur_turn,0,int(my_nodeid),[]])
         myqueue.feedbacklist_append(myqueue.queue_find_index(mid), [cur_turn,int(my_nodeid)])
         myqueue.sort_queue()
-        myqueue.displayqueue()
+        # myqueue.displayqueue()
         queue_lock.release()
 
         # prepare the message and start the send thread
         askmessage = askMessage( fix_row, mid, str(cur_turn))
-        multicast_thread = threading.Thread(target=multicast_message, args=(askmessage,))
-        multicast_thread.start()
+        multicast_message(askmessage)
 
 
 

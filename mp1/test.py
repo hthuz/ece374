@@ -1,6 +1,6 @@
 import threading
 import sys
-
+import struct
 
 class hold_queue:
     def __init__(self):
@@ -108,6 +108,18 @@ def main():
     a =1
     multicast_thread = threading.Thread(target=multicast_message, args=(a,))
     multicast_thread.start()
+
+    
+
+    data1 = 'hello world!'
+    print(len(data1))  # 12
+    res1 = struct.pack('i', len(data1))  # 第一个参数是格式 写i就可以了
+    print(len(res1))  # 4
+    ret1 = struct.unpack('i', res1)
+    print(ret1)  # (12,)
+
+
+
 
 
 if __name__ == '__main__':
