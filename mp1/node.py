@@ -73,6 +73,8 @@ class hold_queue:
 # variable
 ###########
 
+node_num = 0
+
 # key is node_id, whose type is tring. my_node_id's type is also string
 other_node_ip = dict()    
 other_node_port = dict()
@@ -118,20 +120,20 @@ def decidedMessage(mid, agreed_priority, suggested_id,need_multicast):
 def readtxt(filename):
     global other_node_ip
     global other_node_port
-    f=open(filename, 'r', encoding='utf-8')
+    global node_num
+    f = open(filename, 'r', encoding='utf-8')
     for line in f:
         data_line = line.strip("\n").split()
         if len(data_line) == 1:
-            node_number = int(data_line[0])
+            node_num = int(data_line[0])
         else:
-            node_id = (data_line[0])[4]
+            other_node_id = (data_line[0])[4]
             ip = data_line[1]
             port = int(data_line[2])
 
-            other_node_ip[node_id] = ip
-            other_node_port[node_id] = port
-            
-    return node_number
+            other_node_ip[other_node_id] = ip
+            other_node_port[other_node_id] = port
+    return 
 
 
 #################
@@ -348,8 +350,8 @@ def main():
     print('logger is waiting to connect.')
 
     # my node name
-    name = sys.argv[1]
-    my_nodeid = name[4]
+    node_name = sys.argv[1]
+    node_id = node_name[4]
 
     # readtxt
     node_num = readtxt(sys.argv[3])
