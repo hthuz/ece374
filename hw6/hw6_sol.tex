@@ -100,6 +100,17 @@ Note the here $decomp$ function takes $cut\_num$ as argument and use this value 
 
 \question{17.C}
 
+Similar to Q17.B, we just need to need to find the best average quality. We can do the modification as follows:
+\begin{lstlisting}
+def decompavgmax_dp():
+  M[0... 2 ** n - 1]
+  M[2 ** n - 1] = 0
+  for cut_num in range(2 ** n - 2, -1, -1):
+    M[i] = max(decomp(cut_num) / (num of 1s in cut_num),M[cut_num + 1] )
+  return M[0]
+\end{lstlisting}
+
+The number of subproblems doesn't change and each subproblem still requires constant time ignoring resursive calls. The time complexity and space complexity of the algorithm is $O(2^n)$
 
 \question{18.A}
 
