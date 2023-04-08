@@ -106,21 +106,22 @@ UNDELIVERABLE = 0
 
 # Account : Balance
 bank = dict()
+metricfile_name = ""
 
 
 ###################
 # message function
 ###################
 def askMessage(msg_id,message_content, send_priority,need_multicast):
-    string = "ask"+"|" +  msg_id  + "|" + message_content + "|" + send_priority +"|"+ need_multicast+"|"
+    string = "ask"+"|" +  msg_id  + "|" + message_content + "|" + send_priority +"|"+ need_multicast + "|" + str(time.time()) + "|"
     return string.ljust(128," ")
 
 def feedbackMessage(msg_id, proposed_priority, suggestor,need_multicast):
-    string = "feedback"+"|"+ msg_id + "|" + proposed_priority+ "|" + suggestor +"|"+ need_multicast+"|"
+    string = "feedback"+"|"+ msg_id + "|" + proposed_priority+ "|" + suggestor +"|"+ need_multicast + "|" +  str(time.time()) + "|"
     return string.ljust(128," ")
 
 def decidedMessage(msg_id, agreed_priority, suggested_id,need_multicast):
-    string = "decided"+"|"+msg_id+"|"+ agreed_priority+"|"+suggested_id + "|" + need_multicast+"|"
+    string = "decided"+"|"+msg_id+"|"+ agreed_priority+"|"+suggested_id + "|" + need_multicast + "|" + str(time.time()) + "|"
     return string.ljust(128," ")
 
 
@@ -192,7 +193,10 @@ def receive_message(i):
         datalist = data.split("|")
         msg_type = datalist[0]
         msg_id = datalist[1]
+        send_time = float(datalist[5])
         typemid = msg_type + "|" + msg_id
+
+        get_bandwidth(data, send_time)
 
         if (msg_type == "feedback"):
             typemid = typemid + "|feebacker:" + datalist[3]
@@ -233,6 +237,7 @@ def receive_message(i):
             seen_lock.acquire()
             seen_typemid.append(typemid1)
             seen_lock.release()
+
 
             # send feedback message
             # print("send:"+typemid1)
@@ -275,7 +280,6 @@ def receive_message(i):
                     # print("send:"+typemid2)
                     decidedmessage = decidedMessage(msg_id,str(agreed_priority), str(suggested_id),str(1))
                     multicast_message(decidedmessage)
-
                     # update queue value
                     queue.queue_update_element(index,agreed_priority,DELIVERABLE ,suggested_id)
                     queue.sort_queue()
@@ -318,10 +322,6 @@ def receive_message(i):
                 decidedmessage = decidedMessage(msg_id, str(priority), str(suggestor_id), str(0))
                 multicast_message(decidedmessage)
 
-            
-        # con.send("ack".encode('utf-8'))
-        # print("receive "+data)
-    
     
 ###########################
 # send_message thread
@@ -364,6 +364,13 @@ def handle_transaction(msg_content):
 
     return
 
+def get_bandwidth(data, send_time):
+    delay = time.time() - send_time
+    bandwidth = len(data.encode('utf-8')) / delay
+    metricfile = open(metricfile_name, 'a')
+    metricfile.write(data + "," + str(bandwidth) + "\n")
+    metricfile.close()
+    return
 
 
 #######
@@ -376,6 +383,7 @@ def main():
     global node_port
     global node_num 
     global other_node_ip
+    global metricfile_name
 
     # Connection Information
     global send_conn
@@ -398,9 +406,8 @@ def main():
     node_port = int(sys.argv[2])
     readtxt(sys.argv[3])
     node_id = node_name[4]
+    metricfile_name = "./bandwidth_" + node_name + ".csv"
     # readtxt and set config for other nodes
-    print(other_node_ip)
-    print(other_node_port)
 
     print(f"#1 {node_name} is waiting for connection")
 
