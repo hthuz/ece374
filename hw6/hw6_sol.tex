@@ -66,7 +66,37 @@
 
 \question{17.A}
 
+A resursive approach can be applied. To find the highest quality substring {\em hqs(1, n)}, there are two cases, If {\em hqs(i, j)} has a higher quality, update recorded new highest quality. If {\em hqs(i,j)} has a lower quality, recursively find among other substrings.
+
+So define {\em hqs(i,j, h)}, where $(i,j)$ represents $x[i...j]$ and h represents recorded highest quality so far, we have
+
+\begin{equation*}
+hqs(i,j,h) = 
+  \begin{cases}
+    h & \mbox{if } i = j \\
+    hqs(i, j, q(i, j)) & \mbox{if } q(i, j) > h \\
+    max(hqs(i + 1, j, h), hqs(i, j - 1, h)) & \mbox{if } q(i,j) \le h
+  \end{cases}
+\end{equation*}
+
+Higest quality substring of x can be found by calling {\em hqs(1, n, 0)}. There are $n \choose 2$ subproblems in total and for each subproblem, we need it requires $O(1)$ time not counting recursive calls. So the time complexity of the algorithm is $O(n^2)$.
+
 \question{17.B}
+
+For substrings $x_1, x_2, x_k$ of a string $x$ of length $n$, it can be represented with a cut arrary of length $n - 1$. In cut array, 1 represents cut the string in this position and 0 otherwise. For example, substrings ("CAT","DOG") can be represented by (00100), cutting at the third interval from left to right. and ("CA", "TO", "OG") can be represented by (01010). It can be found the cutting array can be represented by a binary number $cut\_num$. So the resursive way is to find the maximum quality of decomposition with the observation
+$$
+decompmax(cut\_num) = max(decomp(cut\_num), decompmax(cut\_num + 1))
+$$
+with base case $decompmax(2 ^ n) = 0$. The dynamic programming algorithm to solve this problem is as follows:
+\begin{lstlisting}
+def decompmax_dp():
+  M[0... 2 ** n - 1]
+  M[2 ** n - 1] = 0
+  for cut_num in range(2 ** n - 2, -1, -1):
+    M[i] = max(decomp(cut_num),M[cut_num + 1] )
+  return M[0]
+\end{lstlisting}
+Note the here $decomp$ function takes $cut\_num$ as argument and use this value to get the quality of this decomposition. There is $2 ^ n - 1$ subproblems in total and each subproblem requires constant time ignoring resursive calls. The time complexity and space complexity of the algorithm is both $O(2^n)$.
 
 \question{17.C}
 
