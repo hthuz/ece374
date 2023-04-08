@@ -63,7 +63,8 @@ class hold_queue:
         while (len(self.queue) > 0 and self.queue[0][3] == 1):
             popdata = self.queue[0]
             self.queue.remove(self.queue[0])
-            print (f"deliver:{popdata}")
+            handle_transaction(popdata[0])
+            # print (f"deliver:{popdata}")
             
 
 
@@ -98,6 +99,13 @@ turn_lock = threading.Lock()
 
 DELIVERABLE = 1
 UNDELIVERABLE = 0
+
+################
+#### Transaction Related
+################
+
+# Account : Balance
+bank = dict()
 
 
 ###################
@@ -285,6 +293,7 @@ def receive_message(i):
 
         if (msg_type == "decided"):
                 
+            msg_content = datalist[0]
             priority = int(datalist[2])
             suggestor_id = int(datalist[3])
             need_multicast = int(datalist[4])
@@ -325,6 +334,35 @@ def multicast_message(msg_content):
         # (send_conn[key]).recv(1024).decode("utf-8")
 
 
+def handle_transaction(msg_content):
+    global bank
+
+    if "DEPOSIT" in msg_content:
+        account, amount = msg_content.split(' ')[1], int(msg_content.split(' ')[2])
+        if account not in bank:
+            bank[account] = 0
+        bank[account] += amount
+
+    if "TRANSFER" in msg_content:
+        account, dest, amount = msg_content.split(' ')[1], msg_content.split(' ')[3], int(msg_content.split(' ')[4])
+        if account not in bank:
+            print("Error!, Account not in Bank!")
+            exit(1)
+        if dest not in bank:
+            bank[dest] = 0
+
+        # Do Transaction
+        if bank[account] - amount >= 0:
+            bank[account] -= amount
+            bank[dest] += amount
+
+    # Print balance information
+    balance_info = ""
+    for account in bank:
+        balance_info += " " + account + ":" + str(bank[account])
+    print("BALANCES" + balance_info ) 
+
+    return
 
 
 
