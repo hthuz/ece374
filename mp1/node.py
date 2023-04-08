@@ -73,7 +73,10 @@ class hold_queue:
 # variable
 ###########
 
+node_name = ""
 node_num = 0
+node_id = 0
+node_port = 0
 
 # key is node_id, whose type is tring. my_node_id's type is also string
 other_node_ip = dict()    
@@ -139,23 +142,27 @@ def readtxt(filename):
 #################
 # establish_send
 #################
-def establish_send(node_num):
+def establish_send():
+    global node_name
+    global node_num
     global other_node_ip
     global other_node_port
     global send_conn
 
+    # Keep connecting until all connections are set
     while (len(send_conn) != node_num):
-        for key in other_node_port:
+        # i is id of other nodes
+        for i in other_node_port:
             try:
-                port = other_node_port[key]
-                addr = other_node_ip[key]
+                port = other_node_port[i]
+                ip = other_node_ip[i]
                 con = socket.socket()
-                con.connect((addr, port))
-                send_conn[key] = con
-                # print(key+" is established")
+                con.connect((ip, port))
+                send_conn[i] = con
             except:
                 continue
-    # print("send_conn established with node_number:"+str(node_num))
+    print(f"#1 {node_name} send connection established")
+    return
 
 
 ###########################
@@ -331,14 +338,17 @@ def multicast_message(fix_row):
 # main
 #######
 def main():
+    global node_name
+    global node_id
+    global node_port
+    global node_num 
+    global other_node_ip
+    global send_conn
+
     global my_turn
     global myqueue
-    global my_nodeid
     global myterminate
-    global other_node_ip
-    global node_num 
     global receive_conn
-    global send_conn
     global receive_prepared
     global seen_typemid
 
@@ -347,35 +357,40 @@ def main():
         print("invalid input")
         return -1
     
-    print('logger is waiting to connect.')
 
     # my node name
     node_name = sys.argv[1]
+    node_port = int(sys.argv[2])
     node_id = node_name[4]
+    # readtxt and set config for other nodes
+    readtxt(sys.argv[3])
 
-    # readtxt
-    node_num = readtxt(sys.argv[3])
-    print(node_num,len(send_conn),other_node_ip)
 
-    # establish send connection
-    send_conn_thread = threading.Thread(target=establish_send, args=(node_num,))
+    print(f"#1 {node_name} is waiting for connection")
+
+    # establish send connection (set send_conn)
+    send_conn_thread = threading.Thread(target=establish_send, args=())
     send_conn_thread.start()
     
+    ######
+    # Set Basic parameter done
+    #####
+
     # establish the receive socket
-    mynode = socket.socket()
-    mynode.bind(('127.0.0.1', int(sys.argv[2])))
-    mynode.listen(20)
-    while (len(receive_conn)!=node_num):
-        s,addr = mynode.accept()
-        receive_conn.append(s)
+    node = socket.socket()
+    node.bind(('127.0.0.1', node_port))
+    node.listen(20)
+    while (len(receive_conn) != node_num):
+        conn,addr = node.accept()
+        receive_conn.append(conn)
         receive_prepared.append(0)
 
+    print(f"#1 {node_name} receive connection established")
     # wait until send connection established already
-    while (len(send_conn)!=node_num or len(receive_conn)!=node_num):
+    while (len(send_conn) != node_num or len(receive_conn) != node_num):
         continue
 
-
-    # receive message thread
+    # tackles message receive from each other node
     for i in range(0,node_num):
         receive_thread = threading.Thread(target=receive_message, args=(i,))
         receive_thread.start()
