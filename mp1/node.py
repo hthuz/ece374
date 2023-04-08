@@ -141,25 +141,21 @@ def readtxt(filename):
 #################
 # establish_send
 #################
-def establish_send():
+def establish_send(node_id, ip, port):
     global node_name
     global node_num
-    global other_node_ip
-    global other_node_port
     global send_conn
 
     # Keep connecting until all connections are set
     while (len(send_conn) != node_num):
         # i is id of other nodes
-        for i in other_node_port:
-            try:
-                port = other_node_port[i]
-                ip = other_node_ip[i]
-                con = socket.socket()
-                con.connect((ip, port))
-                send_conn[i] = con
-            except:
-                continue
+        try:
+            con = socket.socket()
+            con.connect((ip, port))
+            send_conn[node_id] = con
+            break
+        except:
+            continue
     print(f"#1 {node_name} send connection established")
     return
 
@@ -362,16 +358,18 @@ def main():
     # my node name
     node_name = sys.argv[1]
     node_port = int(sys.argv[2])
+    readtxt(sys.argv[3])
     node_id = node_name[4]
     # readtxt and set config for other nodes
-    readtxt(sys.argv[3])
-
+    print(other_node_ip)
+    print(other_node_port)
 
     print(f"#1 {node_name} is waiting for connection")
 
     # establish send connection (set send_conn)
-    send_conn_thread = threading.Thread(target=establish_send, args=())
-    send_conn_thread.start()
+    for i in other_node_ip.keys():
+        send_conn_thread = threading.Thread(target=establish_send, args=(i, other_node_ip[i], other_node_port[i]))
+        send_conn_thread.start()
     
     # establish the receive socket
     node = socket.socket()
