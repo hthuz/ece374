@@ -61,8 +61,88 @@
 % =============
 
 \question{16.A}
+last\_choice is used to record the last letter selected to be added to the string.
+\\Select the letter from the back to the front, the pricinple is:
+\\if A[i] has restrictions on the previous letter, use max to decide whether to add that letter.(E)
+\\If A[i] has no restriction on the previous letter, select it if you can. (C,N,none)
+\\If A[i] can broaden the selection of the previous letter, select it. (Y,S)
+\\Because $$LS (A[1...i], Y \ \vline\ S) > LS (A[1...i], C \ \vline\ N \ \vline\ none) > LS (A[1...i], E)$$
+\begin{lstlisting}
+def LS(A[1...i], last_choice):
+	if i =0 then return 0
+	quit = LS(A[1...i-1],last_choice)
+	choose = 1 + LS(A[1...i-1],A[i])
+
+	if (last_choice == E): 
+		if (A[i] == C): result = choose
+		if (A[i] != C): result = quit
+	
+	if (last_choice == Y or S): 
+		if (A[i] == E): result = max{choose, quit}
+		if (A[i] == N): result = choose
+		if (A[i] == Y or S): result = choose
+		if (A[i] == C): result = max{choose, quit} 
+		# even though when A[i]==C, choose>=quit, use max to chontain all the longest subsequence. think about the case "...NCY..."
+	
+	if (last_choice == C or N or NONE):
+		if (A[i] == E): result = max{choose,quit}
+		if (A[i] == N): result = quit
+		if (A[i] == Y or S or C): result = choose
+	return result
+def LRS(A[1...n]):
+	return LS(A[1...n],NONE)
+\end{lstlisting}
+To make the decision principle stupid, it could become:
+\begin{lstlisting}
+def LS(A[1...i], last_choice):
+	if i =0 then return 0
+	quit = LS(A[1...i-1],last_choice)
+	choose = 1 + LS(A[1...i-1],A[i])
+
+	if (last_choice == E and A[i]!=C) or (last_choice == C or N or NONE and A[i] == N): 
+		result = quit
+	else:
+		result = max{choose, quit}
+	return result
+def LRS(A[1...n]):
+	return LS(A[1...n],NONE)
+\end{lstlisting}
+A[1...n], A[1...n-1], A[1...n-2]... There is n.
+\\ last\_choice must be (none,E,N,Y,C,S), which is constant.
+\\ The resulting algorithm runs in T(n) = O(n)
 
 \question{16.B}
+Using a similar idea to the first question.\\
+LDS(i,last\_choice) denote the length of the longest subsequence of A[1...i] where the last  element in the longest subsequence meet the requirement of t[j].
+\\$muxcase$ =  otherwise
+\\$quitcase$ = ($i>=1$ and ((t[j]=E and A[i]!=C) or (t[j]= C,N,NONE and A[i] = N)))
+\begin{equation*}
+LDS(i,j) = 
+  \begin{cases}
+    0 & \mbox{if } i < 1 \\
+    max\{1+LDS(i-1,hash(A[i])),LDS(i-1,j)\} & \mbox{if }  mux case \\
+    LDS(i-1,j) & \mbox{if }    quit case \\
+  \end{cases}
+\end{equation*}
+\begin{lstlisting}
+def LDS(A[1...n]):
+	A[n+1] = none
+	t[j] = {none,E,N,Y,C,S}
+	hash({none,E,N,Y,C,S}) = {0,1,2,3,4,5}
+	for  j<- 0 to 5
+		space_array[n+1,j] = 0
+	for i <- n down to 1
+		for j = 5 to 0
+			if ((t[j]=E and A[i]!=C) or (t[j]= C,N,NONE and A[i] = N)):
+				space_array[i,j] = space_array[i-1,j]
+			else:
+				space_array[i,j] = max{space_array[i-1,j],1+LDS(i-1,hash(A[i])}
+	
+	return space_array[1,0]	
+\end{lstlisting}
+The resulting algorithm runs in O(n) time.\\
+The space used is in O(n).\\
+
 
 \question{17.A}
 
