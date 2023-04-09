@@ -61,6 +61,7 @@
 % =============
 
 \question{16.A}
+
 last\_choice is used to record the last letter selected to be added to the string.
 \\Select the letter from the back to the front, the pricinple is:
 \\if A[i] has restrictions on the previous letter, use max to decide whether to add that letter.(E)
@@ -112,6 +113,7 @@ A[1...n], A[1...n-1], A[1...n-2]... There is n.
 \\ The resulting algorithm runs in T(n) = O(n)
 
 \question{16.B}
+
 Using a similar idea to the first question.\\
 LDS(i,last\_choice) denote the length of the longest subsequence of A[1...i] where the last  element in the longest subsequence meet the requirement of t[j].
 \\$muxcase$ =  otherwise
@@ -199,19 +201,42 @@ The number of subproblems doesn't change and each subproblem still requires cons
 
 \question{18.A}
 
-A dynamic programming approach can be applied. To find the largest total combined length {\em TCL}, there are two cases. We define $L$ as the recorded length of a consecutive piece of wood. Assume $a_1, a_2, \dots , a_n$ is contained in an array $A$, which describes the marked segments of a piece of wood of length $n$. When $L+A[n] \le 5$, we take the large value of two
-calculating methods of whether to cut $A[n]$ or not. When $L+A[n] > 5$, we just clear $L$ and recursion on the next value.
+A dynamic programming approach can be applied. The length of each marked segemnt of the wood can be represented with an array $A[1...n]$, where $n$ is the number of marked segments in the initial piece of wood. The goal is to divide this array into subarrays with length $\le 5$ by removing some elements and get the largest sum of elements in subarrays. 
 
-So define {\em TCL}$(A[1\dots n], L)$, where the index represents the length of the current piece of wood, we have 
+To find the largest Total Combined Length {\em TCL}. Start from the A[n] and use $L$ to record the length of consecutive piece of wood. 
+Then there will be two cases. In first case if $A[n] + L \le 5$, we can choose to cut $A[n]$ or reserve it as a usable wood. In the second case, if $A[n] + L > 5$, we must cut $A[n]$.
+
+So define {\em TCL}$(i, L)$, where $i$ represents indexs $A[i]$. It represents the length of the current piece of wood, we have 
 
 \begin{equation*}
-TCL(A[1\dots n], L) = 
+TCL(i, L) = 
   \begin{cases}
-      max(A[n] + TCl(A[1\dots n-1],L+A[n]),\\    TCL(A[1\dots n-1],0)) & \mbox{if } L+A[n] \le 5 \\
-      TCL(A[1\dots n-1],0) & \mbox{if } L+A[n] > 5
+	  A[i] & \mbox{if } i = 0 \mbox{ and } A[i] \le 5 \\
+	  0 &  \mbox{if } i = 0 \mbox{ and } A[i] > 5 \\
+      max
+	  \begin{cases}
+		A[i] + TCL( i - 1 , L + A[i]) \\
+		TCL(i - 1, 0) 
+	  \end{cases} & \mbox{if } L + A[i] \le 5 \\
+      TCL(i - 1,0) & \mbox{if } L + A[i] > 5
   \end{cases}
 \end{equation*}
-As we need to recurse the array for $n$ times, and there are only 5 possible values for calculation of $L$, the time complexity and space complexity of the algorithm is $O(5n)$, which is $O(n)$.
+
+The initial call is $TCL(n, 0)$, A resursive algorithm to solve the problem is as follows:
+
+\begin{lstlisting}
+	def TCL(i, L):
+		if i == 0 and A[i] <= 5:
+			return A[i]
+		if i == 0 and A[i] > 5:
+			return 0
+		if L + A[i] <= 5:
+			return max((A[i] + TCL(i - 1), L + A[i]), TCL(i - 1, 0))
+		if L + A[i] > 5:
+			return TCL(i - 1,0)
+\end{lstlisting}
+
+There are $n$ different cases for $A[i]$ and $5$ different values for $L$. So there are $5n$ subproblems in total and each problem requires constant time ignoring recursive calls. The time complexity of the algorithm is $O(5n)$
 
 \question{18.B}
 
