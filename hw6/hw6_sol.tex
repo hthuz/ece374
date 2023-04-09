@@ -79,6 +79,11 @@ hqs(i,j,h) =
   \end{cases}
 \end{equation*}
 
+or simply
+\begin{equation*}
+hqs(i,j) = max(hqs(i + 1, j), hqs(i, j - 1), q(i,j))
+\end{equation*}
+
 Higest quality substring of x can be found by calling {\em hqs(1, n, 0)}. There are $n \choose 2$ subproblems in total and for each subproblem, we need it requires $O(1)$ time not counting recursive calls. So the time complexity of the algorithm is $O(n^2)$.
 
 \question{17.B}
