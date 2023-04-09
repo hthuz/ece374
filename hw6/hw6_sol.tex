@@ -24,7 +24,6 @@
   belowskip=3mm,
   showstringspaces=false,
   columns=flexible,
-  basicstyle={\small\ttfamily},
   numbers=none,
   numberstyle=\tiny\color{gray},
   commentstyle=\color{dkgreen},
@@ -320,7 +319,7 @@ To output the sequence of necessary cuts to achieve the lowest cost, we need to 
 	def sum(A[1:i]):
 		return A[1] + A[2] + ... + A[i]
 
-	def main:
+	def main():
 		bnp = BNP(n, 0) # Best Net Profit
 		cut_sequence 	# Cut achieves the best net profit
 \end{lstlisting}
