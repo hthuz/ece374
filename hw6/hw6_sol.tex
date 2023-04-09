@@ -199,6 +199,20 @@ The number of subproblems doesn't change and each subproblem still requires cons
 
 \question{18.A}
 
+A dynamic programming approach can be applied. To find the largest total combined length {\em TCL}, there are two cases. We define $L$ as the recorded length of a consecutive piece of wood. Assume $a_1, a_2, \dots , a_n$ is contained in an array $A$, which describes the marked segments of a piece of wood of length $n$. When $L+A[n] \le 5$, we take the large value of two
+calculating methods of whether to cut $A[n]$ or not. When $L+A[n] > 5$, we just clear $L$ and recursion on the next value.
+
+So define {\em TCL}$(A[1\dots n], L)$, where the index represents the length of the current piece of wood, we have 
+
+\begin{equation*}
+TCL(A[1\dots n], L) = 
+  \begin{cases}
+      max(A[n] + TCl(A[1\dots n-1],L+A[n]),\\    TCL(A[1\dots n-1],0)) & \mbox{if } L+A[n] \le 5 \\
+      TCL(A[1\dots n-1],0) & \mbox{if } L+A[n] > 5
+  \end{cases}
+\end{equation*}
+As we need to recurse the array for $n$ times, and there are only 5 possible values for calculation of $L$, the time complexity and space complexity of the algorithm is $O(5n)$, which is $O(n)$.
+
 \question{18.B}
 
 \question{18.C}
