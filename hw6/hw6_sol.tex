@@ -204,21 +204,21 @@ The number of subproblems doesn't change and each subproblem still requires cons
 A dynamic programming approach can be applied. The length of each marked segemnt of the wood can be represented with an array $A[1...n]$, where $n$ is the number of marked segments in the initial piece of wood. The goal is to divide this array into subarrays with length $\le 5$ by removing some elements and get the largest sum of elements in subarrays. 
 
 To find the largest Total Combined Length {\em TCL}. Start from the A[n] and use $L$ to record the length of consecutive piece of wood. 
-Then there will be two cases. In first case if $A[n] + L \le 5$, we can choose to cut $A[n]$ or reserve it as a usable wood. In the second case, if $A[n] + L > 5$, we must cut $A[n]$.
+Then there will be two cases. In first case if $A[n] + L \le 5$, we can choose to cut $A[n]$ or reserve it as a usable wood. In the second case, if $A[n] + L > 5$, we must cut $A[n]$. If $L = 0$ and we cut the wood, we won't get usable woods.
 
 So define {\em TCL}$(i, L)$, where $i$ represents indexs $A[i]$. It represents the length of the current piece of wood, we have 
 
 \begin{equation*}
 TCL(i, L) = 
   \begin{cases}
-	  A[i] & \mbox{if } i = 0 \mbox{ and } A[i] \le 5 \\
-	  0 &  \mbox{if } i = 0 \mbox{ and } A[i] > 5 \\
+	  A[i] & \mbox{if } i = 1 \mbox{ and } L + A[i] \le 5 \\
+	  0 &  \mbox{if } i = 1 \mbox{ and } L + A[i] > 5 \\
       max
 	  \begin{cases}
 		A[i] + TCL( i - 1 , L + A[i]) \\
 		TCL(i - 1, 0) 
-	  \end{cases} & \mbox{if } L + A[i] \le 5 \\
-      TCL(i - 1,0) & \mbox{if } L + A[i] > 5
+	  \end{cases} & \mbox{if } i > 1 \mbox{ and } L + A[i] \le 5 \mbox{ and } L \neq 0\\
+      TCL(i - 1,0) & \mbox{if } i > 1 \mbox{ and } (L + A[i] > 5 \mbox{ or } L = 0)
   \end{cases}
 \end{equation*}
 
@@ -226,13 +226,13 @@ The initial call is $TCL(n, 0)$, A resursive algorithm to solve the problem is a
 
 \begin{lstlisting}
 	def TCL(i, L):
-		if i == 0 and A[i] <= 5:
+		if i == 1 and L + A[i] <= 5:
 			return A[i]
-		if i == 0 and A[i] > 5:
+		if i == 1 and L + A[i] > 5:
 			return 0
-		if L + A[i] <= 5:
+		if L + A[i] <= 5 and L != 0:
 			return max((A[i] + TCL(i - 1), L + A[i]), TCL(i - 1, 0))
-		if L + A[i] > 5:
+		if L + A[i] > 5 or L = 0:
 			return TCL(i - 1,0)
 \end{lstlisting}
 
@@ -240,6 +240,89 @@ There are $n$ different cases for $A[i]$ and $5$ different values for $L$. So th
 
 \question{18.B}
 
+Similar to last question, define Best Net Profit $BNP(i ,L)$, in which $i$ and $L$ have the same definition as above. We have
+
+\begin{equation*}
+	BNP(i, L) = 
+	\begin{cases}
+		t & \mbox{if } i = 1 \mbox{ and } L + A[i] <= 5 \\
+		max
+		\begin{cases}
+			0 \\
+			t - (A[1] + L)
+		\end{cases} & \mbox{if } i = 1 \mbox{ and } L + A[i] > 5  \\
+		max
+		\begin{cases}
+			BNP(i - 1, L + A[i]) \\
+			BNP(i - 1, 0) + t - (sum(A[1..i]) + L)
+		\end{cases} & \mbox{if } i > 1 \mbox{ and } L <= 5 \mbox{ and } L \neq 0 \\
+		max
+		\begin{cases}
+		BNP(i - 1, L + A[i]) \\
+		BNP(i - 1, 0) - (sum(A[1..i]) + L) 
+		\end{cases} & \mbox{if } i > 1 \mbox { and } (L > 5 \mbox{ or } L = 0)
+	\end{cases}
+\end{equation*}
+
+where $sum(A[1..i])$ represents $A[1] + A[2] + \dots + A[i]$. Note that if the recorded length $L$ is less than or equal to 5, we can get profit by cutting and if the recorded length is larget than 5, we can't get profit. When there's no recorded legnth (meaning we cut at the edge), there won't be new usable woods created as well.
+
+The resursive algorithm is as follows:
+\begin{lstlisting}
+	def BNP(i,L):
+		if i == 1 and L + A[i] <= 5:
+			return t
+		if i == 1 and L + A[i] > 5:
+			return max(0,t - (A[1] + L))
+		if L <= 5 and L != 0:
+			return max(BNP(i - 1, L + A[i]), BNP(i - 1, 0) + t - (sum(A[1..i]) + L))
+		if L > 5 or L = 0:
+			return max(BNP(i - 1, L + A[i]), BNP(i - 1, 0) - (sum(A[1..i]) + L))
+	
+	def sum(A[1:i]):
+		return A[1] + A[2] + ... + A[i]
+
+\end{lstlisting}
+
+The number of subproblems is still $5n$. for each subproblem, on average $O(n)$ time is required to calculate $sum(A[1..i])$ for each subproblem. So the time complexity will be $O(5n^2)$.
+
 \question{18.C}
+
+To output the sequence of necessary cuts to achieve the lowest cost, we need to record the best choice. The algorithm(Python as draft example) is as follows.
+
+\begin{lstlisting}
+	cut_sequence = []
+	def BNP(i,L):
+		if i == 1 and L + A[i] <= 5:
+			return t
+		if i == 1 and L + A[i] > 5:
+			if (t - A[1] + L) > 0:
+				cut_sequence.append(i)
+				return (t - A[1] + L)
+			else:
+				return 0
+		if L <= 5 and L != 0:
+			cut_profit = BNP(i - 1, 0) + t - (sum(A[1..i]) + L)
+			nocut_profit = BNP(i - 1, L + A[i])
+			if cut_profit > nocut_profit:
+				cut_sequence.append(i)
+				return cut_profit
+			else:
+				return nocut_profit
+		if L > 5 or L = 0:
+			cut_profit = BNP(i - 1, 0) - (sum(A[1..i]) + L)
+			nocut_profit = BNP(i - 1, L + A[i])
+			if cut_profit > nocut_profit:
+				cut_sequence.append(i)
+				return cut_profit
+			else:
+				return nocut_profit
+	
+	def sum(A[1:i]):
+		return A[1] + A[2] + ... + A[i]
+
+	def main:
+		bnp = BNP(n, 0) # Best Net Profit
+		cut_sequence 	# Cut achieves the best net profit
+\end{lstlisting}
 
 \end{document}
