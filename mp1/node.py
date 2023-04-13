@@ -63,7 +63,8 @@ class hold_queue:
         while (len(self.queue) > 0 and self.queue[0][3] == 1):
             popdata = self.queue[0]
             self.queue.remove(self.queue[0])
-            print (f"deliver:{popdata}")
+            handle_transaction(popdata[0])
+            # print (f"deliver:{popdata}")
             
 
 
@@ -99,20 +100,28 @@ turn_lock = threading.Lock()
 DELIVERABLE = 1
 UNDELIVERABLE = 0
 
+################
+#### Transaction Related
+################
+
+# Account : Balance
+bank = dict()
+metricfile_name = ""
+
 
 ###################
 # message function
 ###################
 def askMessage(msg_id,message_content, send_priority,need_multicast):
-    string = "ask"+"|" +  msg_id  + "|" + message_content + "|" + send_priority +"|"+ need_multicast+"|"
+    string = "ask"+"|" +  msg_id  + "|" + message_content + "|" + send_priority +"|"+ need_multicast + "|" + str(time.time()) + "|"
     return string.ljust(128," ")
 
 def feedbackMessage(msg_id, proposed_priority, suggestor,need_multicast):
-    string = "feedback"+"|"+ msg_id + "|" + proposed_priority+ "|" + suggestor +"|"+ need_multicast+"|"
+    string = "feedback"+"|"+ msg_id + "|" + proposed_priority+ "|" + suggestor +"|"+ need_multicast + "|" +  str(time.time()) + "|"
     return string.ljust(128," ")
 
 def decidedMessage(msg_id, agreed_priority, suggested_id,need_multicast):
-    string = "decided"+"|"+msg_id+"|"+ agreed_priority+"|"+suggested_id + "|" + need_multicast+"|"
+    string = "decided"+"|"+msg_id+"|"+ agreed_priority+"|"+suggested_id + "|" + need_multicast + "|" + str(time.time()) + "|"
     return string.ljust(128," ")
 
 
@@ -184,7 +193,10 @@ def receive_message(i):
         datalist = data.split("|")
         msg_type = datalist[0]
         msg_id = datalist[1]
+        send_time = float(datalist[5])
         typemid = msg_type + "|" + msg_id
+
+        get_bandwidth(data, send_time)
 
         if (msg_type == "feedback"):
             typemid = typemid + "|feebacker:" + datalist[3]
@@ -225,6 +237,7 @@ def receive_message(i):
             seen_lock.acquire()
             seen_typemid.append(typemid1)
             seen_lock.release()
+
 
             # send feedback message
             # print("send:"+typemid1)
@@ -267,7 +280,6 @@ def receive_message(i):
                     # print("send:"+typemid2)
                     decidedmessage = decidedMessage(msg_id,str(agreed_priority), str(suggested_id),str(1))
                     multicast_message(decidedmessage)
-
                     # update queue value
                     queue.queue_update_element(index,agreed_priority,DELIVERABLE ,suggested_id)
                     queue.sort_queue()
@@ -285,6 +297,7 @@ def receive_message(i):
 
         if (msg_type == "decided"):
                 
+            msg_content = datalist[0]
             priority = int(datalist[2])
             suggestor_id = int(datalist[3])
             need_multicast = int(datalist[4])
@@ -309,10 +322,6 @@ def receive_message(i):
                 decidedmessage = decidedMessage(msg_id, str(priority), str(suggestor_id), str(0))
                 multicast_message(decidedmessage)
 
-            
-        # con.send("ack".encode('utf-8'))
-        # print("receive "+data)
-    
     
 ###########################
 # send_message thread
@@ -325,7 +334,43 @@ def multicast_message(msg_content):
         # (send_conn[key]).recv(1024).decode("utf-8")
 
 
+def handle_transaction(msg_content):
+    global bank
 
+    if "DEPOSIT" in msg_content:
+        account, amount = msg_content.split(' ')[1], int(msg_content.split(' ')[2])
+        if account not in bank:
+            bank[account] = 0
+        bank[account] += amount
+
+    if "TRANSFER" in msg_content:
+        account, dest, amount = msg_content.split(' ')[1], msg_content.split(' ')[3], int(msg_content.split(' ')[4])
+        if account not in bank:
+            print("Error!, Account not in Bank!")
+            exit(1)
+        if dest not in bank:
+            bank[dest] = 0
+
+        # Do Transaction
+        if bank[account] - amount >= 0:
+            bank[account] -= amount
+            bank[dest] += amount
+
+    # Print balance information
+    balance_info = ""
+    for account in bank:
+        balance_info += " " + account + ":" + str(bank[account])
+    print("BALANCES" + balance_info ) 
+
+    return
+
+def get_bandwidth(data, send_time):
+    delay = time.time() - send_time
+    bandwidth = len(data.encode('utf-8')) / delay
+    metricfile = open(metricfile_name, 'a')
+    metricfile.write(data + "," + str(bandwidth) + "\n")
+    metricfile.close()
+    return
 
 
 #######
@@ -338,6 +383,7 @@ def main():
     global node_port
     global node_num 
     global other_node_ip
+    global metricfile_name
 
     # Connection Information
     global send_conn
@@ -360,9 +406,8 @@ def main():
     node_port = int(sys.argv[2])
     readtxt(sys.argv[3])
     node_id = node_name[4]
+    metricfile_name = "./bandwidth_" + node_name + ".csv"
     # readtxt and set config for other nodes
-    print(other_node_ip)
-    print(other_node_port)
 
     print(f"#1 {node_name} is waiting for connection")
 
