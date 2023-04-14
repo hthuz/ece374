@@ -1,4 +1,4 @@
-node_id,first_node_process_time,last_node_process_time
+msg_id,first_node_process_time,last_node_process_time
 3 1,0.09034466743469238, 0.10589838027954102
 2 1,0.09812784194946289, 0.11625909805297852
 2 2,0.10729575157165527, 0.12661433219909668
