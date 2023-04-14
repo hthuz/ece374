@@ -6,7 +6,7 @@ import csv
 # from openpyxl import load_workbook
 
 
-
+METRICTABLE_PATH = "./metrics/scenario1/table"
 
 
 ########
@@ -159,9 +159,6 @@ UNDELIVERABLE = 0
 
 # Account : Balance
 bank = dict()
-msg_start_time = dict()
-msg_end_time = dict()
-msg_row_index = 2
 
 
 ###################
@@ -476,7 +473,7 @@ def get_metrics(data):
         delay = time.time() - msg_send_time
     bandwidth = len(data.encode('utf-8')) / delay
 
-    metricfile_name = f"./metrics/bandwidth_node{msg_sender}.csv"
+    metricfile_name = f"{METRICTABLE_PATH}/bandwidth_node{msg_sender}.csv"
     metricfile = open(metricfile_name, 'a')
     metricfile.write(f"{data},{str(bandwidth)}\n")
     metricfile.close()
@@ -485,7 +482,7 @@ def get_metrics(data):
 
 def record_startprocess_time(msg_id,msg_content):
     
-    f = open('./metrics/time.log','a')
+    f = open(f'{METRICTABLE_PATH}/time.log','a')
     f.write(f"{msg_id},start_time,{time.time()}\n")
     f.close()
 
@@ -493,7 +490,7 @@ def record_startprocess_time(msg_id,msg_content):
 
 def record_endprocess_time(msg_id):
 
-    f = open('./metrics/time.log', 'a')
+    f = open(f'{METRICTABLE_PATH}/time.log', 'a')
     f.write(f"{msg_id},node{node_id}_end_time,{time.time()}\n")
     f.close()
 
@@ -532,10 +529,17 @@ def main():
     node_id = node_name[4:]
 
     # Write metric header
+<<<<<<< HEAD
     # metricfile_name = f"./metrics/bandwidth_{node_name}.csv"
     # metricfile = open(metricfile_name, 'w')
     # metricfile.write("data, bandwidth\n")
     # metricfile.close()
+=======
+    metricfile_name = f"{METRICTABLE_PATH}/bandwidth_{node_name}.csv"
+    metricfile = open(metricfile_name, 'w')
+    metricfile.write("data, bandwidth\n")
+    metricfile.close()
+>>>>>>> refs/remotes/origin/master
 
     print(f"#1 {node_name} is waiting for connection")
 
