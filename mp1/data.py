@@ -1,7 +1,7 @@
 
 
-NODE_NUM = 8
-SCENARIO_NUM = 2
+NODE_NUM = 3
+SCENARIO_NUM = 1
 METRICTABLE_PATH = f"./metrics/scenario{SCENARIO_NUM}/table"
 METRICFIG_PATH = f"./metrics/scenario{SCENARIO_NUM}/figure"
 
