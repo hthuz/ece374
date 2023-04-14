@@ -11,7 +11,7 @@ import csv
 ########
 # class
 ########
-# queue element is [msg_content,msg_id,final_priority,deliverable,sender, [[turn,suggestor],[turn,suggestor]]]
+# queue element is [msg_content,msg_id,final_priority,deliverable,ackmessage requestor, [[turn,suggestor],[turn,suggestor]]]
 class hold_queue:
     def __init__(self):
         self.queue = []
@@ -21,7 +21,15 @@ class hold_queue:
         for i in range(0,len(self.queue)):
             print (self.queue[i])
         print("#######    queue end   ########")
-        
+    
+    def displayfirst(self):
+        if (len(self.queue) == 0):
+            return
+        if (len(self.queue) <=10000):
+            print("#######   fisrt element and length ########")
+            # print (len(self.queue))
+            print (self.queue[0],len(self.queue))
+            print("#######    end   ########")
     
     def queue_append(self,datalist):
         self.queue.append(datalist)
@@ -43,6 +51,9 @@ class hold_queue:
         # smaller final_priority will be at the head
         # smaller deliverable will be at the head， undiliverable will be at the head
         # smaller suggestor will be at the head
+        # notice that!!: (105,0,5) is before (105,1,1)
+    def queue_len(self):
+        return len(self.queue)
         
     def feedbacklist_append(self, index, proposed_info):
         (self.queue[index][5]).append(proposed_info)
@@ -51,7 +62,8 @@ class hold_queue:
         return len(self.queue[index][5])
 
     def feedbacklist_sort(self, index):
-        (self.queue[index][5]).sort(key=lambda x:(x[0],x[1]))
+        (self.queue[index][5]).sort(key=lambda x:(-x[0],x[1]))
+        # (504,1) is before (504,7)
 
     def feedbacklist_agreed_priority(self,index):
         return self.queue[index][5][0][0]
@@ -60,11 +72,43 @@ class hold_queue:
         return self.queue[index][5][0][1]
     
     def check_and_remove(self):
+        global deliver_turn
         while (len(self.queue) > 0 and self.queue[0][3] == 1):
+
             popdata = self.queue[0]
             self.queue.remove(self.queue[0])
+            print('{0}. deliver:{1}'.format(deliver_turn,popdata))
             handle_transaction(popdata[0])
-            # print (f"deliver:{popdata}")
+            deliver_turn+=1
+        # queue.displayfirst()
+
+    def handle_failure(self,new_node_num):
+        # print("start to handle!!!!!")
+        for index in range(0,queue.queue_len()):
+            msg_id = self.queue[index][1]
+            if (self.feedbacklist_check(index) >= new_node_num + 1):
+
+                typemid2 = "decided"+"|" + msg_id
+                seen_lock.acquire()
+                seen_typemid.append(typemid2)
+                seen_lock.release()
+                
+                # multicast decide message
+                self.feedbacklist_sort(index)
+                agreed_priority = self.feedbacklist_agreed_priority(index)
+                suggested_id = self.feedbacklist_suggested_id(index)
+                decidedmessage = decidedMessage(msg_id,str(agreed_priority), str(suggested_id), node_id)
+                multicast_message(decidedmessage)
+
+                # update queue value
+                self.queue_update_element(index,agreed_priority,DELIVERABLE,suggested_id)
+                
+        # self.displayqueue()
+                
+
+
+
+        
             
 
 
@@ -73,6 +117,7 @@ class hold_queue:
 # variable
 ###########
 
+deliver_turn = 0
 node_name = ""
 node_num = 0
 node_id = ""
@@ -83,22 +128,30 @@ other_node_ip = dict()
 other_node_port = dict()
 send_conn = dict()
 
+# the member of receive_conn : is_prepared
+receive_prepared = dict()
+
 receive_conn = []
-receive_prepared = []
 seen_typemid = []
 
 
 queue = hold_queue()
 turn = 0 # Lamport Timestamp
+si = 0  #  isis timestamp
 terminate = 0
 
 # lock
 seen_lock = threading.Lock()
 queue_lock = threading.Lock()
 turn_lock = threading.Lock()
+si_lock = threading.Lock()
+# receive_conn_lock = threading.Lock()
+send_conn_lock = threading.Lock()
+node_num_lock = threading.Lock()
 
 DELIVERABLE = 1
 UNDELIVERABLE = 0
+
 
 ################
 #### Transaction Related
@@ -112,16 +165,16 @@ metricfile_name = ""
 ###################
 # message function
 ###################
-def askMessage(msg_id,message_content, send_priority,need_multicast):
-    string = "ask"+"|" +  msg_id  + "|" + message_content + "|" + send_priority +"|"+ need_multicast + "|" + str(time.time()) + "|"
+def askMessage(msg_id,message_content, default_priority, msg_sender):
+    string = "ask"+"|" +  msg_id  + "|" + message_content + "|" + default_priority +"|"+ msg_sender+"|" + str(time.time()) + "|"
     return string.ljust(128," ")
 
-def feedbackMessage(msg_id, proposed_priority, suggestor,need_multicast):
-    string = "feedback"+"|"+ msg_id + "|" + proposed_priority+ "|" + suggestor +"|"+ need_multicast + "|" +  str(time.time()) + "|"
+def feedbackMessage(msg_id, proposed_priority, suggestor, msg_sender):
+    string = "feedback"+"|"+ msg_id + "|" + proposed_priority+ "|" + suggestor +"|"+ msg_sender+"|" + str(time.time()) + "|"
     return string.ljust(128," ")
 
-def decidedMessage(msg_id, agreed_priority, suggested_id,need_multicast):
-    string = "decided"+"|"+msg_id+"|"+ agreed_priority+"|"+suggested_id + "|" + need_multicast + "|" + str(time.time()) + "|"
+def decidedMessage(msg_id, agreed_priority, suggested_id, msg_sender):
+    string = "decided"+"|"+msg_id+"|"+ agreed_priority+"|"+suggested_id + "|" + msg_sender+"|" + str(time.time()) + "|"
     return string.ljust(128," ")
 
 
@@ -156,6 +209,7 @@ def establish_send(node_id, ip, port):
     global send_conn
 
     # Keep connecting until all connections are set
+    send_conn_lock.acquire()
     while (len(send_conn) != node_num):
         # i is id of other nodes
         try:
@@ -165,6 +219,7 @@ def establish_send(node_id, ip, port):
             break
         except:
             continue
+    send_conn_lock.release()
     print(f"#1 {node_name} send connection established")
     return
 
@@ -172,7 +227,7 @@ def establish_send(node_id, ip, port):
 ###########################
 # receive_message_thread
 ###########################
-def receive_message(i):
+def receive_message(receive_conn_member):
     global queue
     global node_id
     global turn
@@ -180,12 +235,16 @@ def receive_message(i):
     global receive_conn
     global receive_prepared
     global seen_typemid
+    global si
 
-
-    con = receive_conn[i]
-    while not terminate:
-        receive_prepared [i] = 1
+    con = receive_conn_member
+    othernode_fail = 0
+    while (terminate == 0):
+        receive_prepared [receive_conn_member] = 1
         data = con.recv(128).decode('utf-8')
+        if not data:
+            othernode_fail = 1
+            break
         if (len(data) != 128):
             data += con.recv(128).decode('utf-8')
 
@@ -194,7 +253,7 @@ def receive_message(i):
         msg_type = datalist[0]
         msg_id = datalist[1]
         send_time = float(datalist[5])
-        typemid = msg_type + "|" + msg_id
+        ypemid = msg_type + "|" + msg_id
 
         get_bandwidth(data, send_time)
 
@@ -204,33 +263,40 @@ def receive_message(i):
         # judge if it is in the seen list
         seen_lock.acquire()
         if (typemid in seen_typemid):
-            # print("reject:"+typemid)
             seen_lock.release()   # fuck it!
             continue
-        # print("accept:"+typemid)
+        
             
         # update seen msg list when receive
         seen_typemid.append(typemid)
+        need_multicast = 1
         seen_lock.release()
+
+        # queue_lock.acquire()
+        # queue.sort_queue()
+        # queue.check_and_remove()
+        # queue_lock.release()
 
         if (msg_type == "ask"):
             msg_content = datalist[2]
             original_priority = int(datalist[3])
-            need_multicast = int(datalist[4])
+            msg_sender = int(datalist[4])
 
             # update queue
             # [content,msg_id,final_priority,deliverable,suggestor,[]]
+            # print("aquire 4")
             queue_lock.acquire()
             queue.queue_append([msg_content,msg_id,original_priority,UNDELIVERABLE,int(msg_id[0]),[]])
             queue.sort_queue()
             # myqueue.displayqueue()
             queue_lock.release()
+            # print("release 4")
 
             # add the my_turn
-            turn_lock.acquire()
-            turn += 1
-            cur_turn = turn
-            turn_lock.release()
+            si_lock.acquire()
+            si += 1
+            cur_si = si
+            si_lock.release()
 
             # update seen msg list when send
             typemid1 = "feedback" + "|" + msg_id + "|feebacker:" + node_id
@@ -238,15 +304,14 @@ def receive_message(i):
             seen_typemid.append(typemid1)
             seen_lock.release()
 
-
             # send feedback message
-            # print("send:"+typemid1)
-            feedbackmessage = feedbackMessage(msg_id,str(cur_turn), node_id,str(1))
+            # the first node_id means propose node, the second node_id means the msg_sender
+            feedbackmessage = feedbackMessage(msg_id,str(cur_si), node_id, node_id)
             multicast_message(feedbackmessage)
 
             if (need_multicast == 1):
                 # print("multicast:"+typemid)
-                askmessage = askMessage(msg_id,msg_content, str(original_priority),str(0))
+                askmessage = askMessage(msg_id,msg_content, str(original_priority), node_id)
                 multicast_message(askmessage)
 
 
@@ -254,19 +319,25 @@ def receive_message(i):
 
             proposed_priority = int(datalist[2])
             suggestor = int(datalist[3])
-            need_multicast = int(datalist[4])
+            msg_sender = int(datalist[4])
 
             if (msg_id[0] == node_id):
                 # update queue
                 # [content,mid,final_priority,deliverable,sender,[]]
+                # node_num_lock.acquire()
+                # print("aquire 5")
+                
                 queue_lock.acquire()
                 index = queue.queue_find_index(msg_id)
                 if index == -1: 
-                    print(" cannot find the messages")
-                    return -1
+                    # print(" cannot find the messages")
+                    queue_lock.release()
+                    # print("release 5")
+                    continue
                 queue.feedbacklist_append(index, [proposed_priority,suggestor])
-                if (queue.feedbacklist_check(index) == node_num + 1):
-
+                
+                if (queue.feedbacklist_check(index) >= node_num + 1):
+                   
                     # update seen_typemid when send
                     typemid2 = "decided"+"|" + msg_id
                     seen_lock.acquire()
@@ -278,50 +349,84 @@ def receive_message(i):
                     agreed_priority = queue.feedbacklist_agreed_priority(index)
                     suggested_id = queue.feedbacklist_suggested_id(index)
                     # print("send:"+typemid2)
-                    decidedmessage = decidedMessage(msg_id,str(agreed_priority), str(suggested_id),str(1))
+                    decidedmessage = decidedMessage(msg_id,str(agreed_priority), str(suggested_id), node_id)
                     multicast_message(decidedmessage)
+
                     # update queue value
                     queue.queue_update_element(index,agreed_priority,DELIVERABLE ,suggested_id)
                     queue.sort_queue()
                     queue.check_and_remove()
 
-                # myqueue.displayqueue()
+                # queue.displayqueue()
                 queue_lock.release()
+                # print("release 5")
 
             if (need_multicast == 1):
                 # print("multicast:"+typemid)
-                feedbackmessage = feedbackMessage(msg_id, str(proposed_priority), str(suggestor),str(0))
+                feedbackmessage = feedbackMessage(msg_id, str(proposed_priority), str(suggestor), node_id)
                 multicast_message(feedbackmessage)
 
 
 
         if (msg_type == "decided"):
                 
-            msg_content = datalist[0]
-            priority = int(datalist[2])
+            sk = int(datalist[2])
             suggestor_id = int(datalist[3])
-            need_multicast = int(datalist[4])
+            msg_sender = int(datalist[4])
+
+            si_lock.acquire()
+            temp = si
+            si = max([temp,sk])
+            si_lock.release()
 
             # update priority and suggested_id
+            # print("aquire 2")
             queue_lock.acquire()
             index = queue.queue_find_index(msg_id)
             if (index == -1):
-                print ("fail "+ msg_id +"\n")
+                # print ("fail "+ msg_id +"\n")
+                queue_lock.release()
+                # print("release 2")
                 # myqueue.displayqueue()
-                return -1
-            queue.queue_update_element(index,priority,1,suggestor_id)
-            queue.sort_queue()  # must sort immediatly
-            # myqueue.displayqueue()
-
-            # check if deliverable, remove from queue
+                continue
+            queue.queue_update_element(index,sk,DELIVERABLE,suggestor_id)
+            queue.sort_queue()
             queue.check_and_remove()
             queue_lock.release()
+            # print("release 2")
 
             if (need_multicast == 1):
                 # print("multicast:"+typemid)
-                decidedmessage = decidedMessage(msg_id, str(priority), str(suggestor_id), str(0))
+                decidedmessage = decidedMessage(msg_id, str(sk), str(suggestor_id), node_id)
                 multicast_message(decidedmessage)
 
+    
+    if (othernode_fail == 1):
+        print ("one node fail")
+        node_num_lock.acquire()
+        node_num = node_num - 1
+        queue_lock.acquire()
+        queue.handle_failure(node_num)
+        queue_lock.release()
+        node_num_lock.release()
+    else:
+        print("I fail")
+        # print("aquire 1")
+        queue_lock.acquire()
+        for i in range(0,node_num):
+            queue.handle_failure(i)
+        queue_lock.release()
+        # print("release 1")
+
+    # close
+    con.close()
+
+
+    return
+
+            
+        
+    
     
 ###########################
 # send_message thread
@@ -329,9 +434,24 @@ def receive_message(i):
 
 def multicast_message(msg_content):
     global send_conn
+    global queue
+    global node_num
+    
+    delete_send_conn = []
+    send_conn_lock.acquire()
     for key in send_conn:
-        (send_conn[key]).send("{0}".format(msg_content).encode("utf-8"))
-        # (send_conn[key]).recv(1024).decode("utf-8")
+        try:
+            (send_conn[key]).send("{0}".format(msg_content).encode("utf-8"))
+        except:
+            # print("fail to send:"+msg_content)
+            # print("close it")
+            delete_send_conn.append(key)
+            continue
+    for i in delete_send_conn:
+        send_conn.pop(i)
+
+    send_conn_lock.release()
+
 
 
 def handle_transaction(msg_content):
@@ -372,7 +492,6 @@ def get_bandwidth(data, send_time):
     metricfile.close()
     return
 
-
 #######
 # main
 #######
@@ -383,7 +502,6 @@ def main():
     global node_port
     global node_num 
     global other_node_ip
-    global metricfile_name
 
     # Connection Information
     global send_conn
@@ -408,6 +526,8 @@ def main():
     node_id = node_name[4]
     metricfile_name = "./bandwidth_" + node_name + ".csv"
     # readtxt and set config for other nodes
+    print(other_node_ip)
+    print(other_node_port)
 
     print(f"#1 {node_name} is waiting for connection")
 
@@ -422,8 +542,10 @@ def main():
     node.listen(20)
     while (len(receive_conn) != node_num):
         conn,addr = node.accept()
+        # receive_conn_lock.acquire()
         receive_conn.append(conn)
-        receive_prepared.append(0)
+        # receive_conn_lock.release()
+        receive_prepared[conn] = 1
 
     print(f"#1 {node_name} receive connection established")
     # wait until send connection established already
@@ -434,51 +556,58 @@ def main():
     #####
 
     # tackles message receive from each other node
-    for i in range(0,node_num):
-        receive_thread = threading.Thread(target=receive_message, args=(i,))
+    for receive_conn_member in receive_conn:
+        receive_thread = threading.Thread(target=receive_message, args=(receive_conn_member,))
         receive_thread.start()
 
     # wait until receive thread prepared already
     while True:
         sum = 0
-        for i in range(0,node_num):
-            sum = sum + receive_prepared[i]
+        for receive_conn_member in receive_conn:
+            sum = sum + receive_prepared[receive_conn_member]
         if (sum == node_num):
             break
     
 
-    # send message thread
-    for row in sys.stdin:
-        msg_content = row.strip('\n')
+    # send message
+    try:
+        while(True):
+            for row in sys.stdin:
+                msg_content = row.strip('\n')
 
-        # update turn, store cur_turn
-        turn_lock.acquire()
-        turn += 1
-        cur_turn = turn
-        turn_lock.release()
+                # update turn, store cur_turn
+                turn_lock.acquire()
+                turn += 1
+                cur_turn = turn
+                turn_lock.release()
 
-        # message id example: "1 520", which means node1, turn 520
-        msg_id = node_id + " " + str(cur_turn)
+                # message id example: "1 520", which means node1, turn 520
+                msg_id = node_id + " " + str(cur_turn)
 
-        # update seen_typemid when send
-        # Msg Type | node_id lamport timestamp
-        typemid = "ask" + "|" + msg_id
-        seen_lock.acquire()
-        seen_typemid.append(typemid)
-        seen_lock.release()
+                # update seen_typemid when send
+                # Msg Type | node_id lamport timestamp
+                typemid = "ask" + "|" + msg_id
+                seen_lock.acquire()
+                seen_typemid.append(typemid)
+                seen_lock.release()
 
 
-        # update queue
-        queue_lock.acquire()
-        queue.queue_append([msg_content,msg_id,cur_turn,UNDELIVERABLE,int(node_id),[]])
-        queue.feedbacklist_append(queue.queue_find_index(msg_id), [cur_turn,int(node_id)])
-        queue.sort_queue()
-        # queue.displayqueue()
-        queue_lock.release()
+                # update queue
+                # print("aquire 3")
+                queue_lock.acquire()
+                queue.queue_append([msg_content,msg_id,cur_turn,UNDELIVERABLE,int(node_id),[]])
+                queue.feedbacklist_append(queue.queue_find_index(msg_id), [cur_turn,int(node_id)])
+                queue.sort_queue()
+                # queue.displayqueue()
+                queue_lock.release()
+                # print("release 3")
 
-        # prepare the message and start the send thread
-        askmessage = askMessage( msg_id, msg_content, str(cur_turn),str(1))
-        multicast_message(askmessage)
+                # prepare the message and start the send thread
+                askmessage = askMessage( msg_id, msg_content, str(cur_turn),node_id)
+                multicast_message(askmessage)
+    except:
+        terminate = 1
+    
 
 
 
