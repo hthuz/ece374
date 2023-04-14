@@ -73,11 +73,11 @@ class hold_queue:
     
     def check_and_remove(self):
         global deliver_turn
-        while (len(self.queue) > 0 and self.queue[0][3] == 1):
+        while (len(self.queue) > 0 and self.queue[0][3] == DELIVERABLE):
 
             popdata = self.queue[0]
             self.queue.remove(self.queue[0])
-            print('{0}. deliver:{1}'.format(deliver_turn,popdata))
+            # print('{0}. deliver:{1}'.format(deliver_turn,popdata))
             handle_transaction(popdata[0])
             deliver_turn+=1
         # queue.displayfirst()
@@ -253,7 +253,7 @@ def receive_message(receive_conn_member):
         msg_type = datalist[0]
         msg_id = datalist[1]
         send_time = float(datalist[5])
-        ypemid = msg_type + "|" + msg_id
+        typemid = msg_type + "|" + msg_id
 
         get_bandwidth(data, send_time)
 
@@ -485,11 +485,15 @@ def handle_transaction(msg_content):
     return
 
 def get_bandwidth(data, send_time):
+    global metricfile_name
+
     delay = time.time() - send_time
     bandwidth = len(data.encode('utf-8')) / delay
+
     metricfile = open(metricfile_name, 'a')
-    metricfile.write(data + "," + str(bandwidth) + "\n")
+    metricfile.write(f"{data},{str(bandwidth)}\n")
     metricfile.close()
+
     return
 
 #######
@@ -513,6 +517,8 @@ def main():
     global terminate
     global seen_typemid
 
+    global metricfile_name
+
 
     if len(sys.argv) != 4:
         print("invalid input")
@@ -524,7 +530,13 @@ def main():
     node_port = int(sys.argv[2])
     readtxt(sys.argv[3])
     node_id = node_name[4]
-    metricfile_name = "./bandwidth_" + node_name + ".csv"
+
+    metricfile_name = f"./bandwidth_{node_name}.csv"
+    metricfile = open(metricfile_name, 'w')
+    metricfile.write("data, bandwidth\n")
+    metricfile.close()
+
+
     # readtxt and set config for other nodes
     print(other_node_ip)
     print(other_node_port)
