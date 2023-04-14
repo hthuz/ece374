@@ -482,7 +482,7 @@ def get_metrics(data):
 def record_startprocess_time(msg_id,msg_content):
     
     f = open('./metrics/time.log','a')
-    f.write(f"{msg_id} start_time {time.time()}\n")
+    f.write(f"{msg_id},start_time,{time.time()}\n")
     f.close()
 
     return
@@ -490,7 +490,7 @@ def record_startprocess_time(msg_id,msg_content):
 def record_endprocess_time(msg_id):
 
     f = open('./metrics/time.log', 'a')
-    f.write(f"{msg_id} node{node_id}_end_time {time.time()}\n")
+    f.write(f"{msg_id},node{node_id}_end_time,{time.time()}\n")
     f.close()
 
     return
