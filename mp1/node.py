@@ -6,7 +6,7 @@ import csv
 # from openpyxl import load_workbook
 
 SCENARIO_NUM = 1
-METRICTABLE_PATH = f"./metrics/scenario{SCENARIO_NUM}/table"
+METRICTABLE_PATH = f"./metrics/scenario{SCENARIO_NUM}/testtable"
 
 ########
 # class
