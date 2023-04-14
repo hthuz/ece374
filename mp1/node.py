@@ -5,9 +5,8 @@ import threading
 import csv
 # from openpyxl import load_workbook
 
-
-METRICTABLE_PATH = "./metrics/scenario1/table"
-
+SCENARIO_NUM = 1
+METRICTABLE_PATH = f"./metrics/scenario{SCENARIO_NUM}/table"
 
 ########
 # class
@@ -461,8 +460,6 @@ def get_metrics(data):
 
     datalist = data.split("|")
     msg_sender = int(datalist[4])
-    msg_type = datalist[0]
-    msg_id = datalist[1]
     msg_send_time = float(datalist[5])
 
     # Bandwidth
@@ -476,7 +473,7 @@ def get_metrics(data):
     
     return
 
-def record_startprocess_time(msg_id,msg_content):
+def record_startprocess_time(msg_id):
     
     f = open(f'{METRICTABLE_PATH}/time.log','a')
     f.write(f"{msg_id},start_time,{time.time()}\n")
@@ -600,7 +597,7 @@ def main():
 
                 # Record start time
                 time_table_lock.acquire()
-                record_startprocess_time(msg_id,msg_content)
+                record_startprocess_time(msg_id)
                 time_table_lock.release()
 
                 # prepare the message and start the send thread
