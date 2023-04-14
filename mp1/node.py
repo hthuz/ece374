@@ -78,10 +78,10 @@ class hold_queue:
             popdata = self.queue[0]
             msg_id = popdata[1]
             self.queue.remove(self.queue[0])
-            print('{0}. deliver:{1}'.format(deliver_turn,popdata))
+            # print('{0}. deliver:{1}'.format(deliver_turn,popdata))
 
-            # handle_transaction(popdata[0])
-            # record_endprocess_time(msg_id)
+            handle_transaction(popdata[0])
+            record_endprocess_time(msg_id)
             deliver_turn+=1
         # queue.displayfirst()
 
@@ -254,7 +254,7 @@ def receive_message(receive_conn_member):
         msg_id = datalist[1]
         typemid = msg_type + "|" + msg_id
 
-        # get_metrics(data)
+        get_metrics(data)
 
 
         if (msg_type == "feedback"):
@@ -450,7 +450,9 @@ def handle_transaction(msg_content):
 
     # Print balance information
     balance_info = ""
-    for account in bank:
+    sorted_accounts = list(bank.keys())
+    sorted_accounts.sort()
+    for account in sorted_accounts:
         balance_info += " " + account + ":" + str(bank[account])
     print("BALANCES" + balance_info ) 
 
@@ -525,7 +527,7 @@ def main():
     readtxt(sys.argv[3])
     node_id = node_name[4:]
 
-    # Write metric header
+    # Write bandwidth metric header
     metricfile_name = f"{METRICTABLE_PATH}/bandwidth_{node_name}.csv"
     metricfile = open(metricfile_name, 'w')
     metricfile.write("data, bandwidth\n")
@@ -610,9 +612,9 @@ def main():
     except:
         terminate = 1
         while (len(receive_conn) != 0):
-            print (len(receive_conn))
+            # print (len(receive_conn))
             continue
-        print("I fail")
+        print(f"I {node_id} fail")
         # print("aquire 1")
         queue_lock.acquire()
         print("get 1")
