@@ -3,6 +3,7 @@ import sys
 import time
 import threading
 import csv
+# from openpyxl import load_workbook
 
 
 
@@ -76,9 +77,12 @@ class hold_queue:
         while (len(self.queue) > 0 and self.queue[0][3] == DELIVERABLE):
 
             popdata = self.queue[0]
+            msg_id = popdata[1]
             self.queue.remove(self.queue[0])
             # print('{0}. deliver:{1}'.format(deliver_turn,popdata))
+
             handle_transaction(popdata[0])
+            record_endprocess_time(msg_id)
             deliver_turn+=1
         # queue.displayfirst()
 
@@ -105,11 +109,6 @@ class hold_queue:
                 
         # self.displayqueue()
                 
-
-
-
-        
-            
 
 
 
@@ -145,7 +144,8 @@ seen_lock = threading.Lock()
 queue_lock = threading.Lock()
 turn_lock = threading.Lock()
 si_lock = threading.Lock()
-# receive_conn_lock = threading.Lock()
+time_table_lock = threading.Lock()
+
 send_conn_lock = threading.Lock()
 node_num_lock = threading.Lock()
 
@@ -159,6 +159,9 @@ UNDELIVERABLE = 0
 
 # Account : Balance
 bank = dict()
+msg_start_time = dict()
+msg_end_time = dict()
+msg_row_index = 2
 
 
 ###################
@@ -253,11 +256,10 @@ def receive_message(receive_conn_member):
         # Shared data for all messages
         msg_type = datalist[0]
         msg_id = datalist[1]
-        msg_sender = int(datalist[4])
-        msg_send_time = float(datalist[5])
         typemid = msg_type + "|" + msg_id
 
-        get_bandwidth(data,msg_sender, msg_send_time)
+        get_metrics(data)
+
 
         if (msg_type == "feedback"):
             typemid = typemid + "|feebacker:" + datalist[3]
@@ -277,6 +279,7 @@ def receive_message(receive_conn_member):
             msg_content = datalist[2]
             original_priority = int(datalist[3])
 
+            
             # update queue
             # [content,msg_id,final_priority,deliverable,suggestor,[]]
             queue_lock.acquire()
@@ -454,20 +457,43 @@ def handle_transaction(msg_content):
         balance_info += " " + account + ":" + str(bank[account])
     print("BALANCES" + balance_info ) 
 
+
     return
 
-def get_bandwidth(data,msg_sender, send_time):
+def get_metrics(data):
 
-    delay = time.time() - send_time
+    datalist = data.split("|")
+    msg_sender = int(datalist[4])
+    msg_type = datalist[0]
+    msg_id = datalist[1]
+    msg_send_time = float(datalist[5])
+
+    # Bandwidth
+    delay = time.time() - msg_send_time
     bandwidth = len(data.encode('utf-8')) / delay
 
     metricfile_name = f"./metrics/bandwidth_node{msg_sender}.csv"
     metricfile = open(metricfile_name, 'a')
     metricfile.write(f"{data},{str(bandwidth)}\n")
     metricfile.close()
+    
+    return
+
+def record_startprocess_time(msg_id,msg_content):
+    
+    f = open('./metrics/time.log','a')
+    f.write(f"{msg_id} start_time {time.time()}\n")
+    f.close()
 
     return
 
+def record_endprocess_time(msg_id):
+
+    f = open('./metrics/time.log', 'a')
+    f.write(f"{msg_id} node{node_id}_end_time {time.time()}\n")
+    f.close()
+
+    return
 #######
 # main
 #######
@@ -574,6 +600,11 @@ def main():
                 queue.feedbacklist_append(queue.queue_find_index(msg_id), [cur_turn,int(node_id)])
                 queue.sort_queue()
                 queue_lock.release()
+
+                # Record start time
+                time_table_lock.acquire()
+                record_startprocess_time(msg_id,msg_content)
+                time_table_lock.release()
 
                 # prepare the message and start the send thread
                 askmessage = askMessage( msg_id, msg_content, str(cur_turn),node_id)
