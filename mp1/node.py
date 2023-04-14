@@ -79,10 +79,10 @@ class hold_queue:
             popdata = self.queue[0]
             msg_id = popdata[1]
             self.queue.remove(self.queue[0])
-            # print('{0}. deliver:{1}'.format(deliver_turn,popdata))
+            print('{0}. deliver:{1}'.format(deliver_turn,popdata))
 
-            handle_transaction(popdata[0])
-            record_endprocess_time(msg_id)
+            # handle_transaction(popdata[0])
+            # record_endprocess_time(msg_id)
             deliver_turn+=1
         # queue.displayfirst()
 
@@ -145,7 +145,7 @@ queue_lock = threading.Lock()
 turn_lock = threading.Lock()
 si_lock = threading.Lock()
 time_table_lock = threading.Lock()
-
+receive_conn_lock = threading.Lock()
 send_conn_lock = threading.Lock()
 node_num_lock = threading.Lock()
 
@@ -258,7 +258,7 @@ def receive_message(receive_conn_member):
         msg_id = datalist[1]
         typemid = msg_type + "|" + msg_id
 
-        get_metrics(data)
+        # get_metrics(data)
 
 
         if (msg_type == "feedback"):
@@ -381,6 +381,9 @@ def receive_message(receive_conn_member):
 
     
     if (othernode_fail == 1):
+        receive_conn_lock.acquire()
+        receive_conn.remove(con)
+        receive_conn_lock.release()
         print ("one node fail")
         node_num_lock.acquire()
         node_num = node_num - 1
@@ -389,11 +392,9 @@ def receive_message(receive_conn_member):
         queue_lock.release()
         node_num_lock.release()
     else:
-        print("I fail")
-        queue_lock.acquire()
-        for i in range(0,node_num):
-            queue.handle_failure(i)
-        queue_lock.release()
+        receive_conn_lock.acquire()
+        receive_conn.remove(con)
+        receive_conn_lock.release()
 
     # close
     con.close()
@@ -470,6 +471,9 @@ def get_metrics(data):
 
     # Bandwidth
     delay = time.time() - msg_send_time
+    if (delay == 0):
+        time.sleep(0.0000001)
+        delay = time.time() - msg_send_time
     bandwidth = len(data.encode('utf-8')) / delay
 
     metricfile_name = f"./metrics/bandwidth_node{msg_sender}.csv"
@@ -528,10 +532,10 @@ def main():
     node_id = node_name[4:]
 
     # Write metric header
-    metricfile_name = f"./metrics/bandwidth_{node_name}.csv"
-    metricfile = open(metricfile_name, 'w')
-    metricfile.write("data, bandwidth\n")
-    metricfile.close()
+    # metricfile_name = f"./metrics/bandwidth_{node_name}.csv"
+    # metricfile = open(metricfile_name, 'w')
+    # metricfile.write("data, bandwidth\n")
+    # metricfile.close()
 
     print(f"#1 {node_name} is waiting for connection")
 
@@ -602,15 +606,26 @@ def main():
                 queue_lock.release()
 
                 # Record start time
-                time_table_lock.acquire()
-                record_startprocess_time(msg_id,msg_content)
-                time_table_lock.release()
+                # time_table_lock.acquire()
+                # record_startprocess_time(msg_id,msg_content)
+                # time_table_lock.release()
 
                 # prepare the message and start the send thread
                 askmessage = askMessage( msg_id, msg_content, str(cur_turn),node_id)
                 multicast_message(askmessage)
     except:
         terminate = 1
+        while (len(receive_conn) != 0):
+            print (len(receive_conn))
+            continue
+        print("I fail")
+        # print("aquire 1")
+        queue_lock.acquire()
+        print("get 1")
+        for i in range(0, node_num):
+            queue.handle_failure(i)
+        queue_lock.release()
+        # print("release 1")
     
 
 
