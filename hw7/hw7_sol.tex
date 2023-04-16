@@ -121,8 +121,88 @@ There are n vertices. Set the arrays needs $n$ time, while loop totally run n ti
 
 \question{21.A}
 
+Denote $j$ as $\pi(i)$, $j \in [1,m]$. Let f(i, j) be a boolean function that is True if there's a feasible schedule that ends up main army at $p_i$ and shadow army at $q_j$. For a particular day $i$, the interval if feasible if there exists $j$ such that $\|p_i - q_j\| \in [x,y]$. For $f(i,j)$ to be true, there must exists a schedule to let the interval feasible on day $i - 1$. Formally, there's 
+
+\begin{equation*}
+f(i, j) = 
+	\begin{cases}
+	True & \mbox{if } i = 1, j = 1 \\
+	True & \mbox{if } i = 1 \mbox{ and } \|p_i - q_j\| \in [x,y] \\
+	True & \mbox{if } i > 1 \mbox{ and }\|p_i - q_j\| \in [x,y] \\
+		& \mbox{ and exists k $\in$ $[1,j]$ such that $f(i - 1, k)$ is $True$} \\
+	False & \mbox{if } i = 1 \mbox{ and } \|p_i - q_j\| \notin [x,y] \\
+	False & \mbox{if }  i > 1 \mbox{ and } \|p_i - q_j\| \in [x,y] \\
+		& \mbox{ but there's no k$\in$ $[1,j]$ such that $f(i - 1, k)$ is $True$ } \\
+	False & \mbox{if } \|p_i - q_j\| \notin [x,y]
+	\end{cases}
+\end{equation*}
+
+The output is $f(n, m)$. Based on the recursive equation, a dynamic programming approach with space saving is as follows.
+
+\begin{lstlisting}
+	IsFeasible(p[1..n], q[1..m], x,y):
+		if ||p[1] - q[1]|| not in [x,y]:
+			return False
+		bool M[2][1..m] 
+		# Initialize
+		M[1][1..m] = True
+
+		for i = 2 to n:
+			for j = 1 to m:
+				if ||p[i] - q[j] not in [x,y]:
+					M[2,j] = False
+					continue
+				# ||p[i] - q[j] is in [x,y]
+				if M[1,j] is True:
+					M[2,j] = True
+				else:
+					M[2,j] = False
+			# Stores information about existence of feasibility
+			M[1,1] = M[2,1]
+			for j = 2 to m:
+				M[1,j] = M[1,j - 1] OR M[2,j] # Logical operation OR
+
+		return M[n,m]	
+\end{lstlisting}
+
+Since only two rows of information are used, we only use M[1][1..m] and M[2][1..m] to store these information. M[1][1..m] stores doesn't store previous result directly since there will be additional $O(m)$ time to check if there exists $k \in [1,j]$ such that $M[1][1..k]$ is true. Instead, it directly shows if such $k$ exists by using logical operation OR. $M[1][1..k]$ being True directly shows that the schedule on former day is feasible. The time complexity is $O(nm)$ and the space complexity is $O(2m)$.
+
 \question{21.B}
 
+For all possible values of $x$, find the one with maximal value. The choice of $x$ can be any value of $\|p_i - q_j\|$. Not all possible values of $x$ are feasible and among these feasible ones, find the maximal one. The algorithm is as follows.
+\begin{lstlisting}
+	# L[a..b] is sorted in increasing order
+	search_maximal(L[a..b]):
+		if ( b - a <= 0) return L[a]
+		mid = D[floor((a + b) / 2)]
+		if IsFeasible(p[1..n],q[1..m], mid, inf):
+			return search_maximal(L[mid..b])
+		else:
+			return search_maximal(L[a..mid - 1])
+\end{lstlisting}
+
+The input to $search\_maximal(L[a..b])$ is sorted version of all values of $\|p_i - q_j\|$, where $i \in [1..n]$ and $j \in [1..m]$ with lenght $mn$. The basic idea is to use binary seach to find the maximal feasible value of x. To sort $L[1..nm]$, the time required is $O(nmlog(nm))$. The searching process takes $O(log(nm))$ time according to binary seach and for each search, $IsFeasible$ takes $O(nm)$ time. So the total time required is $O(nmlog(nm))$.
+
 \question{21.C}
+
+To find the interval with minimum instability $y / x$, the equivalent solution is to find the maximal possible value of $x$ and the minimal possible value of $y$. To find the minimal feasible value of $y$, a similar approach as in Q21.B can be applied. The algorithm is as follows.
+
+\begin{lstlisting}
+	search_min_instability(Sorted(L[0..nm])):
+		x = serach_maximal(L[0..nm])
+		y = search_minimal(L[0..nm])
+		return (x,y)
+	
+	# L[a..b] is sorted in increasing order
+	search_minimal(L[a..b]):
+		if ( b - a <= 0) return L[a]
+		mid = D[floor((a + b) / 2)]
+		if IsFeasible(p[1..n],q[1..m], 0, mid):
+			return search_maximal(L[a..mid])
+		else:
+			return search_maximal(L[mid + 1..b])
+\end{lstlisting}
+
+The input to $serach_min_instability$ is still sorted version of all values of $\|p_i - q_j\|$, where $i \in [1..n]$ and $j \in [1..m]$ with lenght $mn$. The time complexity is still the same as before: $O(nmlog(nm))$
 
 \end{document}
