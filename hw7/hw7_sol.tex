@@ -123,9 +123,11 @@ def minisize(original_Tree, f):
 									Remove choose_edge from children_edge[parent[i]] 
 							else:
 									choose_edge = # any edge in children_edge[i]
+
 							    	Remove choose_edge from children_edge[i]
 							X.append(choose_edge)
 							need_num[i] -= 1
+							# justify if need to break when the f(i) is not possible
 					Remove i from Tree
 					if (parent_node[i] has no children and not in the list):
 						new_leaf_list.append(parent_node[i])
