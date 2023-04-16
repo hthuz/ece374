@@ -61,6 +61,64 @@
 
 \question{19}
 
+We can use dynamic programming to solve this problem. Let $A[i][j][l]$ denote the maximum length of two subsequences $U$ and $V$, such that the edit distance between $U$ and $V$ is at most $l$, and the sum of the lengths of $U$ and $V$ is $i+j$.
+The base case is $A[0][0][0] = 0$, meaning that we can construct two empty subsequences with zero length and zero edit distance.
+
+Then, we can fill the dp table for $i$ from 0 to $n$, $j$ from 0 to $n$, and $l$ from 0 to $k$.
+If $i+j$ is even, we cannot have different length sub-sequences for the same edit distance as the total length will be odd. Hence, we set $A[i][j][l]$ to infinity.
+If the last characters of $U$ and $V$ are different, we have two choices:
+
+\textbf{0}:We add the last character of $S$ to $U$, and do not add any character to $V$. In this case, the value of $A[i+1][j][l]$ is $A[i][j][l]$ if $S[i] = S[n-j+1]$, and $A[i][j][l-1]+1$ otherwise (the edit distance is increased by 1).
+
+\textbf{1}:We add the last character of $S$ to $V$, and do not add any character to $U$. In this case, the value of $A[i][j+1][l]$ is $A[i][j][l]$ if $S[j] = S[n-i+1]$, and $A[i][j][l-1]+1$ otherwise (the edit distance is increased by 1).
+
+If the last characters of $U$ and $V$ are the same, we have three choices:
+
+\textbf{0}:We add the last character of $S$ to both $U$ and $V$. In this case, the value of $A[i+1][j+1][l]$ is $A[i][j][l]+1$.
+
+\textbf{1}:We add the last character of $S$ to $U$, and do not add any character to $V$. In this case, the value of $A[i+1][j][l]$ is $A[i][j][l-1]+1$.
+
+\textbf{2}:We add the last character of $S$ to $V$, and do not add any character to $U$. In this case, the value of $A[i][j+1][l]$ is $A[i][j][l-1]+1$.
+
+The answer is the maximum value of $A[i][j][l]$ such that the edit distance is at most $k$. 
+\begin{lstlisting}
+A[0][0][0] = 0
+for i from 0 to n
+    for j from 0 to n
+        for l from 0 to k
+            A[i][j][l] = -inf
+            if (i+j)%2 == 0:
+                continue
+            if i > 0 and j > 0:
+                if S[i] == S[n-j+1]:
+                    A[i][j][l] = max(A[i][j][l], A[i-1][j-1][l]+1)
+                else:
+                    if l > 0:
+                        A[i][j][l] = max(A[i][j][l], A[i-1][j-1][l-1]+1)
+            if i > 0:
+                if S[i] == S[n-j+1]:
+                    A[i][j][l] = max(A[i][j][l], A[i-1][j][l])
+                else:
+                    if l > 0:
+                        A[i][j][l] = max(A[i][j][l], A[i-1][j][l-1]+1)
+            if j > 0:
+                if S[j] == S[n-i+1]:
+                    A[i][j][l] = max(A[i][j][l], A[i][j-1][l])
+                else:
+                    if l > 0:
+                        A[i][j][l] = max(A[i][j][l], A[i][j-1][l-1]+1)
+                    
+ans = 0
+for l from 0 to k
+    for i from 1 to n
+        for j from 1 to n
+            if (i+j)%2 == 1 and A[i][j][l] >= 0:
+                ans = max(ans, A[i][j][l]+i+j)
+                
+return ans
+\end{lstlisting}
+Since we need to loop through $i$ from 0 to $n$, $j$ from 0 to $n$, and $l$ from 0 to $k$, the time complexity of this algorithm is $O(k*n^2)$. And the space used is $O(k*n)$.
+
 \question{20}
 \\We can try to satisfy the number of f (nodes) by starting with the leaves of the tree.For each node:
 \\$parent\_node$ is used to record its parent node, 
