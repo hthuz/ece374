@@ -41,8 +41,8 @@
 \newcommand{\HWnum}{7}
 % specify first and last name and the ID number of students in the group
 % append asterix to indicate who is making the submission
-\newcommand{\StudentA}{Hanggang Zhu, 3200110457}
-\newcommand{\StudentB}{Suhao Wang$^\ast$, 3200110777}
+\newcommand{\StudentA}{Hanggang Zhu$^\ast$, 3200110457}
+\newcommand{\StudentB}{Suhao Wang, 3200110777}
 \newcommand{\StudentC}{Lumeng Xu 3200110184}
 
 % ===============================================================
@@ -62,33 +62,54 @@
 \question{19}
 
 \question{20}
-\\We can try to satisfy the number of f (nodes) by starting with the leaves of the tree.For each node:
-\\$parent\_node$ is used to record its parent node, 
-\\$children\_edge$ is used to record the edge below the node, 
-\\$parent\_edge$ is used to record the edge above it, 
-\\$need\_num$ is used to record the number of edges it requires. It will change dynamically.\\
+\\This problem can be solved either using dynamic programming, which considers each subtree, or using greedy algorithms, because each time edge is selected there is a best option. We chose to use the greedy algorithm.
 
 
 \noindent
-For each leaf node, when the number of edges it requires is greater than 0:
-\\1. If there is a parent edge, select it and update the arrays.
-\\2. If you don't have a parent edge, pick a child edge. Update corresponding arrays.
-\\Repeat the preceding steps to update the array of leaf nodes.
+\\First, define that for node i,
+\\$children\_edge$ is the list of edges "$i->children\_node(i)$"
+\\$parent\_edge$ is the edge "$parent\_node(i)->i$"
+
+
+\noindent
+\\Then start to consider the leaf nodes of the tree first.
+\\Because if you start with the middle node, there's no way to know if you should choose the edge, but if you start with the leaf nodes, since they don't have children nodes, it becomes pretty obvious. There are two choices.
+\\1. If they choose children edge, they will only satisfy the number of their own f function requirements.
+\\2. If the parent edge is selected, it can be used to meet the requirements of f function of the parent node as well as its own.
+
+
+\noindent
+\\Therefore, according to the greedy algorithm, if the leaf node needs zero edges "at this time", it will choose nothing. If it needs one or more edge, it will choose the parent edge first, and then any of the other children edges.
+\\There are three important points to note: 
+\\1. If a node selects its parent edge, it must update some arrays of the parent node. 
+\\2. need\_num needs to be updated in real time and may be negative, but it doesn't matter, our function will end up choosing the least edge so that all nodes have need\_num less than 0.
+\\3. Our function appears to use multiple loops, "while, for, while", but in fact its process is similar to dynamic programming: it ends up simply iterating through all nodes and exiting the while loop. So the time complexity is still O (n). The space complexity is also O (n), we only use c lists, and the maximum size of a list is n.
+
+
+\noindent
+\\$parent\_node$ is a list used to record parent node , 
+\\$children\_node$ is a nested list used to record children node, 
+\\$children\_edge$ is a nested list used to record children edge, 
+\\$parent\_edge$ is used to record the parent edge, 
+\\$need\_num$ is used to record the number of edges it requires. It will change dynamically.
+
 
 \begin{lstlisting}
 def minisize(original_Tree, f):
-	X = [ ]
+	X = [ ]		# the result subset
 	Tree = original_Tree
 	leaf_node_list = [ ]
 	new_leaf_list = [ ]
+
+	# initialize the data
 	for i in Tree.nodes():
 		  	need_num[i] = f(i)
 			children_node[i] = # list of all the children nodes of i
 			children_edge[i] = # list of all the children edges of i
 			parent_node[i]   = # the parent node of i
-
+			parent_edge[i]   = # the parent edge of i
 			if (i is leaf_node):
-					leaf_node_list.append(i)
+					new_leaf_node_list.append(i)
 
 	while (Tree.nodes() is non-empty):
 			leaf_node_list = new_leaf_list
@@ -96,18 +117,18 @@ def minisize(original_Tree, f):
 			for i in leaf_node_list:  
 					while need_num[i]>0:
 							if (parent_edge[i] is not none):
-									dedge = parent_edge[i]
+									choose_edge = parent_edge[i]
 									parent_edge[i] = none
 									need_num[parent_node[i]]-=1
-									Remove dedge from children_edge[parent[i]] 
+									Remove choose_edge from children_edge[parent[i]] 
 							else:
-									dedge = # any edge in children_edge[i]
-							    	Remove dedge from children_edge[i]
-							X.append(dedge)
+									choose_edge = # any edge in children_edge[i]
+							    	Remove choose_edge from children_edge[i]
+							X.append(choose_edge)
 							need_num[i] -= 1
 					Remove i from Tree
-					if (parent[i] is not in new_leaf_list):
-						new_leaf_list.append(parent[i])
+					if (parent_node[i] has no children and not in the list):
+						new_leaf_list.append(parent_node[i])
 			
 	lengthX = len(X)
 	return X, lengthX
@@ -117,7 +138,7 @@ def minisize(original_Tree, f):
 # We maintain some arrays to save time
 
 \end{lstlisting}
-There are n vertices. Set the arrays needs $n$ time, while loop totally run n time. The size of arrays are in O(1) since degrees are at most 3. Running time is T(n) = O(n). Space used is O(n).
+There are n vertices. Set the arrays needs $n$ time, while loop totally run n time. The size of arrays are in O(1) since degrees are at most 3. Running time is T(n) = O(n). Space used is O(n).\\
 
 \question{21.A}
 
