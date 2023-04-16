@@ -62,6 +62,62 @@
 \question{19}
 
 \question{20}
+\\We can try to satisfy the number of f (nodes) by starting with the leaves of the tree.For each node:
+\\$parent\_node$ is used to record its parent node, 
+\\$children\_edge$ is used to record the edge below the node, 
+\\$parent\_edge$ is used to record the edge above it, 
+\\$need\_num$ is used to record the number of edges it requires. It will change dynamically.\\
+
+
+\noindent
+For each leaf node, when the number of edges it requires is greater than 0:
+\\1. If there is a parent edge, select it and update the arrays.
+\\2. If you don't have a parent edge, pick a child edge. Update corresponding arrays.
+\\Repeat the preceding steps to update the array of leaf nodes.
+
+\begin{lstlisting}
+def minisize(original_Tree, f):
+	X = [ ]
+	Tree = original_Tree
+	leaf_node_list = [ ]
+	new_leaf_list = [ ]
+	for i in Tree.nodes():
+		  	need_num[i] = f(i)
+			children_node[i] = # list of all the children nodes of i
+			children_edge[i] = # list of all the children edges of i
+			parent_node[i]   = # the parent node of i
+
+			if (i is leaf_node):
+					leaf_node_list.append(i)
+
+	while (Tree.nodes() is non-empty):
+			leaf_node_list = new_leaf_list
+			new_leaf_list = [ ]
+			for i in leaf_node_list:  
+					while need_num[i]>0:
+							if (parent_edge[i] is not none):
+									dedge = parent_edge[i]
+									parent_edge[i] = none
+									need_num[parent_node[i]]-=1
+									Remove dedge from children_edge[parent[i]] 
+							else:
+									dedge = # any edge in children_edge[i]
+							    	Remove dedge from children_edge[i]
+							X.append(dedge)
+							need_num[i] -= 1
+					Remove i from Tree
+					if (parent[i] is not in new_leaf_list):
+						new_leaf_list.append(parent[i])
+			
+	lengthX = len(X)
+	return X, lengthX
+
+# notes:
+# Tree.nodes() will return the list of all the nodes
+# We maintain some arrays to save time
+
+\end{lstlisting}
+There are n vertices. Set the arrays needs $n$ time, while loop totally run n time. The size of arrays are in O(1) since degrees are at most 3. Running time is T(n) = O(n). Space used is O(n).
 
 \question{21.A}
 
