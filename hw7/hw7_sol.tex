@@ -79,7 +79,12 @@
 
 
 \noindent
-\\Therefore, according to the greedy algorithm, if the leaf node needs zero edges "at this time", it will choose nothing. If it needs one or more edge, it will choose the parent edge first, and then any of the other children edges.
+\\ Therefore, according to the greedy algorithm, for example, if the leaf node needs zero edges "at this time", it will choose nothing. If it needs one or more edge, it will choose the parent edge first, and then any of the other children edges.
+\\ after making the set of leaf nodes' need\_num all to zero. We will remove these nodes and get a new group of leaf nodes who don't have children nodes, which is not necessarily the father node of the previous leaf nodes. (consider different height of leaf node) we must consider the children\_node to decide that.
+\\ Repeat the steps until all the nodes are removed.
+
+
+\noindent
 \\There are three important points to note: 
 \\1. If a node selects its parent edge, it must update some arrays of the parent node. 
 \\2. need\_num needs to be updated in real time and may be negative, but it doesn't matter, our function will end up choosing the least edge so that all nodes have need\_num less than 0.
