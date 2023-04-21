@@ -62,6 +62,17 @@
 
 \question{22.A}
 
+Represent the underground tunnel system as a connected undirected graph $G = (V,E)$, where $V$ is the set of intersections of tunnels and $E$ is the set of tunnels. $n$ is size of $V$ and $m$ is size of $E$. To check if a tunnel $e$ is critical, simply check if $G' = (V,E - {e})$ is connected. Use depth first search to determine if $G'$ is connected takes linear time $O(n + m - 1)$.
+
+\begin{lstlisting}
+  def isCritical(G(V,E),e):
+    T = Tree/Forest genearted by DFS((V, E - {e}))
+    if T is a Forest(has multiple root nodes)
+      return true
+    return False
+\end{lstlisting}
+
+
 \question{22.B}
 
 \question{22.C}
