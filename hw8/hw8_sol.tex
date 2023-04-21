@@ -113,9 +113,74 @@ Note that even though some vertices participate in forming into one cycle, if it
 
 \question{23.A}
 
+\begin{lstlisting}
+TopSort(G):
+	Sorted <- NULL
+	deg_in[1....n] <- -1
+	Tdeg_in[1...n] <- NULL
+	for each edge xy in G do
+		deg_in[y] ++
+	for each vertex v in G do
+		Tdeg_in[deg_in[v]].append(v)
+	while (Tdeg_in[0] is non-empty) do
+		Remove node x from Tdeg_in[0]
+		Sorted.append(x)
+		for each edge xy in Adj(x) do
+			deg_in[y]--
+			move y to Tdeg_in[deg_in[y]]
+	Output Sorted
+Hami(G):
+	Sort_List = TopSort(G)
+	for each vertex v in Sorted_List do
+		have_edge = 0
+		for each edge vu in Adj(v) do
+			 if (u == vertex v successor):
+				have_edge = 1	
+		if (have_edge == 0) do
+			return False
+	return True
+
+\end{lstlisting}
+running time is O(V+E)\\
+
 \question{23.B}
 
+\begin{lstlisting}
+TopSort(G):
+	decribe in A
+Avg(G, s, t):
+	avg_weight[1.....n] <- -1
+	edge_num[1.....n] <- 0
+	Sort_List = TopSort(G)
+	for each vertex x in Sort_List do
+		if (x == s):
+			avg_weight[x] = 0
+			edge_num[x] = 0
+		if (average_weight[x] != -1 ) do
+			for each edge xy in Adj(x) do
+				new_path = (avg_weight[x]*edge_num[x]+weight(xy) )/(edge_num[x]+1)
+				avg_weight[y] = max{ avg_weight[y], new_path}
+				if (new_path == avg_weight[y]) do
+					edge_num[y]++
+	Output avg_weight[t]
+\end{lstlisting}
+running time is O(V+E)\\
 \question{23.C}
+\begin{lstlisting}
+TopSort(G):
+	decribe in A
+Spec(G, s, t):
+	path_weight[1.....n] <- -1
+	Sort_List = TopSort(G)
+	for each vertex x in Sort_List do
+		if (x == s):
+			path_weight[x] = 0
+		if ( path_weight[x] != -1 ) do
+			for each edge xy in Adj(x) do
+				path_weight[y] = max{ path_weight[y], path_weight[x]+weight(y)}
+	Output path_weight[t]
+\end{lstlisting}
+running time is O(V+E)\\
 
 \question{23.D}
 
