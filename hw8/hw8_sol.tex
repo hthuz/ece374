@@ -183,7 +183,30 @@ Spec(G, s, t):
 running time is O(V+E)\\
 
 \question{23.D}
-
+\begin{lstlisting}
+reverse(G):
+	# reverse all the edges
+	Output G'
+TopSort(G):
+	# decribe in A
+even_odd(a):
+	# if a is odd return 1
+	# if a is even return 0
+Numodd(G, s, t):
+	path_num[1.....n] <- -1
+	G' = reverse( G )
+	Sort_List = TopSort(G')
+	for each vertex x in Sort_List do
+		if (x == t):
+			path_num[x] = 0
+		if ( path_num[x] != -1 ) do
+			for each edge xy in Adj(x) do
+				if ( path_num[y] == -1 ) do
+					path_num[y] = 0
+				path_num[y] + = 1
+	Output even_odd(path_num[s])
+\end{lstlisting}
+running time is O(V+E)\\
 \question{24.A}
 
 \question{24.B}
