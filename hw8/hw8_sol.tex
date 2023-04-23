@@ -256,12 +256,12 @@ even_odd(G, s, t):
 topsort running time is O(V+E). even\_odd main function also just go through all the vertices and edges once. Running time is O(V+E).V is the vertex number, E is the edge number.\\
 \question{24.A}
 
-{\bf Modeling of problem:} The modeling of the problem can be considered as a directed graph $G(V,E)$ with size of V=$n$ and size of $E$=$m$ and each vertices has one outgoing edge. The meta-graph $G^{SCC}$ of $G$ is a DAG, with some sources and sinks. We claim that {\em if a strongly connected component of G has more than one vertices, then this SCC must be a sink in $G^{SCC}$}. In other words, {\em All SCC vertices in $G^{SCC}$ only has one vertex in $G$ except sinks}. This can be proved by contradiction. Suppose there exists a vertex is in a strongly connected component that is not a sink in $G^{SCC}$, then for all vertices in SCC, there must be a outgoing edge from these vertices pointing to another in the SCC. At the same time, for some vertex $v$ in SCC, there will be one outgoing edge from $v$ pointing to some other vertices not in this SCC since it's not in the sink. But the contradicts the condition that each vertex only has one outgoing edge. So there's no such vertex and the claim is true.
+{\bf Modeling of problem:} The modeling of the problem can be considered as a directed graph $G(V,E)$ with size of V=$n$ and size of $E$=$m$ and each vertices has one outgoing edge. The edge of a vertex $v$ is represented as $(v \rightarrow contact(v))$. The meta-graph $G^{SCC}$ of $G$ is a DAG, with some sources and sinks. We claim that {\em if a strongly connected component of G has more than one vertices, then this SCC must be a sink in $G^{SCC}$}. In other words, {\em All SCC vertices in $G^{SCC}$ only has one vertex in $G$ except sinks}. This can be proved by contradiction. Suppose there exists a vertex is in a strongly connected component that is not a sink in $G^{SCC}$, then for all vertices in SCC, there must be a outgoing edge from these vertices pointing to another in the SCC. At the same time, for some vertex $v$ in SCC, there will be one outgoing edge from $v$ pointing to some other vertices not in this SCC since it's not in the sink. But the contradicts the condition that each vertex only has one outgoing edge. So there's no such vertex and the claim is true.
 
-To find a rebel that can propagate to all other vertices, this rebel must be a source in $G^{SCC}$. If there are multiple sources $s_i,s_j$ in $G^{SCC}$. there's no way that $s_i$ can propagate to $s_j$ and vice versa. So to solve the problem, just check the sources of $G^{SCC}$.  
+Similarily, it can be proved that each source only corresponds to one sink and each sink can correspond to multiple sources.
 
-This problem can be solved by first finding all the strongly connected components of the graph, then reverse the output meta graph, if there is no edges come out of a strongly connected component, it means that 
-the initial vertex v can get propagated to all the rebels.
+For problem A, to find a rebel that can propagate to all other vertices, this rebel must be a source in $G^{SCC}$. If there are multiple sources $s_i,s_j$ in $G^{SCC}$. there's no way that $s_i$ can propagate to $s_j$ and vice versa. So to solve the problem, just check the sources of $G^{SCC}$.  
+
 
 \begin{algorithm}
 \caption{Find a rebel that propagates to all}\label{alg:q24A}
@@ -278,56 +278,32 @@ the initial vertex v can get propagated to all the rebels.
 \end{algorithmic}
 \end{algorithm}
 
-As a rebel can only send messages to one other rebel, the number edge is equal to number of vertex. The linear time algorithm to obtain $G^{SCC}$ in lecture slides can be applied. It takes linear time to compute in-degree of each vertex. So the time complexity of the algorithm is $O(n + m) = O(n + n) = O(n)$.
+As a rebel can only send messages to one other rebel, the number edge is equal to number of vertex. The linear time algorithm to obtain $G^{SCC}$ in lecture slides can be applied. It takes linear time to compute in-degree of each vertex by traversing through edges and vertices. So the time complexity of the algorithm is $O(n + m) = O(n + n) = O(n)$.
 
 \question{24.B}
 
-The algrithom of this problem is almost the same of the problem above, the only difference is that we need to find the number of the strongly connected components which
-have no edges come out of it, and output the number.
-
-\begin{lstlisting}
-  def MinRebelPropagateAll(G(V,E)):
-  list $S_{SCC}$
-  num_of_rebel <- 0
-  do DFS($G^{rev}$) and output vertices in decreasing post order
-  Mark all nodes as unvisited
-  for each v in the computed order do
-      if v is not visited then 
-           DFS(v)
-           Let $S_v$ be the nodes reached by v
-           Add $S_v$ to $S_{SCC}$
-           Remove $S_v$ from G
-  for each $S_v$ in $S_{SCC}^{rev}$ do
-      if Adj{$S_v$} = 0
-      num_of_rebel += 1
-      Output num_of_rebel  
-\end{lstlisting}
-
-The time complexity of this problem is the same as above, which is $O(n)$.
+If all sources in $G^{SCC}$ is directly sent a message, than all other rebels can receive message. If some rebels that are not sources are directly sent a message, the corresponding source of the rebel still need to be directly sent a message. So minimal number is number of sources in $G^{SCC}$. The algrithom of this problem is almost the same of the problem above, the only difference is that number of sources in $G^{SCC}$ is returned. Time complexity is $O(n)$
 
 \question{24.C}
 
-This problem is basically the same as problem A, the difference is that in this problem, a rebel can send messages to many other rebels.
+A rebel can send messages to many other rebels. The claims in {\bf Modeling of Problem} don't hold any more. But similarily, such a rebel exists if there's a source in $G^{SCC}$ that can reach all sinks in $G^{SCC}$. Note that there can be only one source, otherwise rebels in one source can't propagate to rebels in another source. All rebels in the source SCC can propagate message to everyone. The problem is equivalent to check if the number of sources in $G^{SCC}$ is one since if there's some sink that can't be reached by the source, there must exist another source that can reach this sink, which will lead to multiple sources.
 
-\begin{lstlisting}
-  def RebelPropagateAll(G(V,E)):
-  list $S_{SCC}$
-  do DFS($G^{rev}$) and output vertices in decreasing post order
-  Mark all nodes as unvisited
-  for each v in the computed order do
-      if v is not visited then 
-           DFS(v)
-           Let $S_v$ be the nodes reached by v
-           Add $S_v$ to $S_{SCC}$
-           Remove $S_v$ from G
-           for each $S_v$ in $S_{SCC}^{rev}$ do
-               if Adj{$S_v$} = 0
-               Output v
-               else
-               Output "no solution"
-\end{lstlisting}
+\begin{algorithm}
+\caption{Find rebels that propagates to all}\label{alg:q24A}
+\begin{algorithmic}
+  \Function{$RebelPropagateAll$}{$G(V,E)$}
+    \State $G^{SCC}$ = meta-graph of $G$ obtained in linear time
+    \State Compute $InDeg(v)$, in-degree of each vertex in $G^{SCC}$
+    \If{Number of vertices with $InDeg(v) = 0$ is greater than 1}
+      \State \Return False
+    \Else
+      \State \Return vertices in SCC $v$ in $G^{SCC}$ with $InDeg(v)$ = 0
+    \EndIf
+  \EndFunction
+\end{algorithmic}
+\end{algorithm}
 
-Assume the number of edges of the original graph is $m$, the time complexity is $O(m+n)$.
+Similarily, the time complexity is $O(n + m)$
 
 \question{24.D}
 
