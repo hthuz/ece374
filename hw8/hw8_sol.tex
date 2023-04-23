@@ -111,8 +111,12 @@ def FindCriticalIntersetion(G(V,E)):
 Note that even though some vertices participate in forming into one cycle, if it also participates in forming a non-cycle path, it is critical as well. Similarily, the time complexity is $O(n + m)$
 
 
-\question{23.A}
-
+\question{23.A}\\
+1. Topological sorting
+\\2. traverse vertex for topological sorting result:
+\\If for any vertex $n$ except the last vertex in the list, there is an edge from $n$ to $n+1$, then G has a Hamiltonian path.
+\\Otherwise, G doesn't have a Hamiltonian path.
+\\3. Explanation: in Hamiltonian path you have to visit all the vertices. In the topological sorting result, you cannot "go back". So the only strategy is to "traverse in turn without skip". 
 \begin{lstlisting}
 TopSort(G):
 	Sorted <- NULL
@@ -131,20 +135,25 @@ TopSort(G):
 	Output Sorted
 Hami(G):
 	Sort_List = TopSort(G)
-	for each vertex v in Sorted_List do
+	for each vertex v in Sorted_List do  # except the last vertex
 		have_edge = 0
 		for each edge vu in Adj(v) do
-			 if (u == vertex v successor):
+			 if (u == vertex v successor): 
 				have_edge = 1	
 		if (have_edge == 0) do
 			return False
 	return True
 
 \end{lstlisting}
-running time is O(V+E)\\
+topsort running time is O(V+E). Hami main function also just go through all the vertices and edges once. Running time is O(V+E).V is the vertex number, E is the edge number.\\
 
-\question{23.B}
-
+\question{23.B}\\
+1. use topological sorting and traverse the vertices of the topological sorting result to realize dynamically programming.
+\\2. For each vertex $x$, determine whether $avg\_weight[x]$ is equal to -1. 
+\\If it is -1, then $s$ cannot reach the vertex. continue.
+\\If it is not equal to -1, it means that $s$ can reach this vertex. Walk through each of its edges, and then update the maximum average weight of all the vertices connected by $x$.
+\\3. $avg\_weight[t]$ will store the maximum weight from $s$ to $t$, if it is -1, then $t$ is not reachable for $s$.
+\\($avg\_weight[t]$ is the maximum average weight from $s$ to $i$)
 \begin{lstlisting}
 TopSort(G):
 	decribe in A
@@ -158,14 +167,23 @@ Avg(G, s, t):
 			edge_num[x] = 0
 		if (average_weight[x] != -1 ) do
 			for each edge xy in Adj(x) do
-				new_path = (avg_weight[x]*edge_num[x]+weight(xy) )/(edge_num[x]+1)
+				new_path = (avg_weight[x]*edge_num[x]+w(xy) )/(edge_num[x]+1)
+				# w (xy) is the edge xy's weight
 				avg_weight[y] = max{ avg_weight[y], new_path}
 				if (new_path == avg_weight[y]) do
 					edge_num[y]++
 	Output avg_weight[t]
 \end{lstlisting}
-running time is O(V+E)\\
-\question{23.C}
+topsort running time is O(V+E). Avg main function also just go through all the vertices and edges once. Running time is O(V+E).V is the vertex number, E is the edge number.\\
+
+
+\question{23.C}\\
+1. use topological sorting and traverse the vertices of the topological sorting result to realize dynamically programming.
+\\2. For each vertex $x$, determine whether $path\_weight[x]$ is equal to -1. 
+\\If it is -1, then $s$ cannot reach the vertex. continue.
+\\If it is not equal to -1, it means that $s$ can reach this vertex. Walk through each of its edges, and then update the maximum weight of all the vertices connected by $x$.
+\\3. $path\_weight[t]$ will store the maximum weight from $s$ to $t$, if it is -1, then $t$ is not reachable for $s$.
+\\($path\_weight[i]$ is the maximum weight from $s$ to $i$)
 \begin{lstlisting}
 TopSort(G):
 	decribe in A
@@ -177,36 +195,42 @@ Spec(G, s, t):
 			path_weight[x] = 0
 		if ( path_weight[x] != -1 ) do
 			for each edge xy in Adj(x) do
-				path_weight[y] = max{ path_weight[y], path_weight[x]+weight(y)}
+				path_weight[y] = max{ path_weight[y], path_weight[x]+w(y)}
+				# w(y) means the weight of vertex y no matter it is special or not
 	Output path_weight[t]
 \end{lstlisting}
-running time is O(V+E)\\
+topsort running time is O(V+E). Spec main function also just go through all the vertices and edges once. Running time is O(V+E).V is the vertex number, E is the edge number.\\
 
-\question{23.D}
+
+\question{23.D}\\
+1. First, the DAG is topologically sorted
+\\2. The results sorted by topology will be dynamically programmed from front to back
+\\(path[i] represents whether the number of different paths from s to vertex i is odd or even. 0 means even, 1 means odd.)
+\\3. Start by setting all arrays for dynamic programming to -1,
+\\4. Starting at the starting vertex s, set its $path$ to even (because there are zero paths).
+\\5. Then all the edges of s are considered, and the vertices connected by s are updated according to $path[s]$. Use "path[y] = (path[y] + path[x]) mod 2" to get the "temporary" parity of the connected vertices.
+\\6. Select the next node for topological sort and do the same thing, repeating the previous step until we reach node t.
+\\(When we traverse to vertex j, it means that the number of paths for this node has been determined, that is, its parity has been determined)
 \begin{lstlisting}
-reverse(G):
-	# reverse all the edges
-	Output G'
+EVEN = 0 
+ODD = 1
+# (EVEN+ODD) mod 2=ODD, (EVEN+EVEN) mod 2=EVEN, ODD+ODD mod 2= EVEN, 
 TopSort(G):
 	# decribe in A
-even_odd(a):
-	# if a is odd return 1
-	# if a is even return 0
-Numodd(G, s, t):
-	path_num[1.....n] <- -1
-	G' = reverse( G )
-	Sort_List = TopSort(G')
+even_odd(G, s, t):
+	path[1.....n] <- -1
+	Sort_List = TopSort(G)
 	for each vertex x in Sort_List do
-		if (x == t):
-			path_num[x] = 0
-		if ( path_num[x] != -1 ) do
+		if (x == s):
+			path[x] = EVEN
+		if ( path[x] != -1 ) do
 			for each edge xy in Adj(x) do
-				if ( path_num[y] == -1 ) do
-					path_num[y] = 0
-				path_num[y] + = 1
-	Output even_odd(path_num[s])
+				if ( path[y] == -1 ) do
+					path[y] = EVEN
+				path[y]  = (path[y] + path[x]) mod 2
+	Output path[t]
 \end{lstlisting}
-running time is O(V+E)\\
+topsort running time is O(V+E). even\_odd main function also just go through all the vertices and edges once. Running time is O(V+E).V is the vertex number, E is the edge number.\\
 \question{24.A}
 
 \question{24.B}
