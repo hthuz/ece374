@@ -1,0 +1,53 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{fullpage}
+\pagestyle{plain}
+% choose any of the following packages to support AmsTeX
+%\usepackage{amsmath,amssymb,amsfonts,mathrsfs,mathptm,bm,mathtools}
+% choose the following package to insert eps figures
+% for png, jpg or pdf figures, use pdflatex
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{./img}}
+
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\algnewcommand{\beginComment}{\textbf{/*}}
+\algnewcommand{\endComment}{\textbf{*/}}
+\renewcommand{\Comment}[1]{\beginComment~#1~\endComment}
+
+
+\newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
+% set HW number
+\newcommand{\HWnum}{9}
+% specify first and last name and the ID number of students in the group
+% append asterix to indicate who is making the submission
+\newcommand{\StudentA}{Hanggang Zhu$^\ast$, 3200110457}
+\newcommand{\StudentB}{Suhao Wang, 3200110777}
+\newcommand{\StudentC}{Lumeng Xu 3200110184}
+
+% ===============================================================
+\begin{document}
+
+%%% header
+{\noindent \rule{\linewidth}{0.2mm}}\\
+\noindent{ECE 374, ZJUI, Spring 2023\hfill%
+  \textbf{\large H{}W\HWnum\ Solutions} \hfill \today\smallskip}
+
+\noindent{\hfill \StudentA, \StudentB, and \StudentC \hfill}
+\\[-0.2cm]{\noindent \rule{\linewidth}{0.2mm}}
+%%% end header
+
+
+\question{25.A}
+
+\question{25.B}
+
+\question{25.C}
+
+\question{26}
+
+\question{27.A}
+
+\question{27.B}
+
+\end{document}
