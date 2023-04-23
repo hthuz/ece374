@@ -75,7 +75,7 @@ Represent the underground tunnel system as a connected undirected graph $G = (V,
 
 \question{22.B}
 
-If tunnel $\{v_i, v_j\}$ is destroyed and cops can'n still find a way going from $v_i$ to $v_j$ or from $v_j$ to $V_i$, this shows that there is only one path from $v_i$ to $v_j$ or from $v_j$ to $v_i$, without forming cycles. On other words, $\{v_i, v_j\}$ is critical if it is not an edge of any cycle. To indentify every critical tunnel, do depth first search to find all vertices that are part of a cycle. Then get critical edge from vertices that are not part of any cycle.
+If tunnel $\{v_i, v_j\}$ is destroyed and cops can't still find a way going from $v_i$ to $v_j$ or from $v_j$ to $V_i$, this shows that there is only one path from $v_i$ to $v_j$ or from $v_j$ to $v_i$, without forming cycles. On other words, $\{v_i, v_j\}$ is critical if it is not an edge of any cycle. To indentify every critical tunnel, do depth first search to find all vertices that are part of a cycle. Then get critical edge from vertices that are not part of any cycle.
 
 \begin{lstlisting}
 def FindCriticalTunnel(G(V,E)):
@@ -233,12 +233,111 @@ even_odd(G, s, t):
 topsort running time is O(V+E). even\_odd main function also just go through all the vertices and edges once. Running time is O(V+E).V is the vertex number, E is the edge number.\\
 \question{24.A}
 
+This problem can be solved by first finding all the strongly connected components of the graph, then reverse the output meta graph, if there is no edges come out of a strongly connected component, it means that 
+the initial vertex v can get propagated to all the rebels.
+
+\begin{lstlisting}
+def RebelPropagateAll(G(V,E)):
+  list $S_{SCC}$
+  do DFS($G^{rev}$) and output vertices in decreasing post order
+  Mark all nodes as unvisited
+  for each v in the computed order do
+      if v is not visited then 
+           DFS(v)
+           Let $S_v$ be the nodes reached by v
+           Add $S_v$ to $S_{SCC}$
+           Remove $S_v$ from G
+  for each $S_v$ in $S_{SCC}^{rev}$ do
+      if Adj{$S_v$} = 0
+      Output v
+      else
+      Output "no solution"
+\end{lstlisting}
+
+As a rebel can only send messages to one other rebel, the number of edge is no larger than the number of vertex. As the time complexity of computing reverse and DFS or getting through all 
+points is all linear, the time complexity of this algrithom is $O(n)$.
+
 \question{24.B}
+
+The algrithom of this problem is almost the same of the problem above, the only difference is that we need to find the number of the strongly connected components which
+have no edges come out of it, and output the number.
+
+\begin{lstlisting}
+  def MinRebelPropagateAll(G(V,E)):
+  list $S_{SCC}$
+  num_of_rebel <- 0
+  do DFS($G^{rev}$) and output vertices in decreasing post order
+  Mark all nodes as unvisited
+  for each v in the computed order do
+      if v is not visited then 
+           DFS(v)
+           Let $S_v$ be the nodes reached by v
+           Add $S_v$ to $S_{SCC}$
+           Remove $S_v$ from G
+  for each $S_v$ in $S_{SCC}^{rev}$ do
+      if Adj{$S_v$} = 0
+      num_of_rebel += 1
+      Output num_of_rebel  
+\end{lstlisting}
+
+The time complexity of this problem is the same as above, which is $O(n)$.
 
 \question{24.C}
 
+This problem is basically the same as problem A, the difference is that in this problem, a rebel can send messages to many other rebels.
+
+\begin{lstlisting}
+  def RebelPropagateAll(G(V,E)):
+  list $S_{SCC}$
+  do DFS($G^{rev}$) and output vertices in decreasing post order
+  Mark all nodes as unvisited
+  for each v in the computed order do
+      if v is not visited then 
+           DFS(v)
+           Let $S_v$ be the nodes reached by v
+           Add $S_v$ to $S_{SCC}$
+           Remove $S_v$ from G
+           for each $S_v$ in $S_{SCC}^{rev}$ do
+               if Adj{$S_v$} = 0
+               Output v
+               else
+               Output "no solution"
+\end{lstlisting}
+
+Assume the number of edges of the original graph is $m$, the time complexity is $O(m+n)$.
+
 \question{24.D}
 
+For this problem, when we make the meta graph of the original graph to a circle, the number of reassignments can be minimized, which is the number of sinks plus the sum of the corresponding source -1 of the meta graph.
 
+\begin{lstlisting}
+  def RebelPropagateAll(G(V,E)):
+  list $S_{SCC}$
+  num_of_reassignments <- 0
+  num_of_sink <- 0
+  num_of_cor_source <- 0
+  do DFS($G^{rev}$) and output vertices in decreasing post order
+  Mark all nodes as unvisited
+  for each v in the computed order do
+      if v is not visited then 
+           DFS(v)
+           Let $S_v$ be the nodes reached by v
+           Add $S_v$ to $S_{SCC}$
+           Remove $S_v$ from G
+  for each $S_v$ in $S_{SCC}$ do
+      if Adj{$S_v$} = 0
+      num_of_sink += 1
+      for each $S_v$ in $S_{SCC}^{rev}$ do
+               if Adj{$S_v$} = 0
+               num_of_cor_source += 1
+  num_of_reassignments = num_of_sink + num_of_cor_source - 1
+  Output num_of_reassignments        
+\end{lstlisting}
+
+The time complexity of this algrithom is $O(n)$.
+
+Proof of correctness of this algrithom:
+First, we need to delete one edge of the sink strongly connected component, because a rebel can only send a sigle message to one other rebel, there is at least one edge of each vertex. The number of reassignments of this operation is the number of sinks.
+Then, we need to connect the sink to another source to make the whole graph a circle, which need the number of corresponding sources - 1 reassignments. So, the minimal number of contacts of a single rebel is the number of the sink plus the number of the corresponding sources - 1.
 
 \end{document}
