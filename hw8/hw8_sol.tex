@@ -13,6 +13,7 @@
 \usepackage{color}
 \usepackage{float}
 \usepackage{graphicx}
+\graphicspath{{./img}}
 
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
@@ -328,15 +329,20 @@ The problem is equivalent to find the minima number of reassignment such that $G
       \If {$t_0 = t_1$}
         \State \Comment{Two sources share the same sink}
         \State Starting from $s_0$, traverse through $G^{SCC}$, find the first vertex $v$ with
-        \State $OutAdj^{SCC}(v,v')$ such that $InDeg(v') \ge 2$ or $t_0$ if no such vertex
+        \State $OutAdj^{SCC}(v,v')$ such that $InDeg(v') \ge 2$ or $v' = t_0$ if no such vertex
+        \State Remove $OutAdj^{SCC}(v,v')$ and decrease $InDeg(v')$ in $G^{SCC}$ by 1
         \State \Comment{$v$ is $pre\_common\_successor$, $v'$ is $common\_successor$}
         \State Set $(v, v')$ to $(v,s_1)$ in $Enew$
       \Else 
       \State \Comment{Two sources have different sinks}
         \State Starting from $s_0$, traverse through $G$, find the first vertex $v$ in $t_0$. 
         \State $v$ has $InAdj^{SCC}(v',v)$ such that $v'$ is in $t_0$ as well
-        \State Set $(v',v)$ to $(v', s_1)$ in $Enew$
-
+        \If{i = $|sources| - 2$ ($s_1$ is the last source)}
+          \State Set ${v',v}$ to $(v', sources[0])$ in $Enew$
+        \Else
+          \State Set $(v',v)$ to $(v', s_1)$ in $Enew$
+        \EndIf
+        
       \EndIf
 
     \EndFor
@@ -356,6 +362,14 @@ The problem is equivalent to find the minima number of reassignment such that $G
 \end{algorithmic}
 \end{algorithm}
 
+A draft of the algorithm is given as follows.
+
+\begin{figure}[hbt!]
+  \centering
+  \includegraphics[width = 1\textwidth]{img/q24D.jpg}
+\end{figure}
+
+\newpage
 Note that the algorithm records both the in-edge and out-edge of each vertex. Getting $G^{SCC}$ takes $O(n + n)$ time and iterating through sources takes approximately $O(2n)$ time in total. So the time complexity is $O(n)$
 
 If sink $i$ has $k_i$ number of corresponding sources, we need to connect these sources together so that these sources are connected with each other. The reassignment number is $k_i - 1$.
