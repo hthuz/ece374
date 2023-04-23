@@ -18,7 +18,7 @@
 \usepackage[noend]{algpseudocode}
 \algnewcommand{\beginComment}{\textbf{/*}}
 \algnewcommand{\endComment}{\textbf{*/}}
-\renewcommand{\Comment}[1]{\hfill\beginComment~#1~\endComment}
+\renewcommand{\Comment}[1]{\beginComment~#1~\endComment}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -256,7 +256,7 @@ even_odd(G, s, t):
 topsort running time is O(V+E). even\_odd main function also just go through all the vertices and edges once. Running time is O(V+E).V is the vertex number, E is the edge number.\\
 \question{24.A}
 
-{\bf Modeling of problem:} The modeling of the problem can be considered as a directed graph $G(V,E)$ with size of V=$n$ and size of $E$=$m$ and each vertices has one outgoing edge. The edge of a vertex $v$ is represented as $(v \rightarrow contact(v))$. The meta-graph $G^{SCC}$ of $G$ is a DAG, with some sources and sinks. We claim that {\em if a strongly connected component of G has more than one vertices, then this SCC must be a sink in $G^{SCC}$}. In other words, {\em All SCC vertices in $G^{SCC}$ only has one vertex in $G$ except sinks}. This can be proved by contradiction. Suppose there exists a vertex is in a strongly connected component that is not a sink in $G^{SCC}$, then for all vertices in SCC, there must be a outgoing edge from these vertices pointing to another in the SCC. At the same time, for some vertex $v$ in SCC, there will be one outgoing edge from $v$ pointing to some other vertices not in this SCC since it's not in the sink. But the contradicts the condition that each vertex only has one outgoing edge. So there's no such vertex and the claim is true.
+{\bf Modeling of problem:} The modeling of the problem can be considered as a directed graph $G(V,E)$ with size of V=$n$ and size of $E$=$m$ and each vertices has one outgoing edge. The edge of a vertex $v$ is represented as $(v \rightarrow contact(v))$. The meta-graph $G^{SCC}$ of $G$ is a DAG, with some sources and sinks. We claim that {\em if a strongly connected component of G has more than one vertices, then this SCC must be a sink in $G^{SCC}$}. In other words, {\em All SCC vertices in $G^{SCC}$ only corresponds to one vertex in original graph $G$ and have only one outgoing edge in $G^{SCC}$ except sinks}. This can be proved by contradiction. Suppose there exists a vertex is in a strongly connected component that is not a sink in $G^{SCC}$, then for all vertices in SCC, there must be a outgoing edge from these vertices pointing to another in the SCC. At the same time, for some vertex $v$ in SCC, there will be one outgoing edge from $v$ pointing to some other vertices not in this SCC since it's not in the sink. But the contradicts the condition that each vertex only has one outgoing edge. So there's no such vertex and the claim is true.
 
 Similarily, it can be proved that each source only corresponds to one sink and each sink can correspond to multiple sources.
 
@@ -267,7 +267,7 @@ For problem A, to find a rebel that can propagate to all other vertices, this re
 \caption{Find a rebel that propagates to all}\label{alg:q24A}
 \begin{algorithmic}
   \Function{$RebelPropagateAll$}{$G(V,E)$}
-    \State $G^{SCC}$ = meta-graph of $G$ obtained in linear time
+    \State $G^{SCC} \gets$ meta-graph of $G$ obtained in linear time
     \State Compute $InDeg(v)$, in-degree of each vertex in $G^{SCC}$
     \If{Number of vertices with $InDeg(v) = 0$ is greater than 1}
       \State \Return False
@@ -292,7 +292,7 @@ A rebel can send messages to many other rebels. The claims in {\bf Modeling of P
 \caption{Find rebels that propagates to all}\label{alg:q24A}
 \begin{algorithmic}
   \Function{$RebelPropagateAll$}{$G(V,E)$}
-    \State $G^{SCC}$ = meta-graph of $G$ obtained in linear time
+    \State $G^{SCC} \gets$ meta-graph of $G$ obtained in linear time
     \State Compute $InDeg(v)$, in-degree of each vertex in $G^{SCC}$
     \If{Number of vertices with $InDeg(v) = 0$ is greater than 1}
       \State \Return False
@@ -307,36 +307,62 @@ Similarily, the time complexity is $O(n + m)$
 
 \question{24.D}
 
-For this problem, when we make the meta graph of the original graph to a circle, the number of reassignments can be minimized, which is the number of sinks plus the sum of the corresponding source -1 of the meta graph.
+If a message is sent to $any$ single rebel and it will be propagated to all rebels, the only case is when $G$ itself is a strongly connected component. If $G$ contains multiple SCCs, clearly the condition is not satisfied since only one SCC can contact another and the contary is false according to Modeling of Problem. The only case when $G$ is a SCC itself is when $G$ is a cycle containing all vertices since each vertex has only one outgoing edge. (Suppose there exists a vetex $v$ that is not part of the cycle, in order for the cycle to reach $v$, there must be a path from cycle to $v$. In order to let $v$ to contact other nodes, there must be a path from $v$ to the cycle. Then $v$ becomes part of the cycle, which contradicts that $v$ is not part of the cycle)
 
-\begin{lstlisting}
-  def RebelPropagateAll(G(V,E)):
-  list $S_{SCC}$
-  num_of_reassignments <- 0
-  num_of_sink <- 0
-  num_of_cor_source <- 0
-  do DFS($G^{rev}$) and output vertices in decreasing post order
-  Mark all nodes as unvisited
-  for each v in the computed order do
-      if v is not visited then 
-           DFS(v)
-           Let $S_v$ be the nodes reached by v
-           Add $S_v$ to $S_{SCC}$
-           Remove $S_v$ from G
-  for each $S_v$ in $S_{SCC}$ do
-      if Adj{$S_v$} = 0
-      num_of_sink += 1
-      for each $S_v$ in $S_{SCC}^{rev}$ do
-               if Adj{$S_v$} = 0
-               num_of_cor_source += 1
-  num_of_reassignments = num_of_sink + num_of_cor_source - 1
-  Output num_of_reassignments        
-\end{lstlisting}
+The problem is equivalent to find the minima number of reassignment such that $G$ becomes a SCC. This can be done by connecting sinks in $G^{SCC}$ to sources by removing one edge in sink SCC and if a sink has multiple sources, reassign to connect these sources together. The algorithm is as follows
 
-The time complexity of this algrithom is $O(n)$.
+\begin{algorithm}
+\caption{Reassign so taht any rebel can propate to all rebels}
+\begin{algorithmic}
+  \Function{$RebelPropagateAllReassign$}{$G(V,E)$}
+    \State $Gnew(V,Enew) \gets G(V,E)$
+    \State $G^{SCC} \gets$ meta-graph of $G$ obtained in linear time
+    \State Compute In Degree 
+    \State $sources \gets$ set of sources in $G^{SCC}$
+    \State $sinks \gets$ set of sinks in $G^{SCC}$
+    \For{ $i = 0..|sources| - 2$}
+      \State $s_0 \gets sources[i]$
+      \State $s_1 \gets sources[i + 1]$
+      \State $t_0 \gets GetSink(G^{SCC}, s_0)$
+      \State $t_1 \gets GetSink(G^{SCC}, s_1)$
+      \If {$t_0 = t_1$}
+        \State \Comment{Two sources share the same sink}
+        \State Starting from $s_0$, traverse through $G^{SCC}$, find the first vertex $v$ with
+        \State $OutAdj^{SCC}(v,v')$ such that $InDeg(v') \ge 2$ or $t_0$ if no such vertex
+        \State \Comment{$v$ is $pre\_common\_successor$, $v'$ is $common\_successor$}
+        \State Set $(v, v')$ to $(v,s_1)$ in $Enew$
+      \Else 
+      \State \Comment{Two sources have different sinks}
+        \State Starting from $s_0$, traverse through $G$, find the first vertex $v$ in $t_0$. 
+        \State $v$ has $InAdj^{SCC}(v',v)$ such that $v'$ is in $t_0$ as well
+        \State Set $(v',v)$ to $(v', s_1)$ in $Enew$
 
-Proof of correctness of this algrithom:
-First, we need to delete one edge of the sink strongly connected component, because a rebel can only send a sigle message to one other rebel, there is at least one edge of each vertex. The number of reassignments of this operation is the number of sinks.
-Then, we need to connect the sink to another source to make the whole graph a circle, which need the number of corresponding sources - 1 reassignments. So, the minimal number of contacts of a single rebel is the number of the sink plus the number of the corresponding sources - 1.
+      \EndIf
+
+    \EndFor
+    \State Return $Gnew$
+  \EndFunction
+
+  \vspace{0.4cm}
+
+  \State \Comment{Find correspond sink of a source in the \textbf{Modeling of Problem}}
+  \Function{$GetSink$}{$G(V,E),s$} 
+    \State $v \gets s$
+    \While{ the edge $(v,v')$ in $Adj(v)$ exists }
+      \State $v \gets v'$
+    \EndWhile
+    \State \Return $v$
+  \EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+Note that the algorithm records both the in-edge and out-edge of each vertex. Getting $G^{SCC}$ takes $O(n + n)$ time and iterating through sources takes approximately $O(2n)$ time in total. So the time complexity is $O(n)$
+
+If sink $i$ has $k_i$ number of corresponding sources, we need to connect these sources together so that these sources are connected with each other. The reassignment number is $k_i - 1$.
+Verticex in sink can't propagate to other vertices, but by connect one sink to another source, vertices can propagate to other vertices. All sinks need to be reassigned, so the reassignment number is number of sinks $|sinks|$. So the total number of reassignment is $|sinks| + \sum_{i = 0}^{|sinks|}(k_i - 1)$ or simply number of sources in $G^{SCC}$: $|sources|$
+
+Through the above argument, it's clear that the algorithm builds a cycle containing all vertices. As has been approved, SCC sources in $G^{SCC}$ contains only one vertex so they are just vertices with in degree 0 in $G$. To enable any vertex to propagate to all vertices, at least these vertices need to be contacted. So in theory the minial number of reassignment is $|sources|$. The algorithm given achieves this.
+
+
 
 \end{document}
