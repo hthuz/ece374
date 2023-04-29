@@ -117,4 +117,9 @@ For closed walk $e_1e_2\dots e_l$, denote the edge with maximum weight as $e_m$.
 
 \question{27.B}
 
+To find the cycle with largest {\em max-norm}, one simple way is to find all cycles, compute their max-norm and chooses the one with the highest max-norm. To find all cycles, one efficient way is to use Donald B.Johnson's algorithm to find all simple cycles in $O((n + m)(c + 1))$ time, where $c$ is number of simple cycles\cite{doi:10.1137/0204007}. To compute each cycle's max-norm, in worest time, it takes time $O(c(m))$. It takes $O(c)$ time to get the highest max-norm. So the time complexity is $O(n + m)(c + 1)$.
+
+\bibliographystyle{plain}
+\bibliography{ref}
+
 \end{document}
