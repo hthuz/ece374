@@ -8,7 +8,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \graphicspath{{./img}}
-
+\usepackage{listings}
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \algnewcommand{\beginComment}{\textbf{/*}}
@@ -44,8 +44,71 @@
 
 \question{25.C}
 
-\question{26}
+\question{26}\\
+$f[i][k]$ denotes collecting gold from subtree of $i$ containing node $i$ while using no more than $k$ rails below node $i$. Every node $i$ has at most three subnode, set them as $j_1$,$j_2$,$j_3$.
+\begin{equation*}
+f[i][k] = g(i)+ max
+	\begin{cases}
+		f[j_1][k-1]\\
+		f[j_2][k-1]\\
+		f[j_3][k-1]\\
+		f[j_1][k-2-m]+f[j_2][m],m \in [0,k-2]\\
+		f[j_2][k-2-m]+f[j_3][m],m \in [0,k-2]\\
+		f[j_3][k-2-m]+f[j_1][m],m \in [0,k-2]\\
+		f[j_1][k-3-m-n]+f[j_2][m]+f[j_3][n],m+n \in [0,k-3],m>=0,n>=0\\
+	\end{cases}
+\end{equation*}
+For each node, it has several options.
+\\1. It can select a node and assign k-1 tracks to it
+\\2. He can choose two nodes and assign a total of k-2 tracks to them
+\\3. It can select three nodes and assign a total of k-3 tracks to them\\
+\textbf{notes:}
+\\1. An optimal solution using k rails cannot be derived from an optimal solution using k-1 rails, because it is possible that "$g(i) = 0$" and "$g(subnode(i)) = large$".
+\\2. In this algorithm, some results of dynamic programming are not the actual situation, that is to say, there may be some numbers in $n^2$ A array greater than the final result $A[0][L]$. But they have no way to connect to the root node.
+\\3. Initially set $A[u][0] = g(u)$ because it means "this node is selected and there are no other tracks in the subtree of this node".
+\\4. $fakenode$ is used because some nodes may have fewer than three self-nodes. Let's say that $g(u)$ of these nonexistent nodes is equal to 0, so that we can write the algorithm. One possible question is the number of tracks used. Suppose a node has only two children, it assumes a $fakenode$, and since this nonexistent node wastes a rail, the final result is bound to be less than the result using two children and the result using one child. So there are no mistakes.\\
+\begin{lstlisting}
+# N is the number of nodes, L is limited number of belts
+# assume that the larger number of node is in the bottom
+dyncraft (g,N,L):  
 
+	# initialize
+	int A[0...N-1][0...L]
+	int subnode[0...2]  		# at most three subnode
+	int fakenode[0...L] 			# if subnode<3, use it
+	for i = 0 ...N-1 do  A[i][0] = g(i)
+	for i = 0 ...L 	 do  fake_node[i] = 0
+	for i = 0 ...2 	 do  subnode[0...2] = N
+	
+	# dynamic programming
+	for k = 1...L do
+	  for i = N-1...0 do
+	    count = 0
+	    for t in adj(i):  			# directed tree
+	      subnode[count++] = t
+	    j_1 = subnode[0]
+	    j_2 = subnode[1]
+	    j_3 = subnode[2]
+	    # cases
+	    case = []
+	    case.append(f[j_1][k-1])
+	    case.append(f[j_2][k-1])
+	    case.append(f[j_3][k-1])
+	    for m = 0...k-2
+	      case.append(f[j_1][k-2-m]+f[j_2][m]) 
+		 case.append(f[j_2][k-2-m]+f[j_3][m])
+		 case.append(f[j_3][k-2-m]+f[j_1][m])
+	    for m = 0...k-2
+	      for n = 0...k-2-m
+		 case.append(f[j_1][k-3-m-n]+f[j_2][m]+f[j_3][n])
+	    # store the result
+	    A[i][k] = g(i) + max(case)
+	# final result
+	return A[0][L]
+
+\end{lstlisting}
+Since $L = O(n)$, the worst case total time is in $O(n^4 + n*m)$, where n is the node number, m is the edge number.\\
+the space used is in $O(n^2)$.\\
 \question{27.A}
 
 \question{27.B}
