@@ -109,7 +109,11 @@ dyncraft (g,N,L):
 \end{lstlisting}
 Since $L = O(n)$, the worst case total time is in $O(n^4 + n*m)$, where n is the node number, m is the edge number.\\
 the space used is in $O(n^2)$.\\
+
+
 \question{27.A}
+
+For closed walk $e_1e_2\dots e_l$, denote the edge with maximum weight as $e_m$. Then the max-norm of the closed walk is $w(e_m)/l$. For any closed walk, there is a corresponding simple cycle with subsets of $e_1e_2\dots e_l$ containing $e_m$. But the simple cycle has max-norm greater than or equal that of the closed walk as the number of edges is the simple cycle is smaller than or equal to number of edges in closed walk. Among all closed walks, their corresponding simple cycles have greater max-norm and each simple cycle is a closed walk as well. So there's a simple cycle with max-norm = maximum of any closed walk W in the graph.
 
 \question{27.B}
 
