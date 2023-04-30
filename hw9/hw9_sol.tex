@@ -40,6 +40,49 @@
 
 \question{25.A}
 
+G is represented with $(V,E)$ with number of vertices $n$ and number of edges $m$. Define $d(v,i,j)$ as the minimum distance from $s$ to $v$ among all walks containing at most $i$ total edges and at least $j$ checkpoint edges. Denote the edges with checkpoints as $E'$ and total number as $m'$. For $j > 0$, there's 
+
+\begin{equation*}
+	d(v,i,j) = min
+	\begin{cases}
+		d(v,i - 1,j) \\
+		d(v,i, j + 1) \\
+		min_{(u,v) \in E'}\ d(u, i - 1, j - 1) + w(u,v) \\
+		min_{(u,v) \notin E'}\ d(u, i - 1, j) + w(u,v) 
+	\end{cases}
+\end{equation*}
+
+The base cases $d(v,i,0)$ is the minimum distacne from $s$ to $v$ among all walks containing at most $i$ edges and it can be computed using Bellman-Ford algorithm on directed graph $G(V,E)$. The result is $d(v,n - 1, 2)$
+
+\begin{algorithm}
+\begin{algorithmic}
+	\Function{$GraphCartsFastestPath$}{$G(V,E)$}
+	\For{all $v$ in $E$ and $i \in [0..n - 1]$}
+	\State $d(v,i,0) \gets$ minimum distance computed using Bellman-Ford algorithm
+	\EndFor
+
+	\For{i = 1 to n - 1}
+		\For{j = 0 to m'}
+			\For{each edge$(u,v) \in E$}
+				\begin{equation*}
+					d(v,i,j) = min
+					\begin{cases}
+						d(v,i - 1,j) \\
+						d(v,i, j + 1) \\
+						min_{\phi(u,v) = 1}\ d(u, i - 1, j - 1) + w(u,v) \\
+						min_{\phi(u,v) = 0}\ d(u, i - 1, j) + w(u,v) 
+					\end{cases}
+				\end{equation*}
+			\EndFor
+		\EndFor
+	\EndFor
+	\Return $d(v,n - 1, 2)$
+	\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+Bellman-Ford algoritm takes time O(nm). To compute $(d,i,j)$ for one round, it takes time $O(m)$ and there are $O(nm')$ such cases. So the time complexity is $O(nmm')$, where $m'$ is the number of checkpont edges.
+
 \question{25.B}
 
 \question{25.C}
