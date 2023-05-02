@@ -15,6 +15,25 @@
 \algnewcommand{\endComment}{\textbf{*/}}
 \renewcommand{\Comment}[1]{\beginComment~#1~\endComment}
 
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 \newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
 % set HW number
@@ -125,27 +144,27 @@ dyncraft (g,N,L):
 	
 	# dynamic programming
 	for k = 1...L do
-	  for i = N-1...0 do
-	    count = 0
-	    for t in adj(i):  			# directed tree
-	      subnode[count++] = t
-	    j_1 = subnode[0]
-	    j_2 = subnode[1]
-	    j_3 = subnode[2]
-	    # cases
-	    case = []
-	    case.append(f[j_1][k-1])
-	    case.append(f[j_2][k-1])
-	    case.append(f[j_3][k-1])
-	    for m = 0...k-2
-	      case.append(f[j_1][k-2-m]+f[j_2][m]) 
-		 case.append(f[j_2][k-2-m]+f[j_3][m])
-		 case.append(f[j_3][k-2-m]+f[j_1][m])
-	    for m = 0...k-2
-	      for n = 0...k-2-m
-		 case.append(f[j_1][k-3-m-n]+f[j_2][m]+f[j_3][n])
-	    # store the result
-	    A[i][k] = g(i) + max(case)
+	    for i = N-1...0 do
+	        count = 0
+	        for t in adj(i) do  	# directed tree
+	            subnode[count++] = t
+	        j_1 = subnode[0]
+	        j_2 = subnode[1]
+	        j_3 = subnode[2]
+	        # cases
+	        case = []
+	        case.append(f[j_1][k-1])
+	        case.append(f[j_2][k-1])
+	        case.append(f[j_3][k-1])
+	        for m = 0...k-2 do
+	            case.append(f[j_1][k-2-m]+f[j_2][m]) 
+		   	   case.append(f[j_2][k-2-m]+f[j_3][m])
+		         case.append(f[j_3][k-2-m]+f[j_1][m])
+	        for m = 0...k-2 do
+	            for n = 0...k-2-m dp
+		            case.append(f[j_1][k-3-m-n]+f[j_2][m]+f[j_3][n])
+	        # store the result
+	        A[i][k] = g(i) + max(case)
 	# final result
 	return A[0][L]
 
