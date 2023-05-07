@@ -50,7 +50,7 @@
 %%% header
 {\noindent \rule{\linewidth}{0.2mm}}\\
 \noindent{ECE 374, ZJUI, Spring 2023\hfill%
-  \textbf{\large H{}W\HWnum\ Solutions} \hfill \today\smallskip}
+	\textbf{\large H{}W\HWnum\ Solutions} \hfill \today\smallskip}
 
 \noindent{\hfill \StudentA, \StudentB, and \StudentC \hfill}
 \\[-0.2cm]{\noindent \rule{\linewidth}{0.2mm}}
@@ -59,48 +59,56 @@
 
 \question{25.A}
 
-G is represented with $(V,E)$ with number of vertices $n$ and number of edges $m$. Define $d(v,i,j)$ as the minimum distance from $s$ to $v$ among all walks containing at most $i$ total edges and at least $j$ checkpoint edges. Denote the edges with checkpoints as $E'$ and total number as $m'$. For $j > 0$, there's 
+G is represented with $(V,E)$ with number of vertices $n$ and number of edges $m$. Define $d(v,i,j)$ as the minimum distance from $s$ to $v$ among all walks containing at most $i$ total edges and $j$ checkpoint edges to go. Denote the edges with checkpoints as $E'$ and total number as $m'$. For $j > 0$, there's
 
 \begin{equation*}
 	d(v,i,j) = min
 	\begin{cases}
-		d(v,i - 1,j) \\
-		d(v,i, j + 1) \\
-		min_{(u,v) \in E'}\ d(u, i - 1, j - 1) + w(u,v) \\
-		min_{(u,v) \notin E'}\ d(u, i - 1, j) + w(u,v) 
+		d(v,i - 1,j)                                      \\
+		min_{(u,v) \in E'}
+		\begin{cases}
+			d(u, i - 1, j - 1) + w(u,v) & \mbox{if $j \ge 1$} \\
+			d(u, i - 1, j) + w(u,v)     & \mbox{if $j = 0$}
+		\end{cases} \\
+		min_{(u,v) \notin E'}\ d(u, i - 1, j) + w(u,v)
 	\end{cases}
 \end{equation*}
 
-The base cases $d(v,i,0)$ is the minimum distacne from $s$ to $v$ among all walks containing at most $i$ edges and it can be computed using Bellman-Ford algorithm on directed graph $G(V,E)$. The result is $d(v,n - 1, 2)$
+
+The base cases $d(v,i,0)$ is the minimum distacne from $s$ to $v$ among all walks containing at most $i$ edges without taking checkpoint edges into account and it can be computed using Bellman-Ford algorithm on directed graph $G(V,E)$. The result is $d(v,2n - 1,2)$. Note that two times of travelling through the same road segment are required to make sure 2 checkpoint edges are passed. The algorithm is correcct as its a extension of Bellman-Ford algorithm and takes chekcpoint edges into account. It requires that the path must pass two checkpoint edges.
 
 \begin{algorithm}
-\begin{algorithmic}
-	\Function{$GraphCartsFastestPath$}{$G(V,E)$}
-	\For{all $v$ in $E$ and $i \in [0..n - 1]$}
-	\State $d(v,i,0) \gets$ minimum distance computed using Bellman-Ford algorithm
-	\EndFor
-
-	\For{i = 1 to n - 1}
-		\For{j = 0 to m'}
-			\For{each edge$(u,v) \in E$}
-				\begin{equation*}
-					d(v,i,j) = min
-					\begin{cases}
-						d(v,i - 1,j) \\
-						d(v,i, j + 1) \\
-						min_{\phi(u,v) = 1}\ d(u, i - 1, j - 1) + w(u,v) \\
-						min_{\phi(u,v) = 0}\ d(u, i - 1, j) + w(u,v) 
-					\end{cases}
-				\end{equation*}
-			\EndFor
+	\begin{algorithmic}
+		\Function{$GraphCartsFastestPath$}{$G(V,E),s,t$}
+		\For{all $v$ in $E$ and $i \in [0..2n - 1]$}
+		\State $d(v,i,0) \gets$ minimum distance computed using Bellman-Ford algorithm
 		\EndFor
-	\EndFor
-	\Return $d(v,n - 1, 2)$
-	\EndFunction
-\end{algorithmic}
+
+		\For{$i = 0\ to\ 2n - 1$}
+		\For{$j = 0\ to\ 2$}
+		\For{each edge$(u,v) \in E$}
+		\begin{equation*}
+			d(v,i,j) = min
+			\begin{cases}
+				d(v,i - 1,j)                                      \\
+				min_{(u,v) \in E'}
+				\begin{cases}
+					d(u, i - 1, j - 1) + w(u,v) & \mbox{if $j \ge 1$} \\
+					d(u, i - 1, j) + w(u,v)     & \mbox{if $j = 0$}
+				\end{cases} \\
+				min_{(u,v) \notin E'}\ d(u, i - 1, j) + w(u,v)
+			\end{cases}
+		\end{equation*}
+		\EndFor
+		\EndFor
+		\EndFor
+
+		\Return $d(t,2n - 1, 2)$
+		\EndFunction
+	\end{algorithmic}
 \end{algorithm}
 
-Bellman-Ford algoritm takes time O(nm). To compute $(d,i,j)$ for one round, it takes time $O(m)$ and there are $O(nm')$ such cases. So the time complexity is $O(nmm')$, where $m'$ is the number of checkpont edges.
+Bellman-Ford algoritm takes time O(nm). To compute $(d,i,j)$, there are $2n * 3$ rounds in total and each round takes time $O(m)$. So the time complexity is $O(6nm) = O(nm)$
 
 \question{25.B}
 
@@ -109,15 +117,15 @@ Bellman-Ford algoritm takes time O(nm). To compute $(d,i,j)$ for one round, it t
 \question{26}\\
 $f[i][k]$ denotes collecting gold from subtree of $i$ containing node $i$ while using no more than $k$ rails below node $i$. Every node $i$ has at most three subnode, set them as $j_1$,$j_2$,$j_3$.
 \begin{equation*}
-f[i][k] = g(i)+ max
+	f[i][k] = g(i)+ max
 	\begin{cases}
-		f[j_1][k-1]\\
-		f[j_2][k-1]\\
-		f[j_3][k-1]\\
-		f[j_1][k-2-m]+f[j_2][m],m \in [0,k-2]\\
-		f[j_2][k-2-m]+f[j_3][m],m \in [0,k-2]\\
-		f[j_3][k-2-m]+f[j_1][m],m \in [0,k-2]\\
-		f[j_1][k-3-m-n]+f[j_2][m]+f[j_3][n],m+n \in [0,k-3],m>=0,n>=0\\
+		f[j_1][k-1]                                                   \\
+		f[j_2][k-1]                                                   \\
+		f[j_3][k-1]                                                   \\
+		f[j_1][k-2-m]+f[j_2][m],m \in [0,k-2]                         \\
+		f[j_2][k-2-m]+f[j_3][m],m \in [0,k-2]                         \\
+		f[j_3][k-2-m]+f[j_1][m],m \in [0,k-2]                         \\
+		f[j_1][k-3-m-n]+f[j_2][m]+f[j_3][n],m+n \in [0,k-3],m>=0,n>=0 \\
 	\end{cases}
 \end{equation*}
 For each node, it has several options.
