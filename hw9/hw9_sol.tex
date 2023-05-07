@@ -59,7 +59,7 @@
 
 \question{25.A}
 
-G is represented with $(V,E)$ with number of vertices $n$ and number of edges $m$. Define $d(v,i,j)$ as the minimum distance from $s$ to $v$ among all walks containing at most $i$ total edges and $j$ checkpoint edges to go. Denote the edges with checkpoints as $E'$ and total number as $m'$. For $j > 0$, there's
+G is represented with $(V,E)$ with number of vertices $n$ and number of edges $m$. Define $d(v,i,j)$ as the minimum distance from $s$ to $v$ among all walks containing at most $i$ total edges and $j$ checkpoint edges to go. Denote the edges with checkpoints as $E'$ and total number as $m'$. There's
 
 \begin{equation*}
 	d(v,i,j) = min
@@ -111,6 +111,83 @@ The base cases $d(v,i,0)$ is the minimum distacne from $s$ to $v$ among all walk
 Bellman-Ford algoritm takes time O(nm). To compute $(d,i,j)$, there are $2n * 3$ rounds in total and each round takes time $O(m)$. So the time complexity is $O(6nm) = O(nm)$
 
 \question{25.B}
+
+Based on part A, define $d(v,i,j,k)$ as the minimum distance from $s$ to $v$ among all walks containing at most $i$ total edges, $j$ checkpoint edges to go and $k$ "Time Freeze" powerup left. Similarily, we have:
+
+\begin{equation*}
+	d(v,i,j,k) = min
+	\begin{cases}
+		d(v,i - 1,j,k)                                      \\
+		\mbox{if $k = 1$}\begin{cases}
+
+		min_{(u,v) \in E'}
+		\begin{cases}
+			min(d(u, i - 1, j - 1, k) + w(u,v), d(u,i - 1, j - 1, k - 1)) & \mbox{if $j \ge 1$} \\
+			min(d(u, i - 1, j, k) + w(u,v),d(u, i - 1, j - 1, k - 1))     & \mbox{if $j = 0$}
+		\end{cases} \\
+		min_{(u,v) \notin E'}\ min(d(u, i - 1, j, k) + w(u,v),d(u, i - 1, j, k - 1))
+
+		\end{cases} \\
+
+		\mbox{if $k = 0$}\begin{cases}
+		min_{(u,v) \in E'}
+		\begin{cases}
+			d(u, i - 1, j - 1, k) + w(u,v) & \mbox{if $j \ge 1$} \\
+			d(u, i - 1, j, k) + w(u,v)     & \mbox{if $j = 0$}
+		\end{cases} \\
+		min_{(u,v) \notin E'}\ d(u, i - 1, j, k) + w(u,v)
+		\end{cases}
+	\end{cases}
+\end{equation*}
+
+When there's still powerup, take the optimal choice when we use the powerup and when there's no powerup, the situation is the same as above. The base case is $d(v,i,0,0)$, which can still be computed using Bellman-Ford algorithm. The time complexity in this cases is Similarily $O(2n * 3 * 2 * m) = O(12nm) = O(nm)$
+
+
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$GraphCartsFastestPathWithTimeFreeze$}{$G(V,E),s,t$}
+		\For{all $v$ in $E$ and $i \in [0..2n - 1]$}
+		\State $d(v,i,0,0) \gets$ minimum distance computed using Bellman-Ford algorithm
+		\EndFor
+
+		\For{$i = 0\ to\ 2n - 1$}
+		\For{$j = 0\ to\ 2$}
+		\For{$k = 0\ to\ 1$}
+		\For{each edge$(u,v) \in E$}
+\begin{equation*}
+	d(v,i,j,k) = min
+	\begin{cases}
+		d(v,i - 1,j,k)                                      \\
+		\mbox{if $k = 1$}\begin{cases}
+
+		min_{(u,v) \in E'}
+		\begin{cases}
+			min(d(u, i - 1, j - 1, k) + w(u,v), d(u,i - 1, j - 1, k - 1)) & \mbox{if $j \ge 1$} \\
+			min(d(u, i - 1, j, k) + w(u,v),d(u, i - 1, j - 1, k - 1))     & \mbox{if $j = 0$}
+		\end{cases} \\
+		min_{(u,v) \notin E'}\ min(d(u, i - 1, j, k) + w(u,v),d(u, i - 1, j, k - 1))
+
+		\end{cases} \\
+
+		\mbox{if $k = 0$}\begin{cases}
+		min_{(u,v) \in E'}
+		\begin{cases}
+			d(u, i - 1, j - 1, k) + w(u,v) & \mbox{if $j \ge 1$} \\
+			d(u, i - 1, j, k) + w(u,v)     & \mbox{if $j = 0$}
+		\end{cases} \\
+		min_{(u,v) \notin E'}\ d(u, i - 1, j, k) + w(u,v)
+		\end{cases}
+	\end{cases}
+\end{equation*}
+		\EndFor
+		\EndFor
+		\EndFor
+		\EndFor
+
+		\Return $d(t,2n - 1, 2)$
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
 
 \question{25.C}
 
