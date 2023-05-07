@@ -75,7 +75,7 @@ G is represented with $(V,E)$ with number of vertices $n$ and number of edges $m
 \end{equation*}
 
 
-The base cases $d(v,i,0)$ is the minimum distacne from $s$ to $v$ among all walks containing at most $i$ edges without taking checkpoint edges into account and it can be computed using Bellman-Ford algorithm on directed graph $G(V,E)$. The result is $d(v,2n - 1,2)$. Note that two times of travelling through the same road segment are required to make sure 2 checkpoint edges are passed. The algorithm is correcct as its a extension of Bellman-Ford algorithm and takes chekcpoint edges into account. It requires that the path must pass two checkpoint edges.
+The base cases $d(v,i,0)$ is the minimum distacne from $s$ to $v$ among all walks containing at most $i$ edges without taking checkpoint edges into account and it can be computed using Bellman-Ford algorithm on directed graph $G(V,E)$. The result is $d(t,2n - 1,2)$. Note that two times of travelling through the same road segment are required to make sure 2 checkpoint edges are passed. The algorithm is correcct as its a extension of Bellman-Ford algorithm and takes chekcpoint edges into account. It requires that the path must pass two checkpoint edges.
 
 \begin{algorithm}
 	\begin{algorithmic}
@@ -184,12 +184,51 @@ When there's still powerup, take the optimal choice when we use the powerup and 
 		\EndFor
 		\EndFor
 
-		\Return $d(t,2n - 1, 2)$
+		\Return $d(t,2n - 1, 2,1)$
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
 
 \question{25.C}
+
+Define $d(v,i,k)$ as the minimum distance from $s$ to $v$ among all walks containing at most $i$ total edges and $k$ "Negative Time" Powerup. In this problem, assume the "Negative Time" powerup is valid only in current traversal. For example, if travelling time from $v1$ to $v2$ is 2 and player uses powerup, he can traverse in time $-3$ but if the player goes back and want to pass $v1,v2$ again, the time is still $2$ if the player doesn't use another powerup. In such a case, the won't be negative cycle once the powerups are all used. There's
+\begin{equation*}
+	d(v,i,k) = min
+	\begin{cases}
+		d(v,i - 1,k) \\
+		d(v,i,k - 1) - 5 \mbox{ if $k \ge 0$} \\
+		min_{(u,v) \in E}\ d(u, i - 1, k) + w(u,v)
+	\end{cases}
+\end{equation*}
+
+The base case $d(v,i,0)$ can be computed using Bellman-Ford algorithm. The algorithm takes "Negative Time" into account by adding $d(v,i,k - 1) - 5$. Since checkpoint pathes are not required, $n - 1$ times are enough and the output is $d(t,n - 1, k)$. The time complexity is $O(nmk)$
+
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$GraphCartsFastestPath$}{$G(V,E),s,t$}
+		\For{all $v$ in $E$ and $i \in [0..n - 1]$}
+		\State $d(v,i,0) \gets$ minimum distance computed using Bellman-Ford algorithm
+		\EndFor
+
+		\For{$i = 0\ to\ n - 1$}
+		\For{$j = 0\ to\ k$}
+		\For{each edge$(u,v) \in E$}
+\begin{equation*}
+	d(v,i,k) = min
+	\begin{cases}
+		d(v,i - 1,k) \\
+		d(v,i,k - 1) - 5 \mbox{ if $k \ge 0$} \\
+		min_{(u,v) \in E}\ d(u, i - 1, k) + w(u,v)
+	\end{cases}
+\end{equation*}
+		\EndFor
+		\EndFor
+		\EndFor
+
+		\Return $d(t,n - 1, k)$
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
 
 \question{26}\\
 $f[i][k]$ denotes collecting gold from subtree of $i$ containing node $i$ while using no more than $k$ rails below node $i$. Every node $i$ has at most three subnode, set them as $j_1$,$j_2$,$j_3$.
