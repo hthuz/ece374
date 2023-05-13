@@ -49,6 +49,21 @@
 
 \question{32.A}
 
+As described in lecture slides, a clique in graph $G$ is equivalent to an independent set in complement graph $\overline{G}$. So the problem is equivalent to checking if there's at most $k$ independent sets in $\overline{G}$. This problem is equivalent to checking if $\overline{G}$ is $k$-colorable as set of vertices with the same color form an independent set in G. 
+
+The problem now is to to find a polynominal-time reduction from graph k-coloring to SAT. Specifically, given a graph $\overline{G}$ with $n$ vertices and $m$ edges, create a SAT formula $\phi_{\overline{G}}$ such that $\overline{G}$ is k-colorable iff $\phi_{\overline{G}}$ is satisfiable and $\phi_{\overline{G}}$ can be constructed in polynominal time. For each vertex $v_i$, create $k$ variables $v_i.c_1,v_i.c_2,...v_i.c_k$, where $c_k$ corresponds to colors. construct SAT formula as follows.
+\begin{equation*}
+	\bigwedge_{i=1}^{n} (\bigwedge_{j=1}^{k}(v_i.c_j) \wedge \bigwedge_{a,b=1}^{k} (\overline{v_i.c_a} \vee \overline{v_i.c_b})) \wedge \bigwedge_{\mbox{each edge} (u,v) \in \overline{G}}( \bigwedge_{j=1}^{k}(\overline{u.c_i} \vee \overline{v.c_i}))
+\end{equation*}
+
+\noindent
+$\bigwedge_{j=1}^{k}(v_i.c_j)$ makes sure each vetex takes one color from $k$ colors. \\
+$\bigwedge_{a,b=1}^{k} (\overline{v_i.c_a} \vee \overline{v_i.c_b})$ makes sure each vetex takes only one color instead of multiple colors. \\
+$\bigwedge_{\mbox{each edge} (u,v) \in \overline{G}}( \bigwedge_{j=1}^{k}(\overline{u.c_i} \vee \overline{v.c_i}))$ makes sure vertices with adjacent edges don't have the same color.
+
+The construction can be done in $O((n+m)k)$ time. So to reduce CLIQUE-COVER to SAT, first complement graph, which times $O(n + m)$, then reduce it to SAT using the SAT formula given above.
+
+
 \question{32.B}
 
 No. First of all, this doesn't prove CLIQUE-COVER is in NP. And reduing from CLIQUE-COVER to SAT doesn't prove that CLIQUE-COVER is NP-Hard. One should show that CLIQUE-COVER has a polynominal time cerfiier algorithm and that an proven NPC problem like SAT can be reduced to CLIQUE-COVER.
