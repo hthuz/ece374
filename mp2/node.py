@@ -3,7 +3,7 @@ import sys
 import time
 import threading
 
-hbinterval = 1
+hbinterval = 0.01
 
 class Node:
     def  __init__(self,nodeid,num,timeout, term,state,leader,log,commitIndex):
@@ -41,18 +41,19 @@ def check_timeout(node):
         if node.state == "FOLLOWER":
             if time.time() - node.lasttime >= node.timeout:
                 node.term += 1
-                node.votenum += 1
+                node.votenum = 1
                 node.state = "CANDIDATE"
+                print(f"STATE state=\"{node.state}\"")
+                print(f"STATE term={node.term}")
                 for nodeid in range(node.num):
                     if nodeid == node.id: continue
                     print(f"SEND {nodeid} RequestVotes {node.term}",flush=True)
     return
 
 
-
 if __name__ == "__main__":
 
-    timeout = (int(sys.argv[1]) + 1) * 2
+    timeout = (int(sys.argv[1]) + 1) * 0.2
     node = Node(int(sys.argv[1]),int(sys.argv[2]),timeout,1,"FOLLOWER",None,[],None)
 
     node.lasttime = time.time()
@@ -78,8 +79,6 @@ if __name__ == "__main__":
                 print("---Leader election ENDs!---")  
                 break
         if node.state == "CANDIDATE":
-            print(f"STATE state=\"{node.state}\"")
-            print(f"STATE term={node.term}")
             # Receive Message
             line = sys.stdin.readline()  
             if line is None: break
@@ -110,19 +109,42 @@ if __name__ == "__main__":
             # Receive Message
             # Follower may wait for some time here
             line = sys.stdin.readline()  
+            if line is None: break
+            line = line.strip()
             # If the node has become candidate after timeout
             # But the node still has to wait for this message to arrive
             # and then it releazes it is candidate now
             # This may need to be improved
-            if node.state == "CANDIDATE": continue
-            if line is None: break
-            line = line.strip()
+            node.lasttime = time.time()
+            ###############################################
+            if node.state == "CANDIDATE":
+                # Receive RPC from valid leadre
+                if "AppendEntries" in line:
+                    sender_id = line.split(" ")[1]
+                    node.leader = sender_id
+                    node.state = "FOLLOWER"
+                    continue
+
+                # Receive RequestVote Response
+                if "RequestVotesResponse" in line:
+                    reply = line.split(" ")[4]
+                    if reply == "true":
+                        node.votenum += 1
+
+                # Set as leader
+                if node.votenum > node.num / 2:
+                    node.leader = node.id
+                    node.state = "LEADER"
+                    print(f"STATE state=\"{node.state}\"")
+                    print(f"STATE leader={node.leader}")
+                    continue
+            ###############################################
+
 
             # Receive RequestVote
             if "RequestVotes" in line:
                 sender_id = line.split(" ")[1]
                 sender_term = line.split(" ")[3]
-                node.lasttime = time.time()
                 if int(sender_term) < node.term:
                     print(f"SEND {sender_id} RequestVotesResponse {node.term} false",flush=True)
                     continue
@@ -139,7 +161,6 @@ if __name__ == "__main__":
             if "AppendEntries" in line:
                 sender_id = line.split(" ")[1]
                 sender_term = line.split(" ")[3]
-                node.lasttime = time.time()
                 node.leader = sender_id
                 print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true", flush=True)
                 print(f"STATE term={node.term}")
