@@ -19,30 +19,34 @@ class Node:
         self.votenum = None
         # Follower
         self.votedfor = None
+        self.lasttime = None
         return
     
     def output_state(self):
         print(f"STATE term={self.term}", flush=True)
         print(f"STATE state=\"{self.state}\"", flush=True)
         if self.leader == None:
+            # print(f"STATE leader=0",flush=True)
             print(f"STATE leader=\"None\"",flush=True)
         else:
             print(f"STATE leader={self.leader}", flush=True)
         # print(f"STATE log={self.term}", flush=True)
         # print(f"STATE commitIndex={self.term}", flush=True)
     
-    def check_timeout(self):
-        # Start election
-        while True:
-            if self.state == "FOLLOWER":
-                if time.time() - self.lasttime >= self.timeout:
-                    self.term += 1
-                    self.votenum += 1
-                    self.state = "CANDIDATE"
-                    for nodeid in range(self.num):
-                        if nodeid == self.id: continue
-                        print(f"SEND {nodeid} RequestVotes {self.term}",flush=True)
-        return
+nodelock = threading.Lock()
+
+def check_timeout(node):
+    # Start election
+    while True:
+        if node.state == "FOLLOWER":
+            if time.time() - node.lasttime >= node.timeout:
+                node.term += 1
+                node.votenum += 1
+                node.state = "CANDIDATE"
+                for nodeid in range(node.num):
+                    if nodeid == node.id: continue
+                    print(f"SEND {nodeid} RequestVotes {node.term}",flush=True)
+    return
 
 
 
@@ -53,14 +57,11 @@ if __name__ == "__main__":
 
     node.lasttime = time.time()
     node.votenum = 0
-
-    check_timeout_thread = threading.Thread(target=node.check_timeout)
+    check_timeout_thread = threading.Thread(target=check_timeout,args=(node,))
     check_timeout_thread.start()
 
     while True:
-
         if node.state == "LEADER":
-            node.output_state()
             for nodeid in range(node.num):
                 if nodeid == node.id: continue
                 print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
@@ -76,9 +77,9 @@ if __name__ == "__main__":
             if "LOG" in line:
                 print("---Leader election ENDs!---")  
                 break
-
         if node.state == "CANDIDATE":
-            node.output_state()
+            print(f"STATE state=\"{node.state}\"")
+            print(f"STATE term={node.term}")
             # Receive Message
             line = sys.stdin.readline()  
             if line is None: break
@@ -96,16 +97,15 @@ if __name__ == "__main__":
                 reply = line.split(" ")[4]
                 if reply == "true":
                     node.votenum += 1
-                continue
 
             # Set as leader
             if node.votenum > node.num / 2:
                 node.leader = node.id
                 node.state = "LEADER"
+                print(f"STATE state=\"{node.state}\"")
+                print(f"STATE leader={node.leader}")
                 continue
-
         if node.state == "FOLLOWER":
-            node.output_state()
             # Receive Message
             line = sys.stdin.readline()  
             if line is None: break
@@ -124,6 +124,8 @@ if __name__ == "__main__":
                     node.votedfor = None
                 if node.votedfor == None or sender_id != None:
                     node.votedfor = sender_id
+                    node.leader = sender_id
+                    print(f"STATE state=\"{node.state}\"")
                     print(f"SEND {sender_id} RequestVotesResponse {node.term} true", flush=True)
                     continue
 
@@ -134,7 +136,10 @@ if __name__ == "__main__":
                 node.lasttime = time.time()
                 node.leader = sender_id
                 print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true", flush=True)
-
+                print(f"STATE term={node.term}")
+                print(f"STATE state=\"{node.state}\"")
+                print(f"STATE leader={node.leader}")
+                continue
     print("Somehow it comes to an end")
 
         
