@@ -38,7 +38,6 @@ nodelock = threading.Lock()
 def check_timeout(node):
     # Start election
     while True:
-        nodelock.acquire()
         if node.state == "FOLLOWER":
             if time.time() - node.lasttime >= node.timeout:
                 node.term += 1
@@ -47,7 +46,6 @@ def check_timeout(node):
                 for nodeid in range(node.num):
                     if nodeid == node.id: continue
                     print(f"SEND {nodeid} RequestVotes {node.term}",flush=True)
-        nodelock.release()
     return
 
 
@@ -107,9 +105,16 @@ if __name__ == "__main__":
                 print(f"STATE state=\"{node.state}\"")
                 print(f"STATE leader={node.leader}")
                 continue
+
         if node.state == "FOLLOWER":
             # Receive Message
+            # Follower may wait for some time here
             line = sys.stdin.readline()  
+            # If the node has become candidate after timeout
+            # But the node still has to wait for this message to arrive
+            # and then it releazes it is candidate now
+            # This may need to be improved
+            if node.state == "CANDIDATE": continue
             if line is None: break
             line = line.strip()
 
@@ -127,7 +132,6 @@ if __name__ == "__main__":
                 if node.votedfor == None or sender_id != None:
                     node.votedfor = sender_id
                     node.leader = sender_id
-                    print(f"STATE state=\"{node.state}\"")
                     print(f"SEND {sender_id} RequestVotesResponse {node.term} true", flush=True)
                     continue
 
