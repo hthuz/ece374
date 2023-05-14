@@ -38,6 +38,7 @@ nodelock = threading.Lock()
 def check_timeout(node):
     # Start election
     while True:
+        nodelock.acquire()
         if node.state == "FOLLOWER":
             if time.time() - node.lasttime >= node.timeout:
                 node.term += 1
@@ -46,6 +47,7 @@ def check_timeout(node):
                 for nodeid in range(node.num):
                     if nodeid == node.id: continue
                     print(f"SEND {nodeid} RequestVotes {node.term}",flush=True)
+        nodelock.release()
     return
 
 
