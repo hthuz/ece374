@@ -6,7 +6,7 @@ import threading
 hbinterval = 0.00001
 
 class Node:
-    def  __init__(self,nodeid,num,timeout, term,state,leader,log,commitIndex):
+    def  __init__(self,nodeid,num,timeout, term,state,leader,log,logindex, commitIndex):
         self.id = nodeid
         self.num = num
         self.timeout = timeout
@@ -14,12 +14,15 @@ class Node:
         self.state = state
         self.leader = leader
         self.log = log
+        self.logindex = 0
         self.commitIndex = commitIndex
-        # Candidiate
+        # Candidate
         self.votenum = None
         # Follower
         self.votedfor = None
         self.lasttime = None
+        # Leader
+        self.replynum = None
         return
     
     def output_state(self):
@@ -54,10 +57,11 @@ def check_timeout(node):
 if __name__ == "__main__":
 
     timeout = (int(sys.argv[1]) + 1) * 0.2
-    node = Node(int(sys.argv[1]),int(sys.argv[2]),timeout,1,"FOLLOWER",None,[],None)
+    node = Node(int(sys.argv[1]),int(sys.argv[2]),timeout,1,"FOLLOWER",None,[None],0,0)
 
     node.lasttime = time.time()
     node.votenum = 0
+    node.replynum = 0
     check_timeout_thread = threading.Thread(target=check_timeout,args=(node,))
     check_timeout_thread.start()
 
@@ -65,7 +69,10 @@ if __name__ == "__main__":
         if node.state == "LEADER":
             for nodeid in range(node.num):
                 if nodeid == node.id: continue
-                print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
+                if node.logindex == 0:
+                    print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
+                else:
+                    print(f"SEND {nodeid} AppendEntries {node.term} {node.id} [\"{node.log[node.logindex][1]}\"]",flush=True)
 
             # Receive Message
             line = sys.stdin.readline()  
@@ -74,8 +81,30 @@ if __name__ == "__main__":
             # time.sleep(hbinterval)
 
             if "AppendEntriesResponse" in line:
+                if node.commitIndex < node.logindex:
+                    reply = line.split(" ")[4]
+                    if reply == "true":
+                        node.replynum += 1
                 continue
-            
+
+            # Make Committment
+            if node.replynum > node.num / 2:
+                node.commitIndex = node.logindex
+                print(f"STATE commitIndex={node.commitIndex}")
+                print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
+                for nodeid in range(node.num):
+                    if nodeid == node.id: continue
+                    print(f"SEND {nodeid} Committed {node.term} {node.commitIndex}", flush=True)
+
+            # Receive Log from client
+            if "LOG" in line:
+                content = line.split(" ")[1]
+                node.log.append([node.term, content])
+                node.logindex += 1
+                node.replynum = 1
+                print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]")
+                continue
+
             # A leader with higher term because of network partition
             if "AppendEntries" in line:
                 sender_id = int(line.split(" ")[1])
@@ -89,9 +118,7 @@ if __name__ == "__main__":
                     print(f"STATE leader={node.leader}")
                 continue
 
-            if "LOG" in line:
-                print("---Leader election ENDs!---")  
-                break
+
         if node.state == "CANDIDATE":
             # Receive Message
             line = sys.stdin.readline()  
@@ -178,11 +205,29 @@ if __name__ == "__main__":
                 sender_term = line.split(" ")[3]
                 node.leader = int(sender_id)
                 node.term = int(sender_term)
-                print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true", flush=True)
+
                 print(f"STATE term={node.term}")
                 print(f"STATE state=\"{node.state}\"")
                 print(f"STATE leader={node.leader}")
+                if len(line.split(" ")) == 6:
+                    content = line.split(" ")[5]
+                    content = content[2:-2]
+                    node.log.append([node.term,content])
+                    node.logindex += 1
+                    print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]")
+                print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true", flush=True)
                 continue
+
+            # Receive committed
+            if "Committed" in line:
+                sender_id = int(line.split(" ")[1])
+                commitIndex = int(line.split(" ")[4])
+                node.commitIndex = commitIndex # Or node.logindex
+
+                print(f"STATE commitIndex={node.commitIndex}")
+                print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
+                continue
+
     print("Somehow it comes to an end")
 
         
