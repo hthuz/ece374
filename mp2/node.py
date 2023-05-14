@@ -3,7 +3,7 @@ import sys
 import time
 import threading
 
-hbinterval = 0.01
+hbinterval = 0.00001
 
 class Node:
     def  __init__(self,nodeid,num,timeout, term,state,leader,log,commitIndex):
@@ -71,10 +71,24 @@ if __name__ == "__main__":
             line = sys.stdin.readline()  
             if line is None: break
             line = line.strip()
-            time.sleep(hbinterval)
+            # time.sleep(hbinterval)
 
             if "AppendEntriesResponse" in line:
                 continue
+            
+            # A leader with higher term because of network partition
+            if "AppendEntries" in line:
+                sender_id = int(line.split(" ")[1])
+                sender_term = int(line.split(" ")[3])
+                if sender_term > node.term:
+                    node.term = sender_term
+                    node.leader = sender_id
+                    node.state = "FOLLOWER"
+                    print(f"STATE term={node.term}")
+                    print(f"STATE state=\"{node.state}\"")
+                    print(f"STATE leader={node.leader}")
+                continue
+
             if "LOG" in line:
                 print("---Leader election ENDs!---")  
                 break
@@ -121,7 +135,7 @@ if __name__ == "__main__":
                 # Receive RPC from valid leadre
                 if "AppendEntries" in line:
                     sender_id = line.split(" ")[1]
-                    node.leader = sender_id
+                    node.leader = int(sender_id)
                     node.state = "FOLLOWER"
                     continue
 
@@ -138,6 +152,7 @@ if __name__ == "__main__":
                     print(f"STATE state=\"{node.state}\"")
                     print(f"STATE leader={node.leader}")
                     continue
+                continue
             ###############################################
 
 
@@ -152,8 +167,8 @@ if __name__ == "__main__":
                     node.term = int(sender_term)
                     node.votedfor = None
                 if node.votedfor == None or sender_id != None:
-                    node.votedfor = sender_id
-                    node.leader = sender_id
+                    node.votedfor = int(sender_id)
+                    node.leader = int(sender_id)
                     print(f"SEND {sender_id} RequestVotesResponse {node.term} true", flush=True)
                     continue
 
@@ -161,7 +176,8 @@ if __name__ == "__main__":
             if "AppendEntries" in line:
                 sender_id = line.split(" ")[1]
                 sender_term = line.split(" ")[3]
-                node.leader = sender_id
+                node.leader = int(sender_id)
+                node.term = int(sender_term)
                 print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true", flush=True)
                 print(f"STATE term={node.term}")
                 print(f"STATE state=\"{node.state}\"")
