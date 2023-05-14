@@ -39,26 +39,25 @@
 
 \question{31.A}
 
-(1)\textbf{Algorithm}: We can just use the brute force method for solving the socially distanced set problem in exponential time.
+(1)\textbf{Algorithm}: We can just use the brute force method for solving the socially distanced set problem in exponential time by trying all subsets of vertices.
 Given the socially distanced set, we can just compare the size to $k$, and return yes/no accordingly.
 
-(2)\textbf{Certificate}: A "proof" in this case would be a set $X$ in $G$ where no two vertices of $X$ are connected by an edge, and has a path of length at most 4.
+(2)\textbf{Certificate}: A "proof" in this case would be a subset of vertices $X$ in $G$ where no two vertices of $X$ are connected by an edge, and has a path of length at most 4.
 
 (3)\textbf{Certificate length}: The proof here is a set of $O(n)$ vertices, and can be encoded as a set of $O(n)$ integers. As such, its length is $O(n)$.
 
-(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, wound verify that all the vertices in the set $X$ are indeed in the graph, the set $X$ is a distanced set with no two vertices of $X$ are connected by an edge and the length of a path of it is at most 4.
-The proof has length $O(n)$ in this case, and the verification algorithm runs in $O(n^2)$ time, if we assume the graph is given to us using adjacent lists representation.
+(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, would verify that all the vertices in the set $X$ are indeed in the graph, the set $X$ is a distanced set with no two vertices of $X$ are connected by an edge and the length of a path of it is at most 4. Every two paris of vertices in the subset need to be compared. The proof has length $O(n)$ in this case, and the verification algorithm runs in $O(n^2)$ time, if we assume the graph is given to us using adjacent lists representation.
 
 \question{31.B}
 
-(1)\textbf{Algorithm}: We can just use the brute force method for solving the edge independent problem in exponential time.
+(1)\textbf{Algorithm}: We can just use the brute force method for solving the edge independent problem in exponential time by tring all subsets of independent edges.
 Given the subset, we can just compare the number of edges of it to $k$, and return yes/no accordingly.
 
-(2)\textbf{Certificate}: A "proof" in this case would be a subset $X$ in $G$ where no pair of edges is adjacent.
+(2)\textbf{Certificate}: A "proof" in this case would be an edge subset $X$ of size $k$ in $G$ where no pair of edges are adjacent.
 
 (3)\textbf{Certificate length}: The proof here is a subset of $O(n)$ edges, and can be encoded as a set of $O(n)$ integers. As such, its length is $O(n)$.
 
-(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, wound verify that all the edges in the subset $X$ are indeed in the graph, the set $X$ has $k$ edges with no pair of edges is adjacent.
+(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, would verify that all the edges in the subset $X$ are indeed in the graph, the set $X$ has $k$ edges with no pair of edges is adjacent. Every two edges in the subset need to be compared.
 The proof has length $O(n)$ in this case, and the verification algorithm runs in $O(n^2)$ time, if we assume the graph is given to us using adjacent lists representation.
 
 \question{31.C}
@@ -70,32 +69,31 @@ Given the subset of the set of positive integers, we can just compare ${\sum_{x\
 
 (3)\textbf{Certificate length}: The proof here is a set of $O(n)$ elements in the subset, and can be encoded as a set of $O(n)$ integers. As such, its length is $O(n)$.
 
-(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, wound verify that the elements in the subset $X$ satisfy ${\sum_{x\in X}x}$ - ${\sum_{y\in S-X} y}$ = $t$.
-The proof has length $O(n)$ in this case, and the verification algorithm runs in $O(n^2)$ time, if we assume the subset $X$ is of half the size of the given positive integer set $S$.
+(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, would verify that the elements in the subset $X$ satisfy ${\sum_{x\in X}x}$ - ${\sum_{y\in S-X} y}$ = $t$.
+The proof has length $O(n)$ in this case, and the verification algorithm runs in $O(n)$ time.
 
 \question{31.D}
 
-(1)\textbf{Algorithm}: We can just use the brute force method for solving the 4DM problem in exponential time.
+(1)\textbf{Algorithm}: We can just use the brute force method for solving the 4DM problem in exponential time by trying out all possible subsets.
 Given the subset of the set of quadruples, we can just compare the elements in $S$ with $T$ to see if every element of $X\cup Y\cup Z\cup W$ is covered exactly once and return yes/no accordingly.
 
 (2)\textbf{Certificate}: A "proof" in this case would be a subset $S$ $\in T$ where every element of $X\cup Y\cup Z\cup W$ is covered exactly once by one of the quadruples of $S$.
 
 (3)\textbf{Certificate length}: The proof here is a set of $O(4n)$ = $O(n)$ elements in the subset, and can be encoded as a set of $O(n)$ integers. As such, its length is $O(n)$.
 
-(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, wound verify that every element of $X\cup Y\cup Z\cup W$ is covered exactly once by one of the quadruples of $S$.
+(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, would verify that every element of $X\cup Y\cup Z\cup W$ is covered exactly once by one of the quadruples of $S$.
 The proof has length $O(n)$ in this case, and the verification algorithm runs in $O(n^4)$ time, if we assume all the four sets are computed.
 
 \question{31.E}
 
 (1)\textbf{Algorithm}: We can just use the brute force method for solving the set disjoinr cover problem in exponential time.
-Given the sets $\in F$, we can just determine whether they are pairwise disjoint and compute the union of them to see whether they cover $U$ and return yes/no accordingly.
+Try all combination of $k$ subsets $\in F$, we can just determine whether they are pairwise disjoint and compute the union of them to see whether they cover $U$ and return yes/no accordingly.
 
 (2)\textbf{Certificate}: A "proof" in this case would be $k$ sets $S_1, ... S_k$ $\in F$ where they are pairwise disjoint and their union covers $U$.
 
-(3)\textbf{Certificate length}: The proof here is a set of $O(n)$ subsets and only one element in each subset, and can be encoded as a set of $O(n)$ integers. As such, its length is $O(n)$.
+(3)\textbf{Certificate length}: The proof here is a set of $k$ subsets in $F$ and the union size of these subsets is $n$. The legnth is $O(n)$.
 
-(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, wound verify that the $k$ sets $S_1, ... S_k$ $\in F$ are pairwise disjoint and their union covers $U$.
-The proof has length $O(n)$ in this case, and the verification algorithm runs in $O(n^k)$ time, if we assume all the $n$ elements are contained in each of the $k$ subsets.
+(4)\textbf{Verification algorithm}: The verification algorithm for the given proof, would verify that the $k$ sets $S_1, ... S_k$ $\in F$ are pairwise disjoint and their union covers $U$. It needs to compare each two sets and check if they are disjoint. And it also needs to check the union is exactly $U$. The proof has length $O(n)$ in this case, and the verification algorithm runs in $O(n^k)$ time, if we assume all the $n$ elements are contained in each of the $k$ subsets.
 
 \question{32.A}
 
