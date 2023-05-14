@@ -6,23 +6,23 @@ import threading
 hbinterval = 0.00001
 
 class Node:
-    def  __init__(self,nodeid,num,timeout, term,state,leader,log,logindex, commitIndex):
+    def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = timeout
-        self.term = term
-        self.state = state
-        self.leader = leader
-        self.log = log
+        self.timeout = (nodeid + 1) * 0.2
+        self.term = 1
+        self.state = "FOLLOWER"
+        self.leader = None
+        self.log = [None]
         self.logindex = 0
-        self.commitIndex = commitIndex
+        self.commitIndex = 0
         # Candidate
-        self.votenum = None
+        self.votenum = 0
         # Follower
-        self.votedfor = None
-        self.lasttime = None
+        self.votedfor = 0
+        self.lasttime = time.time()
         # Leader
-        self.replynum = None
+        self.replynum = 0
         return
     
     def output_state(self):
@@ -56,12 +56,8 @@ def check_timeout(node):
 
 if __name__ == "__main__":
 
-    timeout = (int(sys.argv[1]) + 1) * 0.2
-    node = Node(int(sys.argv[1]),int(sys.argv[2]),timeout,1,"FOLLOWER",None,[None],0,0)
+    node = Node(int(sys.argv[1]),int(sys.argv[2]) )
 
-    node.lasttime = time.time()
-    node.votenum = 0
-    node.replynum = 0
     check_timeout_thread = threading.Thread(target=check_timeout,args=(node,))
     check_timeout_thread.start()
 
