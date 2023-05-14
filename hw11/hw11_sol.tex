@@ -118,8 +118,29 @@ The construction can be done in $O((n+m)k)$ time. So to reduce CLIQUE-COVER to S
 
 No. First of all, this doesn't prove CLIQUE-COVER is in NP. And reduing from CLIQUE-COVER to SAT doesn't prove that CLIQUE-COVER is NP-Hard. One should show that CLIQUE-COVER has a polynominal time cerfiier algorithm and that an proven NPC problem like SAT can be reduced to CLIQUE-COVER.
 
-\question{33}
+\question{33}\\
+We can prove this problem is NP-hard by a reduction from the Independent set problem.\\
+Assume an instance of independent set is a graph $G=(V,E)$ and an integer k. $|V| = n$, $|E| = m$.\\
+Let $V\_extra = \{v^e:e \in E(G)\}$, and $|V\_extra|=|E|$. \\
+For each edge $(x,y)$ in $E$,connect one vertex to both $x$ and $y$.\\
+Then $E\_extra = \{all the new added edge\}$.\\
+Construct $G' = (V',E')$ with $V' = V \cup V\_extra$, $E'= E \cup E\_extra $.\\
+Now, proving the following statement domonstrates that the triangle free problem is an NPC problem.\\
+\textbf{claim: $G'$ has a triangle-free set $S'$, whose size is $k+|E(G)|$, iff G has an independent set S, whose size is  $k$.}\\
+\textbf{Step1: if G has an independent set S, whose size is $k$, then $G'$ has a triangle-free set $S'$, whose size is $k+|E(G)|$.}\\
+with $|S| >= k$, select $S' = S \cup V\_extra$\\
+Since there are no edges between all the pinions in $V\_extra$, there must be edges between the vertices in S in order to form a triangle. But $S$ is an independent set, and there are no edges between them. So $G'$ has a triangle free set $S'$ of size k+|E(G)|.\\
 
+
+\noindent
+\textbf{Step2: G has an independent set S, whose size is $k$, if $G'$ has a triangle-free set $S'$, whose size is $k+|E|$.}\\
+Let S' the set for triangle free problem having no triangle and $S'>=|E|+k$, decompose $S'$ into $S_1 = S' \cap V$, $S_2 = S' \cap \{v^e:e \in E(G)\ $ and $e \notin E(S1)\}$.\\
+It is obvious that $S_1 \cap S_2 = \emptyset$ and $S=S_1 \cup S_2$.\\
+$|S_2|$ can be expressed as $|E(G)|-|E(S_1)|$, which will maximize the S' and does not add triangles. Because if $S_2$ contains a vertex that connect to the edge of $S_1$, there will be a triangle in S'.\\
+Thus, $|S| = |S_1|+|S_2|=|S_1|+|E(G)|-|E(S_1)|>=|E(G)|+k $\\
+$|S_1|-|E(S_1)|>=k$\\
+Remove the edges of S1, the set is an independent set of size $k$.\\
+So finding the size of the largest triangle-free subset of vertices in a given undirected graph is NP-hard.
 
 
 \end{document}
