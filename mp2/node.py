@@ -46,8 +46,8 @@ def check_timeout(node):
                 node.term += 1
                 node.votenum = 1
                 node.state = "CANDIDATE"
-                print(f"STATE state=\"{node.state}\"")
-                print(f"STATE term={node.term}")
+                print(f"STATE state=\"{node.state}\"",flush=True)
+                print(f"STATE term={node.term}",flush=True)
                 for nodeid in range(node.num):
                     if nodeid == node.id: continue
                     print(f"SEND {nodeid} RequestVotes {node.term}",flush=True)
@@ -98,7 +98,14 @@ if __name__ == "__main__":
                 node.log.append([node.term, content])
                 node.logindex += 1
                 node.replica_num = 1
-                print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]")
+                print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
+
+
+                ########################################
+                for nodeid in range(node.num):
+                    if nodeid == node.id: continue
+                    print(f"SEND {nodeid} AppendEntries {node.term} {node.id} [\"{node.log[node.logindex][1]}\"]",flush=True)
+                ########################################
                 continue
 
             # A leader with higher term because of network partition
@@ -109,9 +116,9 @@ if __name__ == "__main__":
                     node.term = sender_term
                     node.leader = sender_id
                     node.state = "FOLLOWER"
-                    print(f"STATE term={node.term}")
-                    print(f"STATE state=\"{node.state}\"")
-                    print(f"STATE leader={node.leader}")
+                    print(f"STATE term={node.term}",flush=True)
+                    print(f"STATE state=\"{node.state}\"",flush=True)
+                    print(f"STATE leader={node.leader}",flush=True)
                 continue
 
 
@@ -138,8 +145,8 @@ if __name__ == "__main__":
             if node.votenum > node.num / 2:
                 node.leader = node.id
                 node.state = "LEADER"
-                print(f"STATE state=\"{node.state}\"")
-                print(f"STATE leader={node.leader}")
+                print(f"STATE state=\"{node.state}\"",flush=True)
+                print(f"STATE leader={node.leader}",flush=True)
                 continue
 
         if node.state == "FOLLOWER":
@@ -172,8 +179,8 @@ if __name__ == "__main__":
                 if node.votenum > node.num / 2:
                     node.leader = node.id
                     node.state = "LEADER"
-                    print(f"STATE state=\"{node.state}\"")
-                    print(f"STATE leader={node.leader}")
+                    print(f"STATE state=\"{node.state}\"",flush=True)
+                    print(f"STATE leader={node.leader}",flush=True)
                     continue
                 continue
             ###############################################
@@ -202,15 +209,15 @@ if __name__ == "__main__":
                 node.leader = int(sender_id)
                 node.term = int(sender_term)
 
-                print(f"STATE term={node.term}")
-                print(f"STATE state=\"{node.state}\"")
-                print(f"STATE leader={node.leader}")
+                print(f"STATE term={node.term}",flush=True)
+                print(f"STATE state=\"{node.state}\"",flush=True)
+                print(f"STATE leader={node.leader}",flush=True)
                 if len(line.split(" ")) == 6:
                     content = line.split(" ")[5]
                     content = content[2:-2]
                     node.log.append([node.term,content])
                     node.logindex += 1
-                    print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]")
+                    print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
                 print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true", flush=True)
                 continue
 
@@ -220,7 +227,7 @@ if __name__ == "__main__":
                 commitIndex = int(line.split(" ")[4])
                 node.commitIndex = commitIndex # Or node.logindex
 
-                print(f"STATE commitIndex={node.commitIndex}")
+                print(f"STATE commitIndex={node.commitIndex}",flush=True)
                 print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
                 continue
 
