@@ -22,7 +22,7 @@ class Node:
         self.votedfor = 0
         self.lasttime = time.time()
         # Leader
-        self.replynum = 0
+        self.replica_num = 0
         return
     
     def output_state(self):
@@ -80,11 +80,11 @@ if __name__ == "__main__":
                 if node.commitIndex < node.logindex:
                     reply = line.split(" ")[4]
                     if reply == "true":
-                        node.replynum += 1
+                        node.replica_num += 1
                 continue
 
             # Make Committment
-            if node.replynum > node.num / 2:
+            if node.replica_num > node.num / 2:
                 node.commitIndex = node.logindex
                 print(f"STATE commitIndex={node.commitIndex}")
                 print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
@@ -97,7 +97,7 @@ if __name__ == "__main__":
                 content = line.split(" ")[1]
                 node.log.append([node.term, content])
                 node.logindex += 1
-                node.replynum = 1
+                node.replica_num = 1
                 print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]")
                 continue
 
