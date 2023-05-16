@@ -3,7 +3,7 @@ import sys
 import time
 import threading
 
-hbinterval = 0.00001
+hbinterval = 1
 
 class Node:
     def  __init__(self,nodeid,num):
@@ -61,7 +61,21 @@ if __name__ == "__main__":
     check_timeout_thread = threading.Thread(target=check_timeout,args=(node,))
     check_timeout_thread.start()
 
+    msg_id = 0
+
     while True:
+
+        # Test LOG manually
+        if node.id == 3:
+            node.state = "TESTER"
+            time.sleep(1.2)
+            for nodeid in range(node.num - 1):
+                print(f"SEND {nodeid} LOGlog_message{msg_id}",flush=True)
+                msg_id += 1
+
+            continue
+
+
         if node.state == "LEADER":
             for nodeid in range(node.num):
                 if nodeid == node.id: continue
@@ -74,7 +88,7 @@ if __name__ == "__main__":
             line = sys.stdin.readline()  
             if line is None: break
             line = line.strip()
-            # time.sleep(hbinterval)
+            time.sleep(hbinterval)
 
             if "AppendEntriesResponse" in line:
                 if node.commitIndex < node.logindex:
@@ -94,7 +108,7 @@ if __name__ == "__main__":
 
             # Receive Log from client
             if "LOG" in line:
-                content = line.split(" ")[1]
+                content = line.split(" ")[1:]
                 node.log.append([node.term, content])
                 node.logindex += 1
                 node.replica_num = 1
