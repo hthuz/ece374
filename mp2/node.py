@@ -9,7 +9,7 @@ class Node:
     def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = (nodeid + 1) * 0.2
+        self.timeout = (nodeid + 1) * 2
         self.term = 1
         self.state = "FOLLOWER"
         self.leader = None
@@ -57,6 +57,10 @@ def check_timeout(node):
 if __name__ == "__main__":
 
     node = Node(int(sys.argv[1]),int(sys.argv[2]) )
+    if node.id == 3:
+        node.state = "TESTER"
+        time.sleep(5)
+    node.num -= 1
 
     check_timeout_thread = threading.Thread(target=check_timeout,args=(node,))
     check_timeout_thread.start()
@@ -66,10 +70,9 @@ if __name__ == "__main__":
     while True:
 
         # Test LOG manually
-        if node.id == 3:
-            node.state = "TESTER"
+        if node.state == "TESTER":
             time.sleep(1.2)
-            for nodeid in range(node.num - 1):
+            for nodeid in range(node.num):
                 print(f"SEND {nodeid} LOGlog_message{msg_id}",flush=True)
                 msg_id += 1
 
@@ -79,6 +82,7 @@ if __name__ == "__main__":
         if node.state == "LEADER":
             for nodeid in range(node.num):
                 if nodeid == node.id: continue
+                ## Tester
                 if node.logindex == 0:
                     print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
                 else:
