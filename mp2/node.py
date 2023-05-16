@@ -3,13 +3,13 @@ import sys
 import time
 import threading
 
-hbinterval = 1
+hbinterval = 0.001
 
 class Node:
     def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = (nodeid) * 0.3
+        self.timeout = (nodeid ) * 5
         self.term = 1
         self.state = "FOLLOWER"
         self.leader = None
@@ -25,17 +25,6 @@ class Node:
         self.replica_num = [None]
         return
     
-    def output_state(self):
-        print(f"STATE term={self.term}", flush=True)
-        print(f"STATE state=\"{self.state}\"", flush=True)
-        if self.leader == None:
-            # print(f"STATE leader=0",flush=True)
-            print(f"STATE leader=\"None\"",flush=True)
-        else:
-            print(f"STATE leader={self.leader}", flush=True)
-        # print(f"STATE log={self.term}", flush=True)
-        # print(f"STATE commitIndex={self.term}", flush=True)
-    
 nodelock = threading.Lock()
 
 def check_timeout(node):
@@ -43,12 +32,6 @@ def check_timeout(node):
     while True:
         if node.state == "FOLLOWER":
             if time.time() - node.lasttime >= node.timeout:
-
-                f = open("./debug.txt",'a')
-                f.write(f"Set Candidate\n")
-                f.write(f"{node.id} | {node.lasttime} | {time.time()} | {node.timeout} | {time.time() - node.lasttime}\n")
-                f.close()
-
                 node.term += 1
                 node.votenum = 1
                 node.state = "CANDIDATE"
@@ -62,9 +45,12 @@ def check_timeout(node):
 def send_heartbeat(node):
     while True:
         if node.state == "LEADER":
+            nodelock.acquire()
             for nodeid in range(node.num):
                 if nodeid == node.id: continue
                 print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
+            nodelock.release()
+            time.sleep(hbinterval)
 
 
 if __name__ == "__main__":
@@ -85,6 +71,10 @@ if __name__ == "__main__":
 
     while True:
 
+        line = sys.stdin.readline()
+        if line is None: break
+        line = line.strip()
+
         # Test LOG manually
         if node.state == "TESTER":
             time.sleep(1.2)
@@ -94,13 +84,14 @@ if __name__ == "__main__":
 
             continue
 
-
         if node.state == "LEADER":
-            # Receive Message
-            line = sys.stdin.readline()  
-            if line is None: break
-            line = line.strip()
-            # time.sleep(hbinterval)
+
+            # As a leader, receive request votes from candidate
+            if "RequestVotes" in line:
+                sender_id = int(line.split(" ")[1])
+                print(f"SEND {sender_id} AppendEntries {node.term} {node.id}",flush = True)
+                continue
+                
 
             # Receive Log from client
             if "LOG" in line:
@@ -111,42 +102,43 @@ if __name__ == "__main__":
                 node.replica_num.append(1)
                 print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
 
-                f = open("./debug.txt",'a')
-                f.write(f"LOG Received\n")
-                f.write(f"{node.id} | {node.leader} | {node.commitIndex} | {node.logindex} | {str(node.replica_num)}\n")
-                f.close()
-
                 ########################################
+                nodelock.acquire()
                 for nodeid in range(node.num):
                     if nodeid == node.id: continue
                     print(f"SEND {nodeid} AppendEntries {node.term} {node.id} [\"{node.log[node.logindex][1]}\"]",flush=True)
+                nodelock.release()
                 ########################################
                 continue
 
+
+            # if a term changes before the leader has a chance to fully commit the message, it is no longer 
+            # required to send a response, even if the message has not been yet committed
+            if node.logindex > 0:
+                lastest_logterm = node.log[node.logindex][0]
+                if node.term > lastest_logterm:
+                    continue
+
             if "AppendEntriesResponse" in line:
-                if node.commitIndex < node.logindex and node.logindex >= 1:
+                if node.commitIndex < node.logindex:
                     reply = line.split(" ")[4]
-
-                    f = open("./debug.txt",'a')
-                    f.write(f"AppendEntries\n")
-                    f.write(f"{node.id} | {node.leader} |  {node.commitIndex} | {node.logindex} | {str(node.replica_num)}\n")
-                    f.close()
-
                     if reply == "true":
-                        node.replica_num[1] += 1
+                        node.replica_num[node.logindex] += 1
 
             # Make Committment
             if node.logindex >= 1:
-                if node.replica_num[node.logindex] > node.num / 2:
+                if node.replica_num[node.logindex] > node.num / 2 and node.commitIndex < node.logindex:
                     node.commitIndex = node.logindex
-                    print(f"STATE commitIndex={node.commitIndex}")
+
+                    print(f"STATE commitIndex={node.commitIndex}",flush=True)
                     print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
+
                     for nodeid in range(node.num):
                         if nodeid == node.id: continue
                         print(f"SEND {nodeid} Committed {node.term} {node.commitIndex}", flush=True)
                     continue
 
-            # A leader with higher term because of network partition
+            # A leader with higher term because of network partition or a new leader comes into play
             if "AppendEntries" in line:
                 sender_id = int(line.split(" ")[1])
                 sender_term = int(line.split(" ")[3])
@@ -157,23 +149,30 @@ if __name__ == "__main__":
                     print(f"STATE term={node.term}",flush=True)
                     print(f"STATE state=\"{node.state}\"",flush=True)
                     print(f"STATE leader={node.leader}",flush=True)
+
+                        
                 continue
 
 
         if node.state == "CANDIDATE":
-            # Receive Message
-            line = sys.stdin.readline()  
-            if line is None: break
-            line = line.strip()
 
             # Receive RPC from valid leader
             if "AppendEntries" in line:
-                sender_id = line.split(" ")[1]
+                sender_id = int(line.split(" ")[1])
+                sender_term = int(line.split(" ")[3])
                 node.leader = sender_id
                 node.state = "FOLLOWER"
-                node.lasttime = time.time()
-                continue
+                node.term = sender_term
 
+                if len(line.split(" ")) == 6:
+                    content = line.split(" ")[5]
+                    content = content[2:-2]
+                    node.log.append([node.term,content])
+                    node.logindex += 1
+                    node.replica_num.append(None)
+                    print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
+
+                    continue
             # Receive RequestVote Response
             if "RequestVotesResponse" in line:
                 reply = line.split(" ")[4]
@@ -192,9 +191,6 @@ if __name__ == "__main__":
         if node.state == "FOLLOWER":
             # Receive Message
             # Follower may wait for some time here
-            line = sys.stdin.readline()  
-            if line is None: break
-            line = line.strip()
             # If the node has become candidate after timeout
             # But the node still has to wait for this message to arrive
             # and then it releazes it is candidate now
@@ -202,11 +198,22 @@ if __name__ == "__main__":
             node.lasttime = time.time()
             ###############################################
             if node.state == "CANDIDATE":
-                # Receive RPC from valid leadre
+                # Receive RPC from valid leader
                 if "AppendEntries" in line:
-                    sender_id = line.split(" ")[1]
-                    node.leader = int(sender_id)
+                    sender_id = int(line.split(" ")[1])
+                    sender_term = int(line.split(" ")[3])
+                    node.leader = sender_id
                     node.state = "FOLLOWER"
+                    node.term = sender_term
+
+                    if len(line.split(" ")) == 6:
+                        content = line.split(" ")[5]
+                        content = content[2:-2]
+                        node.log.append([node.term,content])
+                        node.logindex += 1
+                        node.replica_num.append(None)
+                        print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
+
                     continue
 
                 # Receive RequestVote Response
@@ -258,8 +265,10 @@ if __name__ == "__main__":
                     content = content[2:-2]
                     node.log.append([node.term,content])
                     node.logindex += 1
+                    node.replica_num.append(None)
+
                     print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
-                print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true", flush=True)
+                print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
                 continue
 
             # Receive committed
@@ -269,7 +278,8 @@ if __name__ == "__main__":
                 node.commitIndex = commitIndex # Or node.logindex
 
                 print(f"STATE commitIndex={node.commitIndex}",flush=True)
-                print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
+                print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}",flush=True)
+
                 continue
 
     print("Somehow it comes to an end")
