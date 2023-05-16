@@ -69,11 +69,15 @@ if __name__ == "__main__":
 
     msg_id = 0
 
+
     while True:
 
         line = sys.stdin.readline()
         if line is None: break
         line = line.strip()
+        f = open("debug.txt","a")
+        f.write(line + "\n")
+        f.close()
 
         # Test LOG manually
         if node.state == "TESTER":
