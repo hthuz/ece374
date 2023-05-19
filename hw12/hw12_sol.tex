@@ -63,15 +63,13 @@ For the sake of argument,suppose there is an algorithm DECIDEREVACCEPT that corr
 	\begin{algorithmic}
 		\Function{$DECIDEHALT$}{$<M,w>$}
 		\State Encode the following Turing machine $M'$:
-
-		\State $M'(x)$:
-		\State run $M$ on input $w$
-		\State return True
-		
+		\State\quad $M'(x)$:
+			\State\quad\quad run $M$ on input $w$
+			\State\quad\quad return True
 		\If{DECIDEREVACCEPT($<M'>$)}
-		\Return TRUE
+		\State \Return TRUE
 		\Else{}
-		\Return FALSE 
+		\State \Return FALSE 
 		\EndIf
 		\EndFunction
 	\end{algorithmic}
@@ -79,22 +77,18 @@ For the sake of argument,suppose there is an algorithm DECIDEREVACCEPT that corr
 
 We prove this reduction correct as follows:
 
-$=>$ Suppose $M$ halts on input $w$.
+$\Longrightarrow$ Suppose $M$ halts on input $w$.
      
 	  Then $M'$ accepts every input string $x$.
-
-	  In particular, $M'$ accepts the reversal of string $GNIRUT$.
 
 	  So DECIDEREVACCEPT accepts the encoding $<M'>$.
 
 	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
 
 
-$<=$ Suppose $M$ does not halt on input $w$.
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$.
 
      Then $M'$ diverges on every input string $x$.
-
-	 In particular, $M'$ does not accept any reversal of strings.
 
 	 So DECIDEREVACCEPT rejects the encoding $<M'>$.
 
@@ -112,14 +106,14 @@ For the sake of argument,suppose there is an algorithm DECIDEACCEPTTURING2 that 
 		\Function{$DECIDEHALT$}{$<M,w>$}
 		\State Encode the following Turing machine $M'$:
 
-		\State $M'(x)$:
-		\State run $M$ on input $w$
-		\State return True
+		\State\quad $M'(x)$:
+		\State\quad\quad run $M$ on input $w$
+		\State\quad\quad return True
 		
 		\If{DECIDEACCEPTTURING2($<M'>$)}
-		\Return TRUE
+		\State \Return TRUE
 		\Else{}
-		\Return FALSE 
+		\State \Return FALSE 
 		\EndIf
 		\EndFunction
 	\end{algorithmic}
@@ -127,7 +121,7 @@ For the sake of argument,suppose there is an algorithm DECIDEACCEPTTURING2 that 
 
 We prove this reduction correct as follows:
 
-$=>$ Suppose $M$ halts on input $w$ in space ${|w|}^2$.
+$\Longrightarrow$ Suppose $M$ halts on input $w$ in space ${|w|}^2$.
      
 	  Then $M'$ accepts every input string $x$ in space ${|w|}^2$.
 
@@ -136,7 +130,7 @@ $=>$ Suppose $M$ halts on input $w$ in space ${|w|}^2$.
 	  So DECIDEHALT correctly accepts the encoding $<M,w>$ in space ${|w|}^2$.
 
 
-$<=$ Suppose $M$ does not halt on input $w$ in space ${|w|}^2$.
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$ in space ${|w|}^2$.
 
      Then $M'$ diverges on every input string $x$ in space ${|w|}^2$.
 
@@ -159,14 +153,14 @@ So, SOMETIMESHALT is undecidable.
 % 		\Function{$DECIDEHALT$}{$<M,w>$}
 % 		\State Encode the following Turing machine $M'$:
 
-% 		\State $M'(x)$:
-% 		\State run $M$ on input $w$
-% 		\State return True
+% 		\State\quad$M'(x)$:
+% 		\State\quad\quad run $M$ on input $w$
+% 		\State\quad\quad return True
 		
 % 		\If{DECIDESOMETMESHALT($<M'>$)}
-% 		\Return TRUE
+% 		\State \Return TRUE
 % 		\Else{}
-% 		\Return FALSE 
+% 		\State \Return FALSE 
 % 		\EndIf
 % 		\EndFunction
 % 	\end{algorithmic}
@@ -174,22 +168,20 @@ So, SOMETIMESHALT is undecidable.
 
 % We prove this reduction correct as follows:
 
-% $=>$ Suppose $M$ halts on input $w$.
+% $\Longrightarrow$ Suppose $M$ halts on input $w$.
      
 % 	  Then $M'$ accepts every input string $x$.
 
-% 	  In particular, $M'$ accepts the reversal of string $GNIRUT$.
 
 % 	  So DECIDEREVACCEPT accepts the encoding $<M'>$.
 
 % 	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
 
 
-% $<=$ Suppose $M$ does not halt on input $w$.
+% $\Longleftarrow$ Suppose $M$ does not halt on input $w$.
 
 %      Then $M'$ diverges on every input string $x$.
 
-% 	 In particular, $M'$ does not accept any reversal of strings.
 
 % 	 So DECIDEREVACCEPT rejects the encoding $<M'>$.
 
