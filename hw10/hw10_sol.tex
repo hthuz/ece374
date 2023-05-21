@@ -121,6 +121,28 @@ The algorithm will iterate through subgraphs of original graph and apply black b
 
 \question{29.C}
 
+To find the MST, apply Kruskal's algorithm using Union-Find data structure. Specifically, 
+
+\begin{algorithm}
+  \begin{algorithmic}
+    \Function{ComputeMST}{$G(V,E)$} 
+    \State Sort edges in $E$ based on cost 
+    \State $T \gets empty$
+    \State each vertex is a set by itself
+    \While{$E$ is not empty}
+      \State $e = (u,v) \gets edge\ with\ minimum\ cost$
+      \If{$u$ and $v$ are in different sets evaluated using union-find}
+        \State $T \gets T \cup e$
+        \State Merge sets containing $u$ and $v$ using union-find
+      \EndIf
+    \EndWhile
+    \State \Return T
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Sorting will takes time $O(mlog(m))$ and forming the MST using union find structure will take time $(O(nlog(m)))$. So the running time of the algorithm is $O((m+n)logm)$
+
 \question{30}\\
 \textbf{Illustrate:}\\
 \textbf{For the meta graph, we preferentially add the sink SCC to the possible pefect set, and delete the edge connected to the SCC to generate the new sink SCCs.}\\
