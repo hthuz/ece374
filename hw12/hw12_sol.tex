@@ -142,52 +142,47 @@ In both cases, DECIDEHALT is correct. But that's impossible, because HALT is und
 
 \question{36.A}
 
-The language SOMETIMESHALT is the same as $A_{Halt}$.
+For the sake of argument,suppose there is an algorithm DECIDESOMETMESHALT that correctly decides the language SOMETMESHALT. Then we can solve the halting problem as follows
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$DECIDEHALT$}{$<M,w>$}
+		\State Encode the following Turing machine $M'$:
 
-Assume, for the sake of contradiction, that $A_{Halt}$ is decidable. As such, there is a TM, denoted by $TM_{Halt}$, that is a decider for $A_{Halt}$. We can use $TM_{Halt}$ as an implementation of an oracle for $A_{Halt}$, which would imply that one can build a decider for $A_{TM}$. However, $A_{TM}$ is undecidable. A contradiction. It must be that $A_{Halt}$ is undecidable.
-
-So, SOMETIMESHALT is undecidable.
-% For the sake of argument,suppose there is an algorithm DECIDESOMETMESHALT that correctly decides the language SOMETMESHALT. Then we can solve the halting problem as follows
-% \begin{algorithm}
-% 	\begin{algorithmic}
-% 		\Function{$DECIDEHALT$}{$<M,w>$}
-% 		\State Encode the following Turing machine $M'$:
-
-% 		\State\quad$M'(x)$:
-% 		\State\quad\quad run $M$ on input $w$
-% 		\State\quad\quad return True
+		\State\quad$M'(x)$:
+		\State\quad\quad run $M$ on input $w$
+		\State\quad\quad return True
 		
-% 		\If{DECIDESOMETMESHALT($<M'>$)}
-% 		\State \Return TRUE
-% 		\Else{}
-% 		\State \Return FALSE 
-% 		\EndIf
-% 		\EndFunction
-% 	\end{algorithmic}
-% \end{algorithm}
+		\If{DECIDESOMETMESHALT($<M'>$)}
+		\State \Return TRUE
+		\Else{}
+		\State \Return FALSE 
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
 
-% We prove this reduction correct as follows:
+We prove this reduction correct as follows:
 
-% $\Longrightarrow$ Suppose $M$ halts on input $w$.
+$\Longrightarrow$ Suppose $M$ halts on input $w$.
      
-% 	  Then $M'$ accepts every input string $x$.
+	  Then $M'$ accepts every input string $x$.
 
 
-% 	  So DECIDEREVACCEPT accepts the encoding $<M'>$.
+	  So DECIDEREVACCEPT accepts the encoding $<M'>$.
 
-% 	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
-
-
-% $\Longleftarrow$ Suppose $M$ does not halt on input $w$.
-
-%      Then $M'$ diverges on every input string $x$.
+	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
 
 
-% 	 So DECIDEREVACCEPT rejects the encoding $<M'>$.
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$.
 
-% 	 So DECIDEHALT correctly rejects the encoding $<M,w>$.
+     Then $M'$ diverges on every input string $x$.
 
-% In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDEREVACCEPT does not exist.
+
+	 So DECIDEREVACCEPT rejects the encoding $<M'>$.
+
+	 So DECIDEHALT correctly rejects the encoding $<M,w>$.
+
+In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDEREVACCEPT does not exist.
 
 \question{36.B}
 
