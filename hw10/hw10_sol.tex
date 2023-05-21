@@ -68,6 +68,27 @@ use Radix_sort to distinguish the edges
 
 \question{29.A}
 
+Since $H - e$ and $G - e$ have the same minimum spanning tree, vertices in MST survivor must be the same as vertices in $G$. Consider these two situations.  
+
+Suppose the edge $e$ we delete from $G$ is an unsafe edge(i.e. it's not in MST of $G$ and it won't affect MST of $G-e$), then the minimum spanning forest of $G-e$ is still a tree. Then in order to have $G-e$ and $H-e$ have the same MST, $H$ must at least contain all safe edges of $G$.
+
+Suppose the edge $e$ we delete from $G$ is a safe edge. If deleting $e$ causes one vertex in $G$ to be disconneted, then the case is the same as above but there will be a minimum spanning forest with multiple trees and $H$ only needs to at least contain all saft edges of G. If deleting $e$ doesn't affect the connected components of $G$, then the MST of $G$ will be different. In order to let $H - e$ have the same minimum spanning forest as $G - e$. $H$ must contain the another connected with the second minimum cost edge that shares the same cut as $e$. These edges can be obtained as MST deleting original MST edges from $G$.
+
+Based on the arguemtn above, the algorithm is as follows.
+
+\begin{algorithm}
+  \begin{algorithmic}
+    \Function{MSTSurvivor}{$G(V,E)$}
+    \State $T \gets MST\ obtained\ by\ Boruvka's\ Algorithm\ on\ G$
+    \State $G' \gets T - edges\ in\ T$
+    \State $T' \gets MST\ obtained\ by\ Boruvka's\ Algorithm\ on\ G'$
+    \State $H' \gets (V,edges\ in\ T \cup edges\ in\ T')$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The algorithm uses Boruvka's Algorithm twice and some other deletions of edges. Overall, the algorithm takes $O(mlogn)$ time.
+
 \question{29.B}
 
 \question{29.C}
