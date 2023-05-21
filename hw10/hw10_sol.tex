@@ -16,6 +16,26 @@
 \renewcommand{\Comment}[1]{\beginComment~#1~\endComment}
 
 
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
 \newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
 % set HW number
 \newcommand{\HWnum}{10}
@@ -38,7 +58,9 @@
 %%% end header
 
 \question{28.A}
-
+\begin{lstlisting}
+use Radix_sort to distinguish the edges
+\end{lstlisting}
 \question{28.B}
 
 \question{28.C}
@@ -50,8 +72,35 @@
 
 \question{29.C}
 
-\question{30}
+\question{30}\\
+\textbf{Illustrate:}\\
+\textbf{For the meta graph, we preferentially add the sink SCC to the possible pefect set, and delete the edge connected to the SCC to generate the new sink SCCs.}\\
+If we add a non-sink SCC to a set, it cannot form a closed set by itself, because some nodes are reachable in other SCCs. If we add a non-sink SCC, we have to add all its downstream SCCs at the same time, which may cause the number of nodes to exceed n and cause us to miss the pefect set (which may actually exist). From a greedy algorithm perspective, we tend to start adding from sink's SCC, always ensuring that it is a closed set.\\
+\textbf{correctness:}\\
+\textbf{1. For any node A, assuming twin(A) = a, then indegree(A) = outdegree(a), outdegree(A) = indegree(a).}\\
+\textbf{2. If the number of removed nodes is less than or equal to n, the removed nodes cannot be twins.}\\
+Suppose a group of SCCs have uppercase names and twins SCCs have lowercase names. Suppose "F" is sink SCC, its upstream is ABCD and other SCCs, then f is source SCC, and its downstream is abcd and other SCCs. After we add f, we have to add abcd to add f, the twins(F). Now the amount taken away must be greater than n.\\
+\textbf{3. When the number of nodes taken is equal to n, it is closed due to our method of taking away. There are no twins due to note 2. Thus. it is the perfect set.}\\
+\textbf{4. When the number of nodes taken is greater than n, it must contain twins according to the pigeonhole principle, so it is not a perfect set.}\\
+\begin{lstlisting}
+do DFS(G_reverse) and output vertices in decreasing post order.
+Mark all nodes as unvisited
+Define "result" as the possible perfect set
+for each u in the computed order do
+	if u is not visited then
+		DFS(u)
+		Let S_u be the nodes reached by u
+		Add S_u to result 
 
+		if (len(result)>n): No perfect set
+		else if (len(result)==n): result is the perfect set
+		else: continue
+
+		Output S_u as a strong connected component
+		Remove S_u as well as the adj edges from G
+\end{lstlisting}
+runing time is O(m+n), "for each u in the computed order do" and "DFS(u)" could be combined to reduce the running time to O(n+m) rather than O(n(n+m)).\\
+the space used is O(n).\\
 
 
 \end{document}
