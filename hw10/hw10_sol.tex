@@ -58,10 +58,56 @@
 %%% end header
 
 \question{28.A}
+We don't know whether there is an edge between two connected components.\\
+We know which connected components the node $i$ belongs to. That is $C_{i'}$. But we don't know whether the edge i'j' exists for $C_{j'}$.\\
+There may be many edges between each of the two connected components. Choose the smallest edge as the element of E prime. Let's say edge e = (i, j).\\
+If the minimum is found by traverse for all edges of every two connected components, $running time = k^2*m$ is required. Using radix sort can reduce the complexity to O(m) because all the edges can be combined and radix sort by key(i', j') and c(e) respectively to quickly get the final desired edge, where i' and j' are the indices of connected components.\\
+
 \begin{lstlisting}
-use Radix_sort to distinguish the edges
+list = []
+for each edge e=(i,j) in G
+	if i' is not equal to j' do 
+		Add (i',j',c(e)) to list
+use radix sort to distinguish the edges and get the minimum edge for i' and j'.
 \end{lstlisting}
+running time is O(m), space used is O(m).\\
 \question{28.B}
+1. First reverse the graph, using DFS to find all (i, j) paths. For each node, recode the maximum edge from "j" to this node. \\
+2. When different paths combine in one node, record the smaller one of the maximum edge in the two paths. \\
+If the node is an intermediate node, this operation would discard the path with larger c(e), which cannot be the final answer for node i.\\
+If the node is node i, this operation would discard the path with larger c(e), which would result in the minimum of the maximums.\\
+3. When the node "i" is reached, the minimum of these maximum values is selected as $T$. If $T> \alpha$, then $s(u,v)> \alpha$. Else, $s(u,v)<= \alpha$.\\
+4. use indegree to ensure that every node do not continue virus until all the paths have reached this node.\\
+\begin{lstlisting}
+define max_edge [0,1,...n-1]
+define indegree [0,1,...n-1]
+initialize max_edge with -1
+initialize indegree with the indegree value
+decide(G):
+	Get G_reverse
+	Mark all nodes as unvisited
+	virus(G_reverse,j)
+	T = max_edge[i]
+	Judge the relation between T and alpha.
+	
+
+virus(G,u):
+	for each edge uv in adj(u) do
+		if (u == i) return 0
+		if (v is visited)
+			possible = max{ max_edge(u), c(uv)}
+			max_edge(v) = min { possible, max_edge(v)} 
+			if (indegree[v]>=1) indegree[v]--;
+		else
+			set v as visited
+			max_edge(v) =  max{ max_edge(u), c(uv)}
+			if (indegree[v]>=1) indegree[v]--;
+		if (indegree[v]==0)
+			virus(G,v)
+
+	return 1
+\end{lstlisting}
+Running time is O(n+m). It at most traverse the edges and the nodes.
 
 \question{28.C}
 
@@ -154,21 +200,22 @@ Suppose a group of SCCs have uppercase names and twins SCCs have lowercase names
 \textbf{3. When the number of nodes taken is equal to n, it is closed due to our method of taking away. There are no twins due to note 2. Thus. it is the perfect set.}\\
 \textbf{4. When the number of nodes taken is greater than n, it must contain twins according to the pigeonhole principle, so it is not a perfect set.}\\
 \begin{lstlisting}
-do DFS(G_reverse) and output vertices in decreasing post order.
-Mark all nodes as unvisited
-Define "result" as the possible perfect set
-for each u in the computed order do
-	if u is not visited then
-		DFS(u)
-		Let S_u be the nodes reached by u
-		Add S_u to result 
-
-		if (len(result)>n): No perfect set
-		else if (len(result)==n): result is the perfect set
-		else: continue
-
-		Output S_u as a strong connected component
-		Remove S_u as well as the adj edges from G
+PERFECT(G):
+	do DFS(G_reverse) and output vertices in decreasing post order.
+	Mark all nodes as unvisited
+	Define "result" as the possible perfect set
+	for each u in the computed order do
+		if u is not visited then
+			DFS(u)
+			Let S_u be the nodes reached by u
+			Add S_u to result 
+	
+			if (len(result)>n): No perfect set
+			else if (len(result)==n): result is the perfect set
+			else: continue
+	
+			Output S_u as a strong connected component
+			Remove S_u as well as the adj edges from G
 \end{lstlisting}
 runing time is O(m+n), "for each u in the computed order do" and "DFS(u)" could be combined to reduce the running time to O(n+m) rather than O(n(n+m)).\\
 the space used is O(n).\\
