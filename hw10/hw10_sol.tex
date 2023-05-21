@@ -82,7 +82,8 @@ Based on the arguemtn above, the algorithm is as follows.
     \State $T \gets MST\ obtained\ by\ Boruvka's\ Algorithm\ on\ G$
     \State $G' \gets T - edges\ in\ T$
     \State $T' \gets MST\ obtained\ by\ Boruvka's\ Algorithm\ on\ G'$
-    \State $H' \gets (V,edges\ in\ T \cup edges\ in\ T')$
+    \State $H \gets (V,edges\ in\ T \cup edges\ in\ T')$
+    \State \Return $H$
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
@@ -90,6 +91,33 @@ Based on the arguemtn above, the algorithm is as follows.
 The algorithm uses Boruvka's Algorithm twice and some other deletions of edges. Overall, the algorithm takes $O(mlogn)$ time.
 
 \question{29.B}
+
+The idea is to combine several nodes with edges connected between themselives (a subgraph) as one node so that we can get a graph with number of edges is at most $3/2$ of number of vertices. For a subgraph $s$ of $G$ with vertices $v_1,v_2..$, change $s$ to one node of $G$. Edges between $v_i,v_2..$ are ignored and edges like ${v_1,u_1}$, where $u_1$ is not in the subgraph, change it into ${s,u_1}$. If the subgraph can be used with the black box, apply it directly. Otherwise keep forming subgraphs in the subgraph until we can get the MST of the subgraph. The MST of $G$ is formed by connecting MST of different subgraphs using the safe edges. 
+
+By connecting MSTs of subgraphs using the safe edges, we are guarantted to get a MST of $G$, which guaranttes the correctness of the algorithm.
+
+A draft of the algorithm is as follows. 
+
+
+\begin{algorithm}
+  \begin{algorithmic}
+    \Function{ComputeMST}{$G(V,E)$}
+      \If{$|E| \le 1.5|V|$}
+        \State Apply black box to get MST $T$
+        \State \Return $T$
+      \EndIf
+      \State $G_1,G_2...G_k \gets subgraphs\ of\ $G$\ with\ disjoint\ vertices$
+      \For{each $G_i$}
+        \State $T_i \gets ComputeMST(G_i)$
+      \EndFor
+      \State $G' \gets metagraph\ with\ nodes\ representing\ T_i\ as\ described\ above$
+      \State \Return $ComputeMST(G')$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The algorithm will iterate through subgraphs of original graph and apply black box to these subgraphs. These subgraphs will be connected. Each edge will be iterated so approximately, the algorithm takes $O(m)$ time
+
 
 \question{29.C}
 
