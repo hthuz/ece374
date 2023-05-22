@@ -9,7 +9,7 @@ class Node:
     def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = (nodeid + 1) * 0.2
+        self.timeout = (nodeid + 1) * 0.5
         self.term = 1
         self.state = "FOLLOWER"
         self.leader = None
@@ -32,6 +32,7 @@ def check_timeout(node):
     while True:
         if node.state == "FOLLOWER":
             if time.time() - node.lasttime >= node.timeout:
+                debug(f"Check timeout, {time.time()},{node.lasttime}, {time.time() - node.lasttime}",flush=True)
                 node.term += 1
                 node.votenum = 1
                 node.state = "CANDIDATE"
@@ -66,12 +67,6 @@ def debug(msg,flush):
 if __name__ == "__main__":
 
     node = Node(int(sys.argv[1]),int(sys.argv[2]) )
-
-    # if node.id == 3:
-    #     node.state = "TESTER"
-    #     time.sleep(3)
-    # node.num -= 1
-
     check_timeout_thread = threading.Thread(target=check_timeout,args=(node,))
     # send_heartbeat_thread = threading.Thread(target=send_heartbeat, args=(node,))
     check_timeout_thread.start()
@@ -82,16 +77,6 @@ if __name__ == "__main__":
 
     while True:
 
-
-        # Test LOG manually
-        if node.state == "TESTER":
-            time.sleep(1.2)
-            for nodeid in range(node.num):
-                print(f"SEND {nodeid} LOGlog_message{msg_id}",flush=True)
-                debug(f"SEND {nodeid} LOGlog_message{msg_id}",flush=True)
-                msg_id += 1
-
-            continue
 
         if node.state == "LEADER":
             for nodeid in range(node.num):
@@ -125,12 +110,10 @@ if __name__ == "__main__":
                 print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
                 debug(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
                 ########################################
-                nodelock.acquire()
                 for nodeid in range(node.num):
                     if nodeid == node.id: continue
                     print(f"SEND {nodeid} AppendEntries {node.term} {node.id} [\"{node.log[node.logindex][1]}\"]",flush=True)
                     debug(f"SEND {nodeid} AppendEntries {node.term} {node.id} [\"{node.log[node.logindex][1]}\"]",flush=True)
-                nodelock.release()
                 ########################################
                 continue
 
@@ -169,6 +152,7 @@ if __name__ == "__main__":
                 sender_id = int(line.split(" ")[1])
                 sender_term = int(line.split(" ")[3])
                 if sender_term >= node.term:
+                    node.lasttime = time.time()
                     node.term = sender_term
                     node.leader = sender_id
                     node.state = "FOLLOWER"
@@ -192,6 +176,7 @@ if __name__ == "__main__":
 
             # Receive RPC from valid leader
             if "AppendEntries" in line:
+                node.lasttime = time.time()
                 sender_id = int(line.split(" ")[1])
                 sender_term = int(line.split(" ")[3])
                 node.leader = sender_id
@@ -231,6 +216,7 @@ if __name__ == "__main__":
             line = sys.stdin.readline()
             if line is None: break
             line = line.strip()
+
             f = open("debug.txt","a")
             f.write(str(node.id) + " < " + line + "\n")
             f.close()
@@ -240,10 +226,12 @@ if __name__ == "__main__":
             # and then it releazes it is candidate now
             # This may need to be improved
             node.lasttime = time.time()
+            debug(f"Receive Message at time {node.lasttime}",flush=True)
             ###############################################
             if node.state == "CANDIDATE":
                 # Receive RPC from valid leader
                 if "AppendEntries" in line:
+                    node.lasttime = time.time()
                     sender_id = int(line.split(" ")[1])
                     sender_term = int(line.split(" ")[3])
                     node.leader = sender_id
