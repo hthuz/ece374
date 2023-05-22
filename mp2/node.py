@@ -9,7 +9,7 @@ class Node:
     def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = (nodeid ) * 5
+        self.timeout = (nodeid ) * 2
         self.term = 1
         self.state = "FOLLOWER"
         self.leader = None
@@ -35,11 +35,15 @@ def check_timeout(node):
                 node.term += 1
                 node.votenum = 1
                 node.state = "CANDIDATE"
+
                 print(f"STATE state=\"{node.state}\"",flush=True)
                 print(f"STATE term={node.term}",flush=True)
+                debug(f"STATE state=\"{node.state}\"",flush=True)
+                debug(f"STATE term={node.term}",flush=True)
                 for nodeid in range(node.num):
                     if nodeid == node.id: continue
                     print(f"SEND {nodeid} RequestVotes {node.term}",flush=True)
+                    debug(f"SEND {nodeid} RequestVotes {node.term}",flush=True)
     return
 
 def send_heartbeat(node):
@@ -49,9 +53,15 @@ def send_heartbeat(node):
             for nodeid in range(node.num):
                 if nodeid == node.id: continue
                 print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
+                debug(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
             nodelock.release()
             time.sleep(hbinterval)
 
+def debug(msg,flush):
+    f = open("debug.txt","a")
+    f.write(msg + "\n")
+    f.close()
+    return
 
 if __name__ == "__main__":
 
@@ -84,6 +94,7 @@ if __name__ == "__main__":
             time.sleep(1.2)
             for nodeid in range(node.num):
                 print(f"SEND {nodeid} LOGlog_message{msg_id}",flush=True)
+                debug(f"SEND {nodeid} LOGlog_message{msg_id}",flush=True)
                 msg_id += 1
 
             continue
@@ -94,6 +105,7 @@ if __name__ == "__main__":
             if "RequestVotes" in line:
                 sender_id = int(line.split(" ")[1])
                 print(f"SEND {sender_id} AppendEntries {node.term} {node.id}",flush = True)
+                debug(f"SEND {sender_id} AppendEntries {node.term} {node.id}",flush = True)
                 continue
                 
 
@@ -105,16 +117,16 @@ if __name__ == "__main__":
                 node.logindex += 1
                 node.replica_num.append(1)
                 print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
-
+                debug(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
                 ########################################
                 nodelock.acquire()
                 for nodeid in range(node.num):
                     if nodeid == node.id: continue
                     print(f"SEND {nodeid} AppendEntries {node.term} {node.id} [\"{node.log[node.logindex][1]}\"]",flush=True)
+                    debug(f"SEND {nodeid} AppendEntries {node.term} {node.id} [\"{node.log[node.logindex][1]}\"]",flush=True)
                 nodelock.release()
                 ########################################
                 continue
-
 
             # if a term changes before the leader has a chance to fully commit the message, it is no longer 
             # required to send a response, even if the message has not been yet committed
@@ -136,10 +148,12 @@ if __name__ == "__main__":
 
                     print(f"STATE commitIndex={node.commitIndex}",flush=True)
                     print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
-
+                    debug(f"STATE commitIndex={node.commitIndex}",flush=True)
+                    debug(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
                     for nodeid in range(node.num):
                         if nodeid == node.id: continue
                         print(f"SEND {nodeid} Committed {node.term} {node.commitIndex}", flush=True)
+                        debug(f"SEND {nodeid} Committed {node.term} {node.commitIndex}", flush=True)
                     continue
 
             # A leader with higher term because of network partition or a new leader comes into play
@@ -153,7 +167,9 @@ if __name__ == "__main__":
                     print(f"STATE term={node.term}",flush=True)
                     print(f"STATE state=\"{node.state}\"",flush=True)
                     print(f"STATE leader={node.leader}",flush=True)
-
+                    debug(f"STATE term={node.term}",flush=True)
+                    debug(f"STATE state=\"{node.state}\"",flush=True)
+                    debug(f"STATE leader={node.leader}",flush=True)
                         
                 continue
 
@@ -175,6 +191,7 @@ if __name__ == "__main__":
                     node.logindex += 1
                     node.replica_num.append(None)
                     print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
+                    debug(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
 
                     continue
             # Receive RequestVote Response
@@ -189,7 +206,10 @@ if __name__ == "__main__":
                 node.state = "LEADER"
                 print(f"STATE state=\"{node.state}\"",flush=True)
                 print(f"STATE leader={node.leader}",flush=True)
-                print(f"=================LEADER SELECTED==========")
+                print(f"=================LEADER SELECTED==========",flush=True)
+                debug(f"STATE state=\"{node.state}\"",flush=True)
+                debug(f"STATE leader={node.leader}",flush=True)
+                debug(f"=================LEADER SELECTED==========",flush=True)
                 continue
 
         if node.state == "FOLLOWER":
@@ -217,6 +237,7 @@ if __name__ == "__main__":
                         node.logindex += 1
                         node.replica_num.append(None)
                         print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
+                        debug(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
 
                     continue
 
@@ -232,7 +253,10 @@ if __name__ == "__main__":
                     node.state = "LEADER"
                     print(f"STATE state=\"{node.state}\"",flush=True)
                     print(f"STATE leader={node.leader}",flush=True)
-                    print(f"=================LEADER SELECTED==========")
+                    print(f"=================LEADER SELECTED==========",flush=True)
+                    debug(f"STATE state=\"{node.state}\"",flush=True)
+                    debug(f"STATE leader={node.leader}",flush=True)
+                    debug(f"=================LEADER SELECTED==========",flush=True)
                     continue
                 continue
             ###############################################
@@ -244,6 +268,7 @@ if __name__ == "__main__":
                 sender_term = line.split(" ")[3]
                 if int(sender_term) < node.term:
                     print(f"SEND {sender_id} RequestVotesResponse {node.term} false",flush=True)
+                    debug(f"SEND {sender_id} RequestVotesResponse {node.term} false",flush=True)
                     continue
                 if int(sender_term) > node.term:
                     node.term = int(sender_term)
@@ -252,6 +277,7 @@ if __name__ == "__main__":
                     node.votedfor = int(sender_id)
                     node.leader = int(sender_id)
                     print(f"SEND {sender_id} RequestVotesResponse {node.term} true", flush=True)
+                    debug(f"SEND {sender_id} RequestVotesResponse {node.term} true", flush=True)
                     continue
 
             # Receive AppendEntries
@@ -264,6 +290,9 @@ if __name__ == "__main__":
                 print(f"STATE term={node.term}",flush=True)
                 print(f"STATE state=\"{node.state}\"",flush=True)
                 print(f"STATE leader={node.leader}",flush=True)
+                debug(f"STATE term={node.term}",flush=True)
+                debug(f"STATE state=\"{node.state}\"",flush=True)
+                debug(f"STATE leader={node.leader}",flush=True)
                 if len(line.split(" ")) == 6:
                     content = line.split(" ")[5]
                     content = content[2:-2]
@@ -272,7 +301,9 @@ if __name__ == "__main__":
                     node.replica_num.append(None)
 
                     print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
+                    debug(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
                 print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
+                debug(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
                 continue
 
             # Receive committed
@@ -284,10 +315,12 @@ if __name__ == "__main__":
                 print(f"STATE commitIndex={node.commitIndex}",flush=True)
                 print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}",flush=True)
 
+                debug(f"STATE commitIndex={node.commitIndex}",flush=True)
+                debug(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}",flush=True)
                 continue
 
-    print("Somehow it comes to an end")
-
+    print("Somehow it comes to an end",flush=True)
+    debug("Somehow it comes to an end",flush=True)
         
 
 
