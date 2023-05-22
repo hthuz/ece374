@@ -9,7 +9,7 @@ class Node:
     def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = (nodeid + 1) * 0.5
+        self.timeout = (nodeid + 1) * 0.2
         self.term = 1
         self.state = "FOLLOWER"
         self.leader = None
@@ -59,9 +59,9 @@ def send_heartbeat(node):
             time.sleep(hbinterval)
 
 def debug(msg,flush):
-    f = open("debug.txt","a")
-    f.write(str(node.id) + " > " + msg + "\n")
-    f.close()
+    # f = open("debug.txt","a")
+    # f.write(str(node.id) + " > " + msg + "\n")
+    # f.close()
     return
 
 if __name__ == "__main__":
@@ -83,14 +83,14 @@ if __name__ == "__main__":
                 if nodeid == node.id: continue
                 print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
                 debug(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
-            time.sleep(hbinterval)
+            # time.sleep(hbinterval)
 
             line = sys.stdin.readline()
             if line is None: break
             line = line.strip()
-            f = open("debug.txt","a")
-            f.write(str(node.id) + " < " + line + "\n")
-            f.close()
+            # f = open("debug.txt","a")
+            # f.write(str(node.id) + " < " + line + "\n")
+            # f.close()
 
             # As a leader, receive request votes from candidate
             if "RequestVotes" in line:
@@ -128,19 +128,16 @@ if __name__ == "__main__":
                 continue
             if "AppendLogResponse" in line:
                 if node.commitIndex < node.logindex:
-                    reply = line.split(" ")[4]
-                    if reply == "true":
-                        node.replica_num[node.logindex] += 1
+                    logindex = int(line.split(" ")[4])
+                    node.replica_num[logindex] += 1
 
-            # Make Committment
-            if node.logindex >= 1:
-                if node.replica_num[node.logindex] > node.num / 2 and node.commitIndex < node.logindex:
-                    node.commitIndex = node.logindex
+                if node.replica_num[logindex] > node.num / 2:
+                    node.commitIndex = logindex
 
                     print(f"STATE commitIndex={node.commitIndex}",flush=True)
-                    print(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
+                    print(f"COMMITTED {node.log[logindex][1]} {node.commitIndex}", flush=True)
                     debug(f"STATE commitIndex={node.commitIndex}",flush=True)
-                    debug(f"COMMITTED {node.log[node.logindex][1]} {node.commitIndex}", flush=True)
+                    debug(f"COMMITTED {node.log[logindex][1]} {node.commitIndex}", flush=True)
                     for nodeid in range(node.num):
                         if nodeid == node.id: continue
                         print(f"SEND {nodeid} Committed {node.term} {node.commitIndex}", flush=True)
@@ -170,9 +167,9 @@ if __name__ == "__main__":
             line = sys.stdin.readline()
             if line is None: break
             line = line.strip()
-            f = open("debug.txt","a")
-            f.write(str(node.id) + " < " + line + "\n")
-            f.close()
+            # f = open("debug.txt","a")
+            # f.write(str(node.id) + " < " + line + "\n")
+            # f.close()
 
             # Receive RPC from valid leader
             if "AppendEntries" in line:
@@ -217,15 +214,15 @@ if __name__ == "__main__":
             if line is None: break
             line = line.strip()
 
-            f = open("debug.txt","a")
-            f.write(str(node.id) + " < " + line + "\n")
-            f.close()
+            node.lasttime = time.time()
+            # f = open("debug.txt","a")
+            # f.write(str(node.id) + " < " + line + "\n")
+            # f.close()
             # Follower may wait for some time here
             # If the node has become candidate after timeout
             # But the node still has to wait for this message to arrive
             # and then it releazes it is candidate now
             # This may need to be improved
-            node.lasttime = time.time()
             debug(f"Receive Message at time {node.lasttime}",flush=True)
             ###############################################
             if node.state == "CANDIDATE":
@@ -311,8 +308,8 @@ if __name__ == "__main__":
 
                     print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
                     debug(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
-                    print(f"SEND {sender_id} AppendLogResponse {sender_term} true",flush=True)
-                    debug(f"SEND {sender_id} AppendLogResponse {sender_term} true",flush=True)
+                    print(f"SEND {sender_id} AppendLogResponse {sender_term} {node.logindex} true",flush=True)
+                    debug(f"SEND {sender_id} AppendLogResponse {sender_term} {node.logindex} true",flush=True)
                 else:
                     print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
                     debug(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
