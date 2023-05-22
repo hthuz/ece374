@@ -58,6 +58,7 @@
 %%% end header
 
 \question{28.A}
+
 We don't know whether there is an edge between two connected components.\\
 We know which connected components the node $i$ belongs to. That is $C_{i'}$. But we don't know whether the edge i'j' exists for $C_{j'}$.\\
 There may be many edges between each of the two connected components. Choose the smallest edge as the element of E prime. Let's say edge e = (i, j).\\
@@ -71,7 +72,9 @@ for each edge e=(i,j) in G
 use radix sort to distinguish the edges and get the minimum edge for i' and j'.
 \end{lstlisting}
 running time is O(m), space used is O(m).\\
+
 \question{28.B}
+
 1. First reverse the graph, using DFS to find all (i, j) paths. For each node, recode the maximum edge from "j" to this node. \\
 2. When different paths combine in one node, record the smaller one of the maximum edge in the two paths. \\
 If the node is an intermediate node, this operation would discard the path with larger c(e), which cannot be the final answer for node i.\\
@@ -110,6 +113,8 @@ virus(G,u):
 Running time is O(n+m) = O(m). It at most traverse the edges and the nodes.
 
 \question{28.C}
+
+
 \textbf{Correctness:}\\
 Consider$ s(u,v)> \alpha$\\
 When there is only one path between u and v, the longest edge of that path is greater than $\alpha$. It is possible that there are many edges on this path that are longer than $\alpha$, or it is possible that there is only the longest path. In either case, using the meta vertices u' and v' and recursively computing $s(u',v')$ achieves the largest edge in the target.\\
