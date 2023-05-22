@@ -3,13 +3,13 @@ import sys
 import time
 import threading
 
-hbinterval = 0.001
+hbinterval = 0.01
 
 class Node:
     def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = (nodeid ) * 2
+        self.timeout = (nodeid + 1) * 0.2
         self.term = 1
         self.state = "FOLLOWER"
         self.leader = None
@@ -59,7 +59,7 @@ def send_heartbeat(node):
 
 def debug(msg,flush):
     f = open("debug.txt","a")
-    f.write(msg + "\n")
+    f.write(str(node.id) + " > " + msg + "\n")
     f.close()
     return
 
@@ -73,21 +73,15 @@ if __name__ == "__main__":
     # node.num -= 1
 
     check_timeout_thread = threading.Thread(target=check_timeout,args=(node,))
-    send_heartbeat_thread = threading.Thread(target=send_heartbeat, args=(node,))
+    # send_heartbeat_thread = threading.Thread(target=send_heartbeat, args=(node,))
     check_timeout_thread.start()
-    send_heartbeat_thread.start()
+    # send_heartbeat_thread.start()
 
     msg_id = 0
 
 
     while True:
 
-        line = sys.stdin.readline()
-        if line is None: break
-        line = line.strip()
-        f = open("debug.txt","a")
-        f.write(line + "\n")
-        f.close()
 
         # Test LOG manually
         if node.state == "TESTER":
@@ -100,6 +94,18 @@ if __name__ == "__main__":
             continue
 
         if node.state == "LEADER":
+            for nodeid in range(node.num):
+                if nodeid == node.id: continue
+                print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
+                debug(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
+            time.sleep(hbinterval)
+
+            line = sys.stdin.readline()
+            if line is None: break
+            line = line.strip()
+            f = open("debug.txt","a")
+            f.write(str(node.id) + " < " + line + "\n")
+            f.close()
 
             # As a leader, receive request votes from candidate
             if "RequestVotes" in line:
@@ -136,6 +142,8 @@ if __name__ == "__main__":
                     continue
 
             if "AppendEntriesResponse" in line:
+                continue
+            if "AppendLogResponse" in line:
                 if node.commitIndex < node.logindex:
                     reply = line.split(" ")[4]
                     if reply == "true":
@@ -160,7 +168,7 @@ if __name__ == "__main__":
             if "AppendEntries" in line:
                 sender_id = int(line.split(" ")[1])
                 sender_term = int(line.split(" ")[3])
-                if sender_term > node.term:
+                if sender_term >= node.term:
                     node.term = sender_term
                     node.leader = sender_id
                     node.state = "FOLLOWER"
@@ -175,6 +183,12 @@ if __name__ == "__main__":
 
 
         if node.state == "CANDIDATE":
+            line = sys.stdin.readline()
+            if line is None: break
+            line = line.strip()
+            f = open("debug.txt","a")
+            f.write(str(node.id) + " < " + line + "\n")
+            f.close()
 
             # Receive RPC from valid leader
             if "AppendEntries" in line:
@@ -214,6 +228,12 @@ if __name__ == "__main__":
 
         if node.state == "FOLLOWER":
             # Receive Message
+            line = sys.stdin.readline()
+            if line is None: break
+            line = line.strip()
+            f = open("debug.txt","a")
+            f.write(str(node.id) + " < " + line + "\n")
+            f.close()
             # Follower may wait for some time here
             # If the node has become candidate after timeout
             # But the node still has to wait for this message to arrive
@@ -266,6 +286,7 @@ if __name__ == "__main__":
             if "RequestVotes" in line:
                 sender_id = line.split(" ")[1]
                 sender_term = line.split(" ")[3]
+                # debug(f"term is {node.term} and votedfor is {node.votedfor}",flush=True)
                 if int(sender_term) < node.term:
                     print(f"SEND {sender_id} RequestVotesResponse {node.term} false",flush=True)
                     debug(f"SEND {sender_id} RequestVotesResponse {node.term} false",flush=True)
@@ -273,7 +294,7 @@ if __name__ == "__main__":
                 if int(sender_term) > node.term:
                     node.term = int(sender_term)
                     node.votedfor = None
-                if node.votedfor == None or sender_id != None:
+                if node.votedfor == None:
                     node.votedfor = int(sender_id)
                     node.leader = int(sender_id)
                     print(f"SEND {sender_id} RequestVotesResponse {node.term} true", flush=True)
@@ -302,8 +323,14 @@ if __name__ == "__main__":
 
                     print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
                     debug(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
-                print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
-                debug(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
+                    print(f"SEND {sender_id} AppendLogResponse {sender_term} true",flush=True)
+                    debug(f"SEND {sender_id} AppendLogResponse {sender_term} true",flush=True)
+                else:
+                    print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
+                    debug(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
+                # print(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
+                # debug(f"SEND {sender_id} AppendEntriesResponse {sender_term} true",flush=True)
+                
                 continue
 
             # Receive committed
