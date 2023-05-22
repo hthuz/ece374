@@ -107,11 +107,24 @@ virus(G,u):
 
 	return 1
 \end{lstlisting}
-Running time is O(n+m). It at most traverse the edges and the nodes.
+Running time is O(n+m) = O(m). It at most traverse the edges and the nodes.
 
 \question{28.C}
+\textbf{Correctness:}\\
+Consider$ s(u,v)> \alpha$\\
+When there is only one path between u and v, the longest edge of that path is greater than $\alpha$. It is possible that there are many edges on this path that are longer than $\alpha$, or it is possible that there is only the longest path. In either case, using the meta vertices u' and v' and recursively computing $s(u',v')$ achieves the largest edge in the target.\\
+When there are multiple paths between u and v, there exists a path e* where the longest edge is greater than $\alpha$. It is possible that many sides of the path e* are greater than $\alpha$, or it is possible that only the longest path is greater than $\alpha$. It is possible that there are many paths besides path e* that satisfy the above two requirements.\\
+Consider the worst case, where there are multiple paths between u and v, each of which has the potential to be the final chosen path (with the smallest maximum edge). We recursively evaluate $s(u',v')$ for multiple sets of u' and v' and finally compare to get the smallest value of the maximum value, which is $s(u,v)$.\\
+Same thing with $s(u,v)< \alpha$.\\
 
-
+\noindent
+\textbf{Compute:}\\
+Each recursion records left, right, and alpha. Initial left = 0, initial\ right = maximum of all edges. The initial value of $\alpha$ is set to the\\ middle of the two. running time is O (m).\\
+Every time I judge the magnitude relationship between s(u,v) and $\alpha$,\\
+If $s(u,v)> \alpha$. For $s(u',v')$, set $left = \alpha$, $right = original value$, $\alpha = (left+right)/2$.\\
+If $s(u,v)<=\alpha$. For $s(u',v')$, set $left = the original value$, $right =\alpha$, $\alpha = (left+right)/2$.\\
+In summary, use binary search to compute $\alpha$.\\
+T(m) = kT(m/k)+O(m)+O(1), running time is O(mlogm).\\\\
 \question{29.A}
 
 Since $H - e$ and $G - e$ have the same minimum spanning tree, vertices in MST survivor must be the same as vertices in $G$. Consider these two situations.  
