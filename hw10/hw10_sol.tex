@@ -16,6 +16,26 @@
 \renewcommand{\Comment}[1]{\beginComment~#1~\endComment}
 
 
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
 \newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
 % set HW number
 \newcommand{\HWnum}{10}
@@ -39,19 +59,184 @@
 
 \question{28.A}
 
+We don't know whether there is an edge between two connected components.\\
+We know which connected components the node $i$ belongs to. That is $C_{i'}$. But we don't know whether the edge i'j' exists for $C_{j'}$.\\
+There may be many edges between each of the two connected components. Choose the smallest edge as the element of E prime. Let's say edge e = (i, j).\\
+If the minimum is found by traverse for all edges of every two connected components, $running time = k^2*m$ is required. Using radix sort can reduce the complexity to O(m) because all the edges can be combined and radix sort by key(i', j') and c(e) respectively to quickly get the final desired edge, where i' and j' are the indices of connected components.\\
+
+\begin{lstlisting}
+list = []
+for each edge e=(i,j) in G
+	if i' is not equal to j' do 
+		Add (i',j',c(e)) to list
+use radix sort to distinguish the edges and get the minimum edge for i' and j'.
+\end{lstlisting}
+running time is O(m), space used is O(m).\\
+
 \question{28.B}
+
+1. First reverse the graph, using DFS to find all (i, j) paths. For each node, recode the maximum edge from "j" to this node. \\
+2. When different paths combine in one node, record the smaller one of the maximum edge in the two paths. \\
+If the node is an intermediate node, this operation would discard the path with larger c(e), which cannot be the final answer for node i.\\
+If the node is node i, this operation would discard the path with larger c(e), which would result in the minimum of the maximums.\\
+3. When the node "i" is reached, the minimum of these maximum values is selected as $T$. If $T> \alpha$, then $s(u,v)> \alpha$. Else, $s(u,v)<= \alpha$.\\
+4. use indegree to ensure that every node do not continue virus until all the paths have reached this node.\\
+\begin{lstlisting}
+define max_edge [0,1,...n-1]
+define indegree [0,1,...n-1]
+initialize max_edge with -1
+initialize indegree with the indegree value
+decide(G):
+	Get G_reverse
+	Mark all nodes as unvisited
+	virus(G_reverse,j)
+	T = max_edge[i]
+	Judge the relation between T and alpha.
+	
+
+virus(G,u):
+	for each edge uv in adj(u) do
+		if (u == i) return 0
+		if (v is visited)
+			possible = max{ max_edge(u), c(uv)}
+			max_edge(v) = min { possible, max_edge(v)} 
+			if (indegree[v]>=1) indegree[v]--;
+		else
+			set v as visited
+			max_edge(v) =  max{ max_edge(u), c(uv)}
+			if (indegree[v]>=1) indegree[v]--;
+		if (indegree[v]==0)
+			virus(G,v)
+
+	return 1
+\end{lstlisting}
+Running time is O(n+m) = O(m). It at most traverse the edges and the nodes.
 
 \question{28.C}
 
 
+\textbf{Correctness:}\\
+Consider$ s(u,v)> \alpha$\\
+When there is only one path between u and v, the longest edge of that path is greater than $\alpha$. It is possible that there are many edges on this path that are longer than $\alpha$, or it is possible that there is only the longest path. In either case, using the meta vertices u' and v' and recursively computing $s(u',v')$ achieves the largest edge in the target.\\
+When there are multiple paths between u and v, there exists a path e* where the longest edge is greater than $\alpha$. It is possible that many sides of the path e* are greater than $\alpha$, or it is possible that only the longest path is greater than $\alpha$. It is possible that there are many paths besides path e* that satisfy the above two requirements.\\
+Consider the worst case, where there are multiple paths between u and v, each of which has the potential to be the final chosen path (with the smallest maximum edge). We recursively evaluate $s(u',v')$ for multiple sets of u' and v' and finally compare to get the smallest value of the maximum value, which is $s(u,v)$.\\
+Same thing with $s(u,v)< \alpha$.\\
+
+\noindent
+\textbf{Compute:}\\
+Each recursion records left, right, and alpha. Initial left = 0, initial\ right = maximum of all edges. The initial value of $\alpha$ is set to the\\ middle of the two. running time is O (m).\\
+Every time I judge the magnitude relationship between s(u,v) and $\alpha$,\\
+If $s(u,v)> \alpha$. For $s(u',v')$, set $left = \alpha$, $right = original value$, $\alpha = (left+right)/2$.\\
+If $s(u,v)<=\alpha$. For $s(u',v')$, set $left = the original value$, $right =\alpha$, $\alpha = (left+right)/2$.\\
+In summary, use binary search to compute $\alpha$.\\
+T(m) = kT(m/k)+O(m)+O(1), running time is O(mlogm).\\\\
 \question{29.A}
+
+Since $H - e$ and $G - e$ have the same minimum spanning tree, vertices in MST survivor must be the same as vertices in $G$. Consider these two situations.  
+
+Suppose the edge $e$ we delete from $G$ is an unsafe edge(i.e. it's not in MST of $G$ and it won't affect MST of $G-e$), then the minimum spanning forest of $G-e$ is still a tree. Then in order to have $G-e$ and $H-e$ have the same MST, $H$ must at least contain all safe edges of $G$.
+
+Suppose the edge $e$ we delete from $G$ is a safe edge. If deleting $e$ causes one vertex in $G$ to be disconneted, then the case is the same as above but there will be a minimum spanning forest with multiple trees and $H$ only needs to at least contain all saft edges of G. If deleting $e$ doesn't affect the connected components of $G$, then the MST of $G$ will be different. In order to let $H - e$ have the same minimum spanning forest as $G - e$. $H$ must contain the another connected with the second minimum cost edge that shares the same cut as $e$. These edges can be obtained as MST deleting original MST edges from $G$.
+
+Based on the arguemtn above, the algorithm is as follows.
+
+\begin{algorithm}
+  \begin{algorithmic}
+    \Function{MSTSurvivor}{$G(V,E)$}
+    \State $T \gets MST\ obtained\ by\ Boruvka's\ Algorithm\ on\ G$
+    \State $G' \gets T - edges\ in\ T$
+    \State $T' \gets MST\ obtained\ by\ Boruvka's\ Algorithm\ on\ G'$
+    \State $H \gets (V,edges\ in\ T \cup edges\ in\ T')$
+    \State \Return $H$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The algorithm uses Boruvka's Algorithm twice and some other deletions of edges. Overall, the algorithm takes $O(mlogn)$ time.
 
 \question{29.B}
 
+The idea is to combine several nodes with edges connected between themselives (a subgraph) as one node so that we can get a graph with number of edges is at most $3/2$ of number of vertices. For a subgraph $s$ of $G$ with vertices $v_1,v_2..$, change $s$ to one node of $G$. Edges between $v_i,v_2..$ are ignored and edges like ${v_1,u_1}$, where $u_1$ is not in the subgraph, change it into ${s,u_1}$. If the subgraph can be used with the black box, apply it directly. Otherwise keep forming subgraphs in the subgraph until we can get the MST of the subgraph. The MST of $G$ is formed by connecting MST of different subgraphs using the safe edges. 
+
+By connecting MSTs of subgraphs using the safe edges, we are guarantted to get a MST of $G$, which guaranttes the correctness of the algorithm.
+
+A draft of the algorithm is as follows. 
+
+
+\begin{algorithm}
+  \begin{algorithmic}
+    \Function{ComputeMST}{$G(V,E)$}
+      \If{$|E| \le 1.5|V|$}
+        \State Apply black box to get MST $T$
+        \State \Return $T$
+      \EndIf
+      \State $G_1,G_2...G_k \gets subgraphs\ of\ $G$\ with\ disjoint\ vertices$
+      \For{each $G_i$}
+        \State $T_i \gets ComputeMST(G_i)$
+      \EndFor
+      \State $G' \gets metagraph\ with\ nodes\ representing\ T_i\ as\ described\ above$
+      \State \Return $ComputeMST(G')$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The algorithm will iterate through subgraphs of original graph and apply black box to these subgraphs. These subgraphs will be connected. Each edge will be iterated so approximately, the algorithm takes $O(m)$ time
+
+
 \question{29.C}
 
-\question{30}
+To find the MST, apply Kruskal's algorithm using Union-Find data structure. Specifically, 
 
+\begin{algorithm}
+  \begin{algorithmic}
+    \Function{ComputeMST}{$G(V,E)$} 
+    \State Sort edges in $E$ based on cost 
+    \State $T \gets empty$
+    \State each vertex is a set by itself
+    \While{$E$ is not empty}
+      \State $e = (u,v) \gets edge\ with\ minimum\ cost$
+      \If{$u$ and $v$ are in different sets evaluated using union-find}
+        \State $T \gets T \cup e$
+        \State Merge sets containing $u$ and $v$ using union-find
+      \EndIf
+    \EndWhile
+    \State \Return T
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Sorting will takes time $O(mlog(m))$ and forming the MST using union find structure will take time $(O(nlog(m)))$. So the running time of the algorithm is $O((m+n)logm)$
+
+\question{30}\\
+\textbf{Illustrate:}\\
+\textbf{For the meta graph, we preferentially add the sink SCC to the possible pefect set, and delete the edge connected to the SCC to generate the new sink SCCs.}\\
+If we add a non-sink SCC to a set, it cannot form a closed set by itself, because some nodes are reachable in other SCCs. If we add a non-sink SCC, we have to add all its downstream SCCs at the same time, which may cause the number of nodes to exceed n and cause us to miss the pefect set (which may actually exist). From a greedy algorithm perspective, we tend to start adding from sink's SCC, always ensuring that it is a closed set.\\
+\textbf{correctness:}\\
+\textbf{1. For any node A, assuming twin(A) = a, then indegree(A) = outdegree(a), outdegree(A) = indegree(a).}\\
+\textbf{2. If the number of removed nodes is less than or equal to n, the removed nodes cannot be twins.}\\
+Suppose a group of SCCs have uppercase names and twins SCCs have lowercase names. Suppose "F" is sink SCC, its upstream is ABCD and other SCCs, then f is source SCC, and its downstream is abcd and other SCCs. After we add f, we have to add abcd to add f, the twins(F). Now the amount taken away must be greater than n.\\
+\textbf{3. When the number of nodes taken is equal to n, it is closed due to our method of taking away. There are no twins due to note 2. Thus. it is the perfect set.}\\
+\textbf{4. When the number of nodes taken is greater than n, it must contain twins according to the pigeonhole principle, so it is not a perfect set.}\\
+\begin{lstlisting}
+PERFECT(G):
+	do DFS(G_reverse) and output vertices in decreasing post order.
+	Mark all nodes as unvisited
+	Define "result" as the possible perfect set
+	for each u in the computed order do
+		if u is not visited then
+			DFS(u)
+			Let S_u be the nodes reached by u
+			Add S_u to result 
+	
+			if (len(result)>n): No perfect set
+			else if (len(result)==n): result is the perfect set
+			else: continue
+	
+			Output S_u as a strong connected component
+			Remove S_u as well as the adj edges from G
+\end{lstlisting}
+runing time is O(m+n), "for each u in the computed order do" and "DFS(u)" could be combined to reduce the running time to O(n+m) rather than O(n(n+m)).\\
+the space used is O(n).\\
 
 
 \end{document}

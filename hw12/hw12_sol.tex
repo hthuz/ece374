@@ -15,6 +15,25 @@
 \algnewcommand{\endComment}{\textbf{*/}}
 \renewcommand{\Comment}[1]{\beginComment~#1~\endComment}
 
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 \newcommand{\question}[1]{\bigskip\noindent{\textbf{Q{#1} solution}}}
 % set HW number
@@ -39,22 +58,326 @@
 
 \question{34}
 
+For the sake of argument,suppose there is an algorithm DECIDEREVACCEPT that correctly decides the language REVACCEPT. Then we can solve the halting problem as follows
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$DECIDEHALT$}{$<M,w>$}
+		\State Encode the following Turing machine $M'$:
+		\State\quad $M'(x)$:
+			\State\quad\quad run $M$ on input $w$
+			\State\quad\quad return True
+		\If{DECIDEREVACCEPT($<M'>$)}
+		\State \Return TRUE
+		\Else{}
+		\State \Return FALSE 
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+We prove this reduction correct as follows:
+
+$\Longrightarrow$ Suppose $M$ halts on input $w$.
+     
+	  Then $M'$ accepts every input string $x$.
+
+	  So DECIDEREVACCEPT accepts the encoding $<M'>$.
+
+	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
+
+
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$.
+
+     Then $M'$ diverges on every input string $x$.
+
+	 So DECIDEREVACCEPT rejects the encoding $<M'>$.
+
+	 So DECIDEHALT correctly rejects the encoding $<M,w>$.
+
+In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDEREVACCEPT does not exist.
+
 \question{35.A}
+
+To decide the language, we can design a Turing machine $TM$ that works as follows:
+
+1. On input $n⟨M, w⟩$, the $TM$ first checks whether $n$ is a valid integer and whether $⟨M, w⟩$ is a valid encoding of a Turing machine $M$ and its input $w$. If the input is invalid, the $TM$ rejects.
+
+2. The $TM$ then simulates $M$ on input $w$ using a modified tape that only allows access to the first $w^2$ cells. If $M$ accepts $w$ using no more than $w^2$ cells, the simulation terminates in an accepting state.
+
+3. If the simulation terminates in an accepting state, the $TM$ accepts. Otherwise, the $TM$ rejects.
+
+To simulate $M$ on input $w$ using a tape with limited space, the $TM$ can use a two-track tape. The first track stores the contents of the first $w^2$ cells of $M$'s tape, while the second track keeps track of the head position and state transitions of $M$. The $TM$ can simulate a single step of $M$ by reading the current cell of the second track, updating the first track and second track based on the transition function of $M$, and then moving the second track head by one cell. If the simulation takes more than $w^2$ steps, the $TM$ terminates and rejects.
 
 \question{35.B}
 
+For the sake of argument,suppose there is an algorithm DECIDEACCEPTTURING2 that correctly decides the language ACCEPTTURING2, which is the given language in the question. Then we can solve the halting problem as follows
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$DECIDEHALT$}{$<M,w>$}
+		\State Encode the following Turing machine $M'$:
+
+		\State\quad $M'(x)$:
+		\State\quad\quad run $M$ on input $w$
+		\State\quad\quad return True
+		
+		\If{DECIDEACCEPTTURING2($<M'>$)}
+		\State \Return TRUE
+		\Else{}
+		\State \Return FALSE 
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+We prove this reduction correct as follows:
+
+$\Longrightarrow$ Suppose $M$ halts on input $w$ in space ${|w|}^2$.
+     
+	  Then $M'$ accepts every input string $x$ in space ${|w|}^2$.
+
+	  So DECIDEACCEPTTURING2 accepts the encoding $<M'>$ in space ${|w|}^2$.
+
+	  So DECIDEHALT correctly accepts the encoding $<M,w>$ in space ${|w|}^2$.
+
+
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$ in space ${|w|}^2$.
+
+     Then $M'$ diverges on every input string $x$ in space ${|w|}^2$.
+
+	 So DECIDEACCEPTTURING2 rejects the encoding $<M'>$ in space ${|w|}^2$.
+
+	 So DECIDEHALT correctly rejects the encoding $<M,w>$ in space ${|w|}^2$.
+
+In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDEACCEPTTURING2 does not exist.
+
 \question{36.A}
+
+For the sake of argument,suppose there is an algorithm DECIDESOMETMESHALT that correctly decides the language SOMETMESHALT. Then we can solve the halting problem as follows
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$DECIDEHALT$}{$<M,w>$}
+		\State Encode the following Turing machine $M'$:
+
+		\State\quad$M'(x)$:
+		\State\quad\quad run $M$ on input $w$
+		\State\quad\quad return True
+		
+		\If{DECIDESOMETMESHALT($<M'>$)}
+		\State \Return TRUE
+		\Else{}
+		\State \Return FALSE 
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+We prove this reduction correct as follows:
+
+$\Longrightarrow$ Suppose $M$ halts on input $w$.
+     
+	  Then $M'$ accepts every input string $x$.
+
+
+	  So DECIDESOMETMESHALT accepts the encoding $<M'>$.
+
+	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
+
+
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$.
+
+     Then $M'$ diverges on every input string $x$.
+
+
+	 So DECIDESOMETMESHALT rejects the encoding $<M'>$.
+
+	 So DECIDEHALT correctly rejects the encoding $<M,w>$.
+
+In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDESOMETMESHALT does not exist.
 
 \question{36.B}
 
+To accept the language , we can design a Turing machine $TM$ that works as follows:
+
+1. On input $⟨M⟩$, the $TM$ generates a list of all possible input strings to $M$ in some given order.
+
+2. For each generated input string, the $TM$ simulates $M$ on that input string. If $M$ halts on that string, the $TM$ accepts and halts.
+
+3. If all possible input strings have been generated and the $TM$ has not yet accepted, then the machine rejects.
+
+This TM accepts $⟨M⟩$ if and only if $M$ halts on at least one input string, and rejects $⟨M⟩$ otherwise. However, as the halting problem is undecidable, this $TM$ may not halt if $M$ does not halt on any input string. In practice, we cannot construct a Turing machine that solves the Halting problem for Turing machines, which means that we cannot design an algorithm that always correctly decides whether a given Turing machine halts on all possible input strings.
+
 \question{37.A}
+
+$L_0$ is decidable, as it has a decider. This decider can be desbribed as: A program to check whether the eventrual state is equal to the start state.
+This program always stops and outputs for any input string $w$ $\in \sum^*$ whether or not $w$ $\in L$.
+As this language has a decider, it is decidable.
 
 \question{37.B}
 
+$L_1$ is undecidable. We can prove it as follows:
+
+For the sake of argument,suppose there is an algorithm DECIDEL1ACCEPT that correctly decides the language $L_1$. Then we can solve the halting problem as follows
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$DECIDEHALT$}{$<M,w>$}
+		\State Encode the following Turing machine $M'$:
+		\State\quad $M'(x)$:
+			\State\quad\quad run $M$ on input $w$
+			\State\quad\quad return True
+		\If{DECIDEL1ACCEPT($<M'>$)}
+		\State \Return TRUE
+		\Else{}
+		\State \Return FALSE 
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+We prove this reduction correct as follows:
+
+$\Longrightarrow$ Suppose $M$ halts on input $w$.
+     
+	  Then $M'$ accepts every input string $x$.
+
+	  So DECIDEL1ACCEPT accepts the encoding $<M'>$.
+
+	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
+
+
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$.
+
+     Then $M'$ diverges on every input string $x$.
+
+	 So DECIDEL1ACCEPT rejects the encoding $<M'>$.
+
+	 So DECIDEHALT correctly rejects the encoding $<M,w>$.
+
+In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDEL1ACCEPT does not exist.
+
 \question{37.C}
+
+$L_2$ is undecidable. We can prove it as follows:
+
+For the sake of argument,suppose there is an algorithm DECIDEL2ACCEPT that correctly decides the language $L_2$. Then we can solve the halting problem as follows
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$DECIDEHALT$}{$<M,w>$}
+		\State Encode the following Turing machine $M'$:
+		\State\quad $M'(x)$:
+			\State\quad\quad run $M$ on input $w$
+			\State\quad\quad return True
+		\If{DECIDEL2ACCEPT($<M'>$)}
+		\State \Return TRUE
+		\Else{}
+		\State \Return FALSE 
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+We prove this reduction correct as follows:
+
+$\Longrightarrow$ Suppose $M$ halts on input $w$.
+     
+	  Then $M'$ accepts every input string $x$.
+
+	  So DECIDEL2ACCEPT accepts the encoding $<M'>$.
+
+	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
+
+
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$.
+
+     Then $M'$ diverges on every input string $x$.
+
+	 So DECIDEL2ACCEPT rejects the encoding $<M'>$.
+
+	 So DECIDEHALT correctly rejects the encoding $<M,w>$.
+
+In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDEL2ACCEPT does not exist.
 
 \question{37.D}
 
+$L_3$ is undecidable. We can prove it as follows:
+
+For the sake of argument,suppose there is an algorithm DECIDEL3ACCEPT that correctly decides the language $L_3$. Then we can solve the halting problem as follows
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$DECIDEHALT$}{$<M,w>$}
+		\State Encode the following Turing machine $M'$:
+		\State\quad $M'(x)$:
+			\State\quad\quad run $M$ on input $w$
+			\State\quad\quad return True
+		\If{DECIDEL3ACCEPT($<M'>$)}
+		\State \Return TRUE
+		\Else{}
+		\State \Return FALSE 
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+We prove this reduction correct as follows:
+
+$\Longrightarrow$ Suppose $M$ halts on input $w$.
+     
+	  Then $M'$ accepts every input string $x$.
+
+	  So DECIDEL3ACCEPT accepts the encoding $<M'>$.
+
+	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
+
+
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$.
+
+     Then $M'$ diverges on every input string $x$.
+
+	 So DECIDEL3ACCEPT rejects the encoding $<M'>$.
+
+	 So DECIDEHALT correctly rejects the encoding $<M,w>$.
+
+In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDEL3ACCEPT does not exist.
+
 \question{37.E}
+
+$L_4$ is undecidable. We can prove it as follows:
+
+For the sake of argument,suppose there is an algorithm DECIDEL4ACCEPT that correctly decides the language $L_4$. Then we can solve the halting problem as follows
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{$DECIDEHALT$}{$<M,w>$}
+		\State Encode the following Turing machine $M'$:
+		\State\quad $M'(x)$:
+			\State\quad\quad run $M$ on input $w$
+			\State\quad\quad return True
+		\If{DECIDEL4ACCEPT($<M'>$)}
+		\State \Return TRUE
+		\Else{}
+		\State \Return FALSE 
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+We prove this reduction correct as follows:
+
+$\Longrightarrow$ Suppose $M$ halts on input $w$.
+     
+	  Then $M'$ accepts every input string $x$.
+
+	  So DECIDEL4ACCEPT accepts the encoding $<M'>$.
+
+	  So DECIDEHALT correctly accepts the encoding $<M,w>$.
+
+
+$\Longleftarrow$ Suppose $M$ does not halt on input $w$.
+
+     Then $M'$ diverges on every input string $x$.
+
+	 So DECIDEL4ACCEPT rejects the encoding $<M'>$.
+
+	 So DECIDEHALT correctly rejects the encoding $<M,w>$.
+
+In both cases, DECIDEHALT is correct. But that's impossible, because HALT is undecidable. We conclude that the algorithm DECIDEL4ACCEPT does not exist.
 
 \end{document}
