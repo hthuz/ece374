@@ -9,7 +9,7 @@ class Node:
     def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = (nodeid + 1) * 0.2
+        self.timeout = (nodeid + 1) * 0.1
         self.term = 1
         self.state = "FOLLOWER"
         self.leader = None
@@ -68,26 +68,29 @@ if __name__ == "__main__":
 
     node = Node(int(sys.argv[1]),int(sys.argv[2]) )
     check_timeout_thread = threading.Thread(target=check_timeout,args=(node,))
-    # send_heartbeat_thread = threading.Thread(target=send_heartbeat, args=(node,))
+    send_heartbeat_thread = threading.Thread(target=send_heartbeat, args=(node,))
     check_timeout_thread.start()
-    # send_heartbeat_thread.start()
+    send_heartbeat_thread.start()
 
     msg_id = 0
 
 
     while True:
 
+        line = sys.stdin.readline()
+        if line is None: break
+        line = line.strip()
 
         if node.state == "LEADER":
-            for nodeid in range(node.num):
-                if nodeid == node.id: continue
-                print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
-                debug(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
+            # for nodeid in range(node.num):
+            #     if nodeid == node.id: continue
+            #     print(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
+            #     debug(f"SEND {nodeid} AppendEntries {node.term} {node.id}", flush=True)
             # time.sleep(hbinterval)
 
-            line = sys.stdin.readline()
-            if line is None: break
-            line = line.strip()
+            # line = sys.stdin.readline()
+            # if line is None: break
+            # line = line.strip()
             # f = open("debug.txt","a")
             # f.write(str(node.id) + " < " + line + "\n")
             # f.close()
@@ -164,9 +167,9 @@ if __name__ == "__main__":
 
 
         if node.state == "CANDIDATE":
-            line = sys.stdin.readline()
-            if line is None: break
-            line = line.strip()
+            # line = sys.stdin.readline()
+            # if line is None: break
+            # line = line.strip()
             # f = open("debug.txt","a")
             # f.write(str(node.id) + " < " + line + "\n")
             # f.close()
@@ -210,9 +213,9 @@ if __name__ == "__main__":
 
         if node.state == "FOLLOWER":
             # Receive Message
-            line = sys.stdin.readline()
-            if line is None: break
-            line = line.strip()
+            # line = sys.stdin.readline()
+            # if line is None: break
+            # line = line.strip()
 
             node.lasttime = time.time()
             # f = open("debug.txt","a")
