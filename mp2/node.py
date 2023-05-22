@@ -9,7 +9,7 @@ class Node:
     def  __init__(self,nodeid,num):
         self.id = nodeid
         self.num = num
-        self.timeout = (nodeid + 1) * 0.1
+        self.timeout = (nodeid + 1) * 0.2
         self.term = 1
         self.state = "FOLLOWER"
         self.leader = None
@@ -60,7 +60,7 @@ def send_heartbeat(node):
 
 def debug(msg,flush):
     # f = open("debug.txt","a")
-    # f.write(str(node.id) + " > " + msg + "\n")
+    # f.write(str(time.time()) + " " +  str(node.id) + " > " + msg + "\n")
     # f.close()
     return
 
@@ -71,6 +71,7 @@ if __name__ == "__main__":
     send_heartbeat_thread = threading.Thread(target=send_heartbeat, args=(node,))
     check_timeout_thread.start()
     send_heartbeat_thread.start()
+    # f = open("debug.txt","a")
 
     msg_id = 0
 
@@ -80,6 +81,9 @@ if __name__ == "__main__":
         line = sys.stdin.readline()
         if line is None: break
         line = line.strip()
+        # f = open("debug.txt","a")
+        # f.write(str(time.time()) + " " + str(node.id) + " < " + line + "\n")
+        # f.close()
 
         if node.state == "LEADER":
             # for nodeid in range(node.num):
@@ -149,6 +153,8 @@ if __name__ == "__main__":
 
             # A leader with higher term because of network partition or a new leader comes into play
             if "AppendEntries" in line:
+                if node.id == 0:
+                    debug(f"Partition Recovers",flush=True)
                 sender_id = int(line.split(" ")[1])
                 sender_term = int(line.split(" ")[3])
                 if sender_term >= node.term:
@@ -156,12 +162,24 @@ if __name__ == "__main__":
                     node.term = sender_term
                     node.leader = sender_id
                     node.state = "FOLLOWER"
-                    print(f"STATE term={node.term}",flush=True)
-                    print(f"STATE state=\"{node.state}\"",flush=True)
-                    print(f"STATE leader={node.leader}",flush=True)
                     debug(f"STATE term={node.term}",flush=True)
                     debug(f"STATE state=\"{node.state}\"",flush=True)
                     debug(f"STATE leader={node.leader}",flush=True)
+                    print(f"STATE term={node.term}",flush=True)
+                    print(f"STATE state=\"{node.state}\"",flush=True)
+                    print(f"STATE leader={node.leader}",flush=True)
+                    if len(line.split(" ")) == 6:
+                        content = line.split(" ")[5]
+                        content = content[2:-2]
+                        node.log.append([node.term,content])
+                        node.logindex += 1
+                        node.replica_num.append(None)
+
+                        print(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
+                        debug(f"STATE log[{node.logindex}]=[{node.term},\"{content}\"]",flush=True)
+                        print(f"SEND {sender_id} AppendLogResponse {sender_term} {node.logindex} true",flush=True)
+                        debug(f"SEND {sender_id} AppendLogResponse {sender_term} {node.logindex} true",flush=True)
+
                         
                 continue
 
@@ -290,17 +308,17 @@ if __name__ == "__main__":
                     continue
 
             # Receive AppendEntries
-            if "AppendEntries" in line:
+            if "AppendEntries" in line and "AppendEntriesResponse" not in line:
                 sender_id = line.split(" ")[1]
                 sender_term = line.split(" ")[3]
                 node.leader = int(sender_id)
                 node.term = int(sender_term)
 
-                print(f"STATE term={node.term}",flush=True)
                 print(f"STATE state=\"{node.state}\"",flush=True)
+                print(f"STATE term={node.term}",flush=True)
                 print(f"STATE leader={node.leader}",flush=True)
-                debug(f"STATE term={node.term}",flush=True)
                 debug(f"STATE state=\"{node.state}\"",flush=True)
+                debug(f"STATE term={node.term}",flush=True)
                 debug(f"STATE leader={node.leader}",flush=True)
                 if len(line.split(" ")) == 6:
                     content = line.split(" ")[5]
