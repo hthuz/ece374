@@ -18,9 +18,21 @@ Ans2: $1^* + 1^*01^* + 1^*01^*01^*$
 Note: $1$ can't be in middle of two $0$s
 Ans: $1^*0^*1^*$
 
+- All strings that do not contain $10$ as a substring
+Note: 0 must appear before 1
+Ans: $0^*1^*$
+
 - All strings that contain $101$ or $010$ as a substring  
 Ans: $(0 + 1)^*(101 + 010)(0 + 1)^* $
 
 - All strings that do not contain $111$ as a substring  
 Note: appearance of $111$ should be avoid
 Ans: $((\epsilon + 1 + 11)0)^*(\epsilon + 1 + 11)0^*$
+
+Regular languages are closed under union, concatenation, kleene star, intersection
+
+Languages accepted by DFAs are closed under complement, intersection and union
+
+Languages accepted by NFAs are closed under concatenation, union, kleene star.
+
+CFLs are closed under union, concatenation and Kleene star but not under intersection
