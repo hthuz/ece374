@@ -6,6 +6,7 @@
 *.synctex.gz
 *.swp
 *_sol.pdf
+!solution/*_sol.pdf
 *.DS_Store
 *.bbl
 *.bcf

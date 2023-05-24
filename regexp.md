@@ -35,4 +35,4 @@ Languages accepted by DFAs are closed under complement, intersection and union
 
 Languages accepted by NFAs are closed under concatenation, union, kleene star.
 
-CFLs are closed under union, concatenation and Kleene star but not under intersection
+CFLs are closed under union, concatenation and Kleene star but not under intersection nor complement
